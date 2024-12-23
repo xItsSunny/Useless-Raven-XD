@@ -6,8 +6,8 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.clicks.Pattern;
-import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.client.MouseEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -54,11 +54,11 @@ public class ClickRecorder extends Module {
         delays.clear();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMouseEvent(@NotNull MouseEvent event) {
         long time = System.currentTimeMillis();
 
-        if (!event.buttonstate || mc.currentScreen != null || !Utils.nullCheck()) return;
+        if (!event.isButtonstate() || mc.currentScreen != null || !Utils.nullCheck()) return;
 
         if (lastClick != -1) {
             delays.add((int) (time - lastClick));

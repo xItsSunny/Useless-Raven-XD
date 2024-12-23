@@ -2,7 +2,7 @@ package keystrokesmod.module.impl.fun;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.other.RotationHandler;
@@ -347,7 +347,7 @@ public class NoteBot extends Module {
 
         // Start loading song
         long time1 = System.currentTimeMillis();
-        Raven.getExecutor().execute(() -> {
+        Client.getExecutor().execute(() -> {
             try {
                 this.song = SongDecoders.parse(file);
                 long time2 = System.currentTimeMillis();

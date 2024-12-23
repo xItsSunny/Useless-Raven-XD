@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.movement.noslow;
 
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.utility.PacketUtils;
@@ -15,7 +15,7 @@ import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class GrimACNoSlow extends INoSlow {
@@ -25,11 +25,11 @@ public class GrimACNoSlow extends INoSlow {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(@NotNull SendPacketEvent event) {
         if (canFoodNoSlow()) {
             if (event.getPacket() instanceof C08PacketPlayerBlockPlacement) {
-                event.setCanceled(true);
+                event.cancel();
                 PacketUtils.sendPacketNoEvent(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
                 PacketUtils.sendPacketNoEvent(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.DROP_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
                 Utils.sendClick(1, false);
@@ -37,13 +37,13 @@ public class GrimACNoSlow extends INoSlow {
             } else if (toCancel && event.getPacket() instanceof C07PacketPlayerDigging) {
                 if (((C07PacketPlayerDigging) event.getPacket()).getStatus() == C07PacketPlayerDigging.Action.RELEASE_USE_ITEM) {
                     toCancel = false;
-                    event.setCanceled(true);
+                    event.cancel();
                 }
             }
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         ItemStack itemStack = SlotHandler.getHeldItem();
         if (!mc.thePlayer.isUsingItem() || itemStack == null) {

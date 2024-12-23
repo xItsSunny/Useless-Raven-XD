@@ -3,8 +3,9 @@ package keystrokesmod.utility;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.mojang.realmsclient.gui.ChatFormatting;
-import keystrokesmod.Raven;
-import keystrokesmod.event.ClickEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.client.ClickEvent;
+import keystrokesmod.event.client.MouseEvent;
 import keystrokesmod.mixins.impl.client.GuiScreenAccessor;
 import keystrokesmod.module.impl.other.NameHider;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -13,7 +14,6 @@ import keystrokesmod.utility.i18n.I18nManager;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.Timer;
-import net.minecraftforge.client.event.MouseEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Settings;
@@ -42,7 +42,6 @@ import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.potion.Potion;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.*;
-import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -57,17 +56,18 @@ import java.util.*;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Utils {
+public final class Utils {
     private static final Random rand = new Random();
     public static final Minecraft mc = Minecraft.getMinecraft();
-    public static final ChatComponentText PREFIX = new ChatComponentText("&7[&dR&7]&r ");
+    public static final String PREFIX = "&7[&dR&7]&r ";
     public static HashSet<String> friends = new HashSet<>();
     public static HashSet<String> enemies = new HashSet<>();
     public static final Logger log = LogManager.getLogger();
 
-    public static boolean addEnemy(String name) {
+    public static boolean addEnemy(@NotNull String name) {
         if (enemies.add(name.toLowerCase())) {
             Utils.sendMessage("&7Added &cenemy&7: &b" + name);
             return true;
@@ -93,13 +93,13 @@ public class Utils {
     }
 
     public static List<NetworkPlayerInfo> getTablist() {
-        final ArrayList<NetworkPlayerInfo> list = new ArrayList<>(mc.getNetHandler().getPlayerInfoMap());
-        removeDuplicates(list);
-        list.remove(mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()));
-        return list;
+        return mc.getNetHandler().getPlayerInfoMap().stream()
+                .distinct()
+                .filter(info -> !info.getGameProfile().getId().equals(mc.thePlayer.getUniqueID()))
+                .collect(Collectors.toList());
     }
 
-    public static double getFallDistance(Entity entity) {
+    public static double getFallDistance(@NotNull Entity entity) {
         double fallDist = -1;
         Vec3 pos = new Vec3(entity.posX, entity.posY, entity.posZ);
         int y = (int) Math.floor(pos.yCoord);
@@ -114,21 +114,13 @@ public class Utils {
         return fallDist;
     }
 
-    public static void removeDuplicates(final ArrayList list) {
-        final HashSet set = new HashSet(list);
-        list.clear();
-        list.addAll(set);
-    }
-
-    public static boolean removeFriend(String name) {
+    public static void removeFriend(@NotNull String name) {
         if (friends.remove(name.toLowerCase())) {
             Utils.sendMessage("&7Removed &afriend&7: &b" + name);
-            return true;
         }
-        return false;
     }
 
-    public static boolean addFriend(String name) {
+    public static boolean addFriend(@NotNull String name) {
         if (friends.add(name.toLowerCase())) {
             Utils.sendMessage("&7Added &afriend&7: &b" + name);
             return true;
@@ -192,7 +184,7 @@ public class Utils {
 
     public static void sendMessage(String txt) {
         if (nullCheck()) {
-            String m = formatColor("&7[&dR&7]&r " + replace(txt));
+            String m = formatColor(PREFIX + replace(txt));
             mc.thePlayer.addChatMessage(new ChatComponentText(m));
         }
     }
@@ -225,7 +217,7 @@ public class Utils {
     }
 
     static {
-        Raven.getExecutor().scheduleWithFixedDelay(() -> {
+        Client.getExecutor().scheduleWithFixedDelay(() -> {
             if (Utils.nullCheck() && !delayedMessage.isEmpty()) {
                 for (String s : delayedMessage) {
                     sendMessage(s);
@@ -406,7 +398,7 @@ public class Utils {
     // bro this method is too fucking slow, so I improve it
     public static Timer getTimer() {
         if (timer == null) {
-            timer = Reflection.get(mc, "field_71428_T", Timer.class);
+            timer = ReflectionUtils.get(mc, "field_71428_T");
             return timer;
         }
         return timer;
@@ -737,10 +729,10 @@ public class Utils {
         return str.replace("§k", "").replace("§l", "").replace("§m", "").replace("§n", "").replace("§o", "").replace("§r", "");
     }
 
-    public static boolean isLeftClicking() {
+    public static boolean isNotLeftClicking() {
         if (ModuleManager.autoClicker.isEnabled()) {
-            return Mouse.isButtonDown(0);
-        } else return CPSCalculator.f() > 1 && System.currentTimeMillis() - CPSCalculator.LL < 300L;
+            return !Mouse.isButtonDown(0);
+        } else return CPSCalculator.f() <= 1 || System.currentTimeMillis() - CPSCalculator.LL >= 300L;
     }
 
     public static boolean tryingToCombo() {
@@ -750,14 +742,14 @@ public class Utils {
     public static void setMouseButtonState(int mouseButton, boolean held) {
         MouseEvent m = new MouseEvent();
 
-        Reflection.set(m, "button", mouseButton);
-        Reflection.set(m, "buttonstate", held);
-        MinecraftForge.EVENT_BUS.post(m);
+        m.setButton(mouseButton);
+        m.setButtonstate(held);
+        Client.EVENT_BUS.post(m);
 
-        ByteBuffer buttons = Reflection.get(Mouse.class, "buttons", ByteBuffer.class);
-        buttons.put(mouseButton, (byte) (held ? 1 : 0));
-        Reflection.set(Mouse.class, "buttons", buttons);
-
+        if (!m.isCancelled()) {
+            ByteBuffer buttons = ReflectionUtils.getDeclared(Mouse.class, "buttons");
+            buttons.put(mouseButton, (byte) (held ? 1 : 0));
+        }
     }
 
     public static long getDifference(long n, long n2) {
@@ -780,30 +772,29 @@ public class Utils {
         final Vec3 vec3 = new Vec3((double) (sin * n2), (double) MathHelper.sin(-rotationPitch * 0.017453292f), (double) (cos * n2));
         final Vec3 addVector = getPositionEyes.addVector(vec3.xCoord * (double) n, vec3.yCoord * (double) n, vec3.zCoord * (double) n);
         Vec3 vec4 = null;
-        final List getEntitiesWithinAABBExcludingEntity = mc.theWorld.getEntitiesWithinAABBExcludingEntity(mc.getRenderViewEntity(), mc.getRenderViewEntity().getEntityBoundingBox().addCoord(vec3.xCoord * (double) n, vec3.yCoord * (double) n, vec3.zCoord * (double) n).expand(1.0, 1.0, 1.0));
-        double n3 = (double) n;
-        for (int i = 0; i < getEntitiesWithinAABBExcludingEntity.size(); ++i) {
-            final Entity entity2 = (Entity) getEntitiesWithinAABBExcludingEntity.get(i);
-            if (entity2.canBeCollidedWith()) {
-                final float getCollisionBorderSize = entity2.getCollisionBorderSize();
-                final AxisAlignedBB expand = entity2.getEntityBoundingBox().expand((double) getCollisionBorderSize, (double) getCollisionBorderSize, (double) getCollisionBorderSize);
+        final List<Entity> getEntitiesWithinAABBExcludingEntity = mc.theWorld.getEntitiesWithinAABBExcludingEntity(mc.getRenderViewEntity(), mc.getRenderViewEntity().getEntityBoundingBox().addCoord(vec3.xCoord * (double) n, vec3.yCoord * (double) n, vec3.zCoord * (double) n).expand(1.0, 1.0, 1.0));
+        double n3 = n;
+        for (Entity entity1 : getEntitiesWithinAABBExcludingEntity) {
+            if (entity1.canBeCollidedWith()) {
+                final float getCollisionBorderSize = entity1.getCollisionBorderSize();
+                final AxisAlignedBB expand = entity1.getEntityBoundingBox().expand((double) getCollisionBorderSize, (double) getCollisionBorderSize, (double) getCollisionBorderSize);
                 final MovingObjectPosition calculateIntercept = expand.calculateIntercept(getPositionEyes, addVector);
                 if (expand.isVecInside(getPositionEyes)) {
                     if (0.0 < n3 || n3 == 0.0) {
-                        entity = entity2;
+                        entity = entity1;
                         vec4 = ((calculateIntercept == null) ? getPositionEyes : calculateIntercept.hitVec);
                         n3 = 0.0;
                     }
                 } else if (calculateIntercept != null) {
                     final double distanceTo = getPositionEyes.distanceTo(calculateIntercept.hitVec);
                     if (distanceTo < n3 || n3 == 0.0) {
-                        if (entity2 == mc.getRenderViewEntity().ridingEntity && !entity2.canRiderInteract()) {
+                        if (entity1 == mc.getRenderViewEntity().ridingEntity && !entity1.canRiderInteract()) {
                             if (n3 == 0.0) {
-                                entity = entity2;
+                                entity = entity1;
                                 vec4 = calculateIntercept.hitVec;
                             }
                         } else {
-                            entity = entity2;
+                            entity = entity1;
                             vec4 = calculateIntercept.hitVec;
                             n3 = distanceTo;
                         }
@@ -829,19 +820,19 @@ public class Utils {
         if (d == 0) {
             return (double) Math.round(n);
         } else {
-            double p = Math.pow(10.0D, (double) d);
+            double p = Math.pow(10.0D, d);
             return (double) Math.round(n * p) / p;
         }
     }
     public static double PitchFromEntity(EntityPlayer en, float f) {
-        return (double) (mc.thePlayer.rotationPitch - pitchToEntity(en, f));
+        return mc.thePlayer.rotationPitch - pitchToEntity(en, f);
     }
     public static double fovFromEntity(EntityPlayer en) {
         return ((((double) (mc.thePlayer.rotationYaw - fovToEntity(en)) % 360.0D) + 540.0D) % 360.0D) - 180.0D;
     }
 
     public static float fovFromEntityf(EntityPlayer en) {
-        return (float) (((((float) (mc.thePlayer.rotationYaw - fovToEntity(en)) % 360.0D) + 540.0D) % 360.0D) - 180.0D);
+        return (float) (((((mc.thePlayer.rotationYaw - fovToEntity(en)) % 360.0D) + 540.0D) % 360.0D) - 180.0D);
     }
 
     public static float fovToEntity(EntityPlayer ent) {
@@ -1085,10 +1076,14 @@ public class Utils {
      * Sends a click to Minecraft legitimately
      */
     public static void sendClick(final int button, final boolean state) {
+        MouseEvent event = new MouseEvent();
+        event.setButton(button);
+        event.setButtonstate(state);
+        Client.EVENT_BUS.post(event);
+        if (event.isCancelled()) return;
+
         final int keyBind = button == 0 ? mc.gameSettings.keyBindAttack.getKeyCode() : mc.gameSettings.keyBindUseItem.getKeyCode();
-
         KeyBinding.setKeyBindState(keyBind, state);
-
         if (state) {
             KeyBinding.onTick(keyBind);
         }
@@ -1099,8 +1094,8 @@ public class Utils {
         int y = s.height - Mouse.getY() * s.height / mc.displayHeight - 1;
 
         ClickEvent event = new ClickEvent();
-        MinecraftForge.EVENT_BUS.post(event);
-        if (event.isCanceled())
+        Client.EVENT_BUS.post(event);
+        if (event.isCancelled())
             return;
 
         ((GuiScreenAccessor) s).mouseClicked(x, y, 0);

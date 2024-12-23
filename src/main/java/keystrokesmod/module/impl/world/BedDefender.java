@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.world;
 
-import keystrokesmod.event.MoveInputEvent;
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.RotationEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
@@ -22,7 +22,7 @@ import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,7 +70,7 @@ public class BedDefender extends IAutoClicker {
         click = false;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (ModuleManager.bedwars.isEnabled() && BedWars.outsideSpawn) {
             targetToAim = null;
@@ -124,13 +124,13 @@ public class BedDefender extends IAutoClicker {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMoveInput(@NotNull MoveInputEvent event) {
         if (targetToAim != null)
             event.setSneak(true);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRotation(RotationEvent event) {
         if (targetToAim != null) {
             if (lastYaw == null || lastPitch == null) {

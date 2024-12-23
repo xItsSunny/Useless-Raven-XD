@@ -1,6 +1,10 @@
 package keystrokesmod.module.impl.movement.teleport;
 
-import keystrokesmod.event.*;
+import keystrokesmod.event.client.ClickEvent;
+import keystrokesmod.event.network.SendPacketEvent;
+import keystrokesmod.event.player.MoveEvent;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.movement.Teleport;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.setting.impl.SubMode;
@@ -11,8 +15,7 @@ import keystrokesmod.utility.RotationUtils;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Queue;
@@ -29,17 +32,17 @@ public class HypixelTeleport extends SubMode<Teleport> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onClick(ClickEvent event) {
         if (timerTicks != -1) return;
         MovingObjectPosition hitResult = RotationUtils.rayCast(15, RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
         if (hitResult != null && hitResult.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             timerTicks = (int) Math.floor(new Vec3(hitResult.getBlockPos()).distanceTo(mc.thePlayer) / MoveUtil.getAllowedHorizontalDistance());
-            event.setCanceled(true);
+            event.cancel();
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMove(MoveInputEvent event) {
         if (state == State.TIMER) {
             event.setForward(1);
@@ -69,13 +72,13 @@ public class HypixelTeleport extends SubMode<Teleport> {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onSendPacket(SendPacketEvent event) {
         switch (state) {
             case NONE:
                 if (event.getPacket() instanceof C03PacketPlayer) {
                     if (!MoveUtil.isMoving() && event.getPacket().getClass() == C03PacketPlayer.class) {
-                        event.setCanceled(true);
+                        event.cancel();
                         if (hasLag == 0) {
                             yaw = mc.thePlayer.rotationYaw;
                             pitch = mc.thePlayer.rotationPitch;
@@ -89,31 +92,31 @@ public class HypixelTeleport extends SubMode<Teleport> {
             case TIMER:
                 synchronized (delayedPackets) {
                     delayedPackets.add(event.getPacket());
-                    event.setCanceled(true);
+                    event.cancel();
                 }
                 break;
             case LAG:
                 if (event.getPacket() instanceof C03PacketPlayer) {
-                    event.setCanceled(true);
+                    event.cancel();
                 } else {
                     synchronized (delayedPackets) {
                         delayedPackets.add(event.getPacket());
-                        event.setCanceled(true);
+                        event.cancel();
                     }
                 }
                 break;
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMove(@NotNull MoveEvent event) {
         if (state == State.LAG) {
-            event.setCanceled(true);
+            event.cancel();
             mc.thePlayer.motionX = mc.thePlayer.motionY = mc.thePlayer.motionZ = 0;
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (state == State.NONE && hasLag > 0) {
             event.setYaw(yaw);

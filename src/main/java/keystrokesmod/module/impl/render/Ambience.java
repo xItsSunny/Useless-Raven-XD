@@ -1,18 +1,17 @@
 package keystrokesmod.module.impl.render;
 
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.network.play.server.S03PacketTimeUpdate;
 import net.minecraft.network.play.server.S2BPacketChangeGameState;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class Ambience extends Module {
@@ -53,7 +52,7 @@ public class Ambience extends Module {
         mc.theWorld.getWorldInfo().setThundering(false);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (!Utils.nullCheck()) return;
         if (mc.thePlayer.ticksExisted % 20 == 0) {
@@ -74,26 +73,26 @@ public class Ambience extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S03PacketTimeUpdate) {
-            event.setCanceled(true);
+            event.cancel();
         } else if (event.getPacket() instanceof S2BPacketChangeGameState && this.weather.getInput() != 0) {
             S2BPacketChangeGameState s2b = (S2BPacketChangeGameState) event.getPacket();
 
             if (s2b.getGameState() == 1 || s2b.getGameState() == 2) {
-                event.setCanceled(true);
+                event.cancel();
             }
         }
     }
 
-    @SubscribeEvent
-    public void onRenderTick(TickEvent.RenderTickEvent event) {
-        if (!Utils.nullCheck() || event.phase != TickEvent.Phase.END) return;
+    @EventListener
+    public void onRenderTick(Render2DEvent event) {
+        if (!Utils.nullCheck()) return;
         mc.theWorld.setWorldTime((long) (time.getInput() + (System.currentTimeMillis() * speed.getInput())));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onFogColors(EntityViewRenderEvent.@NotNull FogColors event) {
         if (!fogColor.isToggled()) return;
 

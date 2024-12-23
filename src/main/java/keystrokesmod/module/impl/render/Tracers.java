@@ -1,5 +1,7 @@
 package keystrokesmod.module.impl.render;
 
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -7,11 +9,8 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.awt.*;
-import java.util.Iterator;
 
 public class Tracers extends Module {
     public ButtonSetting a;
@@ -56,12 +55,10 @@ public class Tracers extends Module {
         this.rgb_c = (new Color((int) b.getInput(), (int) c.getInput(), (int) d.getInput())).getRGB();
     }
 
-    @SubscribeEvent
-    public void o(RenderWorldLastEvent ev) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (Utils.nullCheck()) {
-            Iterator<EntityPlayer> var3 = mc.theWorld.playerEntities.iterator();
-            while (var3.hasNext()) {
-                EntityPlayer en = var3.next();
+            for (EntityPlayer en : mc.theWorld.playerEntities) {
                 if (en != mc.thePlayer && en.deathTime == 0 && (a.isToggled() || !en.isInvisible()) && !AntiBot.isBot(en)) {
                     int rgb;
                     if (distanceColor.isToggled()) {

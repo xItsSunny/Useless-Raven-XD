@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.fun.antiaim;
 
-import keystrokesmod.event.JumpEvent;
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.player.JumpEvent;
+import keystrokesmod.event.player.RotationEvent;
 import keystrokesmod.module.impl.fun.AntiAim;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -9,8 +9,7 @@ import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.movement.Move;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class SnapAntiAim extends SubMode<AntiAim> {
@@ -38,16 +37,16 @@ public class SnapAntiAim extends SubMode<AntiAim> {
         Utils.correctValue(minDelay, maxDelay);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onJump(JumpEvent event) {
         if (fastJump.isToggled()) {
             if (lastAim)
-                event.setCanceled(true);
+                event.cancel();
             disableTicks = Math.max(2, disableTicks);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onRotation(@NotNull RotationEvent event) {
         if (!parent.canAntiAim()) {
             return;

@@ -8,8 +8,8 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 
 import java.util.Comparator;
 
@@ -35,8 +35,8 @@ public class LagRange extends Module {
         this.registerSetting(onlyOnGround = new ButtonSetting("Only onGround", false));
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent e) throws InterruptedException {
+    @EventListener
+    public void onRender(Render2DEvent e) throws InterruptedException {
         if (!shouldStart()) {
             return;
         }

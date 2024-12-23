@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
 public class Progress {
     private final Animation posYAnimation = new Animation(Easing.EASE_OUT_EXPO, 300);

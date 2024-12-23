@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 

@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.movement.speed;
 
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.Speed;
 import keystrokesmod.module.impl.movement.TargetStrafe;
 import keystrokesmod.module.impl.movement.speed.hypixel.GroundStrafeSpeed;
@@ -12,7 +12,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.movement.Move;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class HypixelSpeed extends SubMode<Speed> {
@@ -37,7 +37,7 @@ public class HypixelSpeed extends SubMode<Speed> {
         this.registerSetting(fullStrafe = new ButtonSetting("Full strafe", false, strafe::isToggled));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (strafe.isToggled() && canStrafe()) {
             if (parent.offGroundTicks == 9) {

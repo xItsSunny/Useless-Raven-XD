@@ -1,13 +1,13 @@
 package keystrokesmod.module.impl.movement.fly;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class Vanilla2Fly extends SubMode<Fly> {
@@ -41,7 +41,7 @@ public class Vanilla2Fly extends SubMode<Fly> {
             MoveUtil.stop();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (groundSpoof.isToggled()) {
             event.setOnGround(true);

@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.world;
 
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -22,8 +22,7 @@ import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.List;
@@ -47,7 +46,7 @@ public class Clutch extends Module {
         this.registerSetting(mode, aimSpeed, lookView, placeDelay, overVoid, fallDistance, minFallDistance, autoSwitch, silentSwing);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onPreUpdate(PreUpdateEvent event) {
         if (!shouldClutch()) {
             rot = null;

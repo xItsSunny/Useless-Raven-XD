@@ -1,13 +1,13 @@
 package keystrokesmod.module.impl.render;
 
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 public class FullBright extends Module {
     private static final float brightness = 15.0f;
@@ -73,8 +73,8 @@ public class FullBright extends Module {
         }
     }
 
-    @SubscribeEvent
-    public void onPlayerTick(PlayerTickEvent event) {
+    @EventListener
+    public void onPlayerTick(PreUpdateEvent event) {
         if (mode.getInput() == 1) {
             if (mc.gameSettings.gammaSetting < brightness) {
                 mc.gameSettings.gammaSetting = (float) Math.min(mc.gameSettings.gammaSetting + 0.1, brightness);

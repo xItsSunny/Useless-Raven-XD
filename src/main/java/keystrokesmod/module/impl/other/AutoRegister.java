@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.other;
 
-import keystrokesmod.Raven;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -10,7 +10,7 @@ import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.play.server.S02PacketChat;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.security.MessageDigest;
@@ -56,7 +56,7 @@ public class AutoRegister extends Module {
         return passwordBuilder.toString();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S02PacketChat) {
             final String text = ((S02PacketChat) event.getPacket()).getChatComponent().getUnformattedText();
@@ -76,7 +76,7 @@ public class AutoRegister extends Module {
                 (register ? "Registering" : "Logging in") + "... (" + time + "ms)"
         );
 
-        Raven.getExecutor().schedule(() -> {
+        Client.getExecutor().schedule(() -> {
             final String pwd = generatePassword(mc.thePlayer.getName());
             final String text;
             if (register) {

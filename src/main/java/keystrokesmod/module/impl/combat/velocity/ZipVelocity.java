@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.combat.velocity;
 
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -11,8 +11,8 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.network.play.server.S32PacketConfirmTransaction;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.network.AttackEntityEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Queue;
@@ -53,12 +53,12 @@ public class ZipVelocity extends SubMode<Velocity> {
         delayedPackets.clear();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S12PacketEntityVelocity) {
             if (((S12PacketEntityVelocity) event.getPacket()).getEntityID() != mc.thePlayer.getEntityId()) return;
 
-            event.setCanceled(true);
+            event.cancel();
             delayedPackets.add(event.getPacket());
             if (lastVelocityTime == -1) {
                 lastVelocityTime = System.currentTimeMillis();
@@ -69,13 +69,13 @@ public class ZipVelocity extends SubMode<Velocity> {
                 if (System.currentTimeMillis() - lastVelocityTime >= (int) delay.getInput()) {
                     release();
                 }
-                event.setCanceled(true);
+                event.cancel();
                 delayedPackets.add(event.getPacket());
             }
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onAttack(AttackEntityEvent event) {
         if (delayed && stopOnAttack.isToggled())
             release();

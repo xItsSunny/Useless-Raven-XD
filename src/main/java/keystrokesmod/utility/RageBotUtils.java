@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
 public class RageBotUtils {
     public static int getArmHypixelBedWars(Set<Integer> ignoreSlots) {

@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.combat.criticals;
 
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.Criticals;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -9,7 +9,7 @@ import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.Packet;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Queue;
@@ -38,7 +38,7 @@ public class LagCriticals extends SubMode<Criticals> {
         startLag = -1;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(SendPacketEvent event) {
         if (startLag != -1) {
             if (mc.thePlayer.onGround || delayed
@@ -55,7 +55,7 @@ public class LagCriticals extends SubMode<Criticals> {
 
             if (Utils.isTargetNearby(ModuleManager.killAura.isEnabled() ? ModuleManager.killAura.attackRange.getInput() : 3)) {
                 startLag = System.currentTimeMillis();
-                event.setCanceled(true);
+                event.cancel();
                 delayedPackets.add(event.getPacket());
             }
         } else if (mc.thePlayer.onGround) {

@@ -1,12 +1,12 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 public class AutoSwap extends Module {
     private final ButtonSetting sameType;
@@ -19,7 +19,7 @@ public class AutoSwap extends Module {
         this.registerSetting(swapToGreaterStack = new ButtonSetting("Swap to greater stack", true));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent e) {
         ItemStack heldItem = mc.thePlayer.getHeldItem();
         int biggestStack = getSlot(heldItem);

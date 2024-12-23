@@ -9,7 +9,7 @@ import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 import static keystrokesmod.utility.render.blur.StencilUtil.checkSetupFBO;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glUniform1;

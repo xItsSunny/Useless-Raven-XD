@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
+import keystrokesmod.event.render.Render2DEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -9,8 +10,7 @@ import keystrokesmod.utility.Reflection;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemBlock;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 public class BurstClicker extends Module {
     public static SliderSetting clicks;
@@ -30,7 +30,7 @@ public class BurstClicker extends Module {
 
     public void onEnable() {
         if (clicks.getInput() != 0.0D && mc.currentScreen == null && mc.inGameHasFocus) {
-            Raven.getExecutor().execute(() -> {
+            Client.getExecutor().execute(() -> {
                 try {
                     int cl = (int) clicks.getInput();
                     int del = (int) delay.getInput();
@@ -69,8 +69,8 @@ public class BurstClicker extends Module {
         this.l_r = false;
     }
 
-    @SubscribeEvent
-    public void r(RenderTickEvent ev) {
+    @EventListener
+    public void r(Render2DEvent ev) {
         if (Utils.nullCheck()) {
             if (this.l_c) {
                 this.c(true);

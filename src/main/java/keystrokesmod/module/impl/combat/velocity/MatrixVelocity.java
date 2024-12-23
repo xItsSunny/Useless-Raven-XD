@@ -1,13 +1,13 @@
 package keystrokesmod.module.impl.combat.velocity;
 
-import keystrokesmod.event.PostVelocityEvent;
+import keystrokesmod.event.player.PostVelocityEvent;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.network.AttackEntityEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class MatrixVelocity extends SubMode<Velocity> {
@@ -25,14 +25,14 @@ public class MatrixVelocity extends SubMode<Velocity> {
         reduced = false;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPostVelocity(PostVelocityEvent event) {
         reduced = false;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onAttack(@NotNull AttackEntityEvent event) {
-        if (event.target instanceof EntityLivingBase && mc.thePlayer.hurtTime > 0) {
+        if (event.getTarget() instanceof EntityLivingBase && mc.thePlayer.hurtTime > 0) {
             if (reduced) return;
 
             if (mc.thePlayer.isSprinting()) {

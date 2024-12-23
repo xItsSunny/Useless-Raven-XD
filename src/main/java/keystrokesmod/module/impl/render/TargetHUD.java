@@ -10,9 +10,9 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.event.network.AttackEntityEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.Nullable;
 
 public class TargetHUD extends Module {
@@ -107,17 +107,17 @@ public class TargetHUD extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onAttack(AttackEntityEvent event) {
         if (onlyKillAura.isToggled()) return;
 
-        if (event.target instanceof EntityLivingBase) {
-            target = (EntityLivingBase) event.target;
+        if (event.getTarget() instanceof EntityLivingBase) {
+            target = (EntityLivingBase) event.getTarget();
         }
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onRender(Render2DEvent event) {
         if (mc.currentScreen != null) {
             return;
         }

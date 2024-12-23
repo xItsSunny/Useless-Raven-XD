@@ -1,9 +1,9 @@
 package keystrokesmod.module.impl.movement.wallclimb;
 
-import keystrokesmod.event.MoveEvent;
+import keystrokesmod.event.player.MoveEvent;
 import keystrokesmod.module.impl.movement.WallClimb;
 import keystrokesmod.module.setting.impl.SubMode;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class IntaveWallClimb extends SubMode<WallClimb> {
@@ -11,7 +11,7 @@ public class IntaveWallClimb extends SubMode<WallClimb> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMove(MoveEvent event) {
         if (!mc.thePlayer.isCollidedHorizontally || mc.thePlayer.isOnLadder() || mc.thePlayer.isInWater() || mc.thePlayer.isInLava() || mc.thePlayer.isUsingItem())
             return;

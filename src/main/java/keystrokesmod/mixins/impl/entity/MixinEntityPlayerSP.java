@@ -1,7 +1,11 @@
 package keystrokesmod.mixins.impl.entity;
 
 import com.mojang.authlib.GameProfile;
-import keystrokesmod.event.*;
+import keystrokesmod.event.player.PostMotionEvent;
+import keystrokesmod.event.player.PostUpdateEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.world.PushOutOfBlockEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.movement.Sprint;
@@ -21,7 +25,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
+import keystrokesmod.Client;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -32,6 +36,7 @@ import java.util.Objects;
 
 import static keystrokesmod.utility.movement.Direction.*;
 
+@SuppressWarnings("UnresolvedMixinReference")
 @Mixin(value = EntityPlayerSP.class, priority = 999)
 public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
     @Shadow
@@ -118,15 +123,15 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         RotationUtils.prevRenderYaw = RotationUtils.renderYaw;
 
         PreUpdateEvent event = new PreUpdateEvent();
-        MinecraftForge.EVENT_BUS.post(event);
-        if (event.isCanceled())
+        Client.EVENT_BUS.post(event);
+        if (event.isCancelled())
             ci.cancel();
     }
 
     @Inject(method = "onUpdate", at = @At("RETURN"))
     public void onPostUpdate(CallbackInfo ci) {
         if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0, this.posZ))) {  // ensure compat
-            MinecraftForge.EVENT_BUS.post(new PostUpdateEvent());
+            Client.EVENT_BUS.post(new PostUpdateEvent());
         }
     }
 
@@ -149,10 +154,10 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
                 this.isSneaking()
         );
 
-        MinecraftForge.EVENT_BUS.post(pre);
-        if (pre.isCanceled()) {
+        Client.EVENT_BUS.post(pre);
+        if (pre.isCancelled()) {
             //Todo: EventUpdate Post
-            MinecraftForge.EVENT_BUS.post(new PostMotionEvent());
+            Client.EVENT_BUS.post(new PostMotionEvent());
             return;
         }
 
@@ -233,7 +238,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         }
 
         //Todo: EventUpdate Post
-        MinecraftForge.EVENT_BUS.post(new PostMotionEvent());
+        Client.EVENT_BUS.post(new PostMotionEvent());
     }
 
     /**
@@ -440,8 +445,8 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
 
                 if (direction != null) {
                     PushOutOfBlockEvent event = new PushOutOfBlockEvent(direction, 0.1F);
-                    MinecraftForge.EVENT_BUS.post(event);
-                    if (event.isCanceled())
+                    Client.EVENT_BUS.post(event);
+                    if (event.isCancelled())
                         cir.setReturnValue(false);
                     direction = event.getDirection();
                     final float pushMotion = event.getPushMotion();

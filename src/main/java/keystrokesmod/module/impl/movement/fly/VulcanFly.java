@@ -1,7 +1,8 @@
 package keystrokesmod.module.impl.movement.fly;
 
-import keystrokesmod.event.BlockAABBEvent;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.world.BlockAABBEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -10,7 +11,6 @@ import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class VulcanFly extends SubMode<Fly> {
@@ -30,7 +30,7 @@ public class VulcanFly extends SubMode<Fly> {
         Utils.resetTimer();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onBlockAABB(@NotNull BlockAABBEvent event) {
         if (BlockUtils.replaceable(event.getBlockPos()) && !mc.thePlayer.isSneaking()) {
             final double x = event.getBlockPos().getX(), y = event.getBlockPos().getY(), z = event.getBlockPos().getZ();
@@ -49,10 +49,10 @@ public class VulcanFly extends SubMode<Fly> {
             Utils.getTimer().timerSpeed = (float) (timerSpeed.getInput() - Math.random() / 1000);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
-            event.setCanceled(true);
+            event.cancel();
             shouldTimer = true;
         }
     }

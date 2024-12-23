@@ -1,6 +1,11 @@
 package keystrokesmod.module.impl.movement.phase;
 
-import keystrokesmod.event.*;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.PrePlayerInputEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
+import keystrokesmod.event.world.BlockAABBEvent;
+import keystrokesmod.event.world.PushOutOfBlockEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.movement.Phase;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -12,7 +17,6 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import static keystrokesmod.utility.BlockUtils.insideBlock;
@@ -49,7 +53,7 @@ public class VulcanPhase extends SubMode<Phase> {
         yMoving = false;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         mc.thePlayer.cameraYaw = 0.1F;
         if (timer1 > 25) {
@@ -72,7 +76,7 @@ public class VulcanPhase extends SubMode<Phase> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onBlockAABB(BlockAABBEvent event) {
         if (insideBlock()) {
             if (!yMoving && event.getBlockPos().getY() < mc.thePlayer.posY) return;
@@ -103,7 +107,7 @@ public class VulcanPhase extends SubMode<Phase> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onStrafe(PrePlayerInputEvent event) {
         if (mc.gameSettings.keyBindJump.isKeyDown() && mc.thePlayer.hurtTime > 0) {
             mc.thePlayer.motionY = .99;
@@ -141,7 +145,7 @@ public class VulcanPhase extends SubMode<Phase> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         Packet<?> packet = event.getPacket();
 
@@ -149,13 +153,13 @@ public class VulcanPhase extends SubMode<Phase> {
             teleport = true;
         } else if (packet instanceof S12PacketEntityVelocity) {
             if (cancelVelocity.isToggled() && insideBlock())
-                event.setCanceled(true);
+                event.cancel();
         }
 
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPushOutOfBlock(@NotNull PushOutOfBlockEvent event) {
-        event.setCanceled(true);
+        event.cancel();
     }
 }

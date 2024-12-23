@@ -10,8 +10,8 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.item.ItemSkull;
 import net.minecraft.item.ItemSoup;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 
 public class AutoHeal extends Module {
     private final ButtonSetting autoDrop;
@@ -38,8 +38,8 @@ public class AutoHeal extends Module {
         this.registerSetting(startDelay = new SliderSetting("Start delay", 0, 0, 300, 1));
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onRender(Render2DEvent event) {
         if (!Utils.nullCheck() || mc.thePlayer.isDead || mc.playerController == null) return;
         if (System.currentTimeMillis() - lastHeal < healDelay.getInput()) return;
 

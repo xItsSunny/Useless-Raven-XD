@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.movement.fly;
 
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.player.RotationEvent;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.world.Scaffold;
@@ -10,7 +10,7 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class AirPlaceFly extends SubMode<Fly> {
@@ -41,7 +41,7 @@ public class AirPlaceFly extends SubMode<Fly> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRotation(@NotNull RotationEvent event) {
         event.setPitch(90);
     }

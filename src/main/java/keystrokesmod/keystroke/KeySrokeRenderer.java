@@ -1,9 +1,9 @@
 package keystrokesmod.keystroke;
 
+import keystrokesmod.event.render.Render2DEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 import java.awt.*;
 import java.io.IOException;
@@ -23,13 +23,13 @@ public class KeySrokeRenderer {
         this.c[1] = new KeyStrokeMouse(1, 38, 50);
     }
 
-    @SubscribeEvent
-    public void onRenderTick(RenderTickEvent e) {
+    @EventListener
+    public void onRenderTick(Render2DEvent e) {
         if (this.mc.currentScreen != null) {
             if (this.mc.currentScreen instanceof KeyStrokeConfigGui) {
                 try {
                     this.mc.currentScreen.handleInput();
-                } catch (IOException var3) {
+                } catch (IOException ignored) {
                 }
             }
 

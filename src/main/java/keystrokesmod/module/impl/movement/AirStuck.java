@@ -1,14 +1,14 @@
 package keystrokesmod.module.impl.movement;
 
-import keystrokesmod.event.MoveEvent;
-import keystrokesmod.event.RotationEvent;
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.player.MoveEvent;
+import keystrokesmod.event.player.RotationEvent;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class AirStuck extends Module {
@@ -24,22 +24,22 @@ public class AirStuck extends Module {
         this.registerSetting(clearMotion = new ButtonSetting("Clear motion", true));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMove(@NotNull MoveEvent event) {
-        event.setCanceled(true);
+        event.cancel();
         mc.thePlayer.motionX = motionX;
         mc.thePlayer.motionY = motionY;
         mc.thePlayer.motionZ = motionZ;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(@NotNull SendPacketEvent event) {
         if (event.getPacket() instanceof C03PacketPlayer) {
             switch ((int) mode.getInput()) {
                 case 0:
                     break;
                 case 2:
-                    event.setCanceled(true);
+                    event.cancel();
                     break;
                 case 1:
                     event.setPacket(new C03PacketPlayer(((C03PacketPlayer) event.getPacket()).isOnGround()));
@@ -71,7 +71,7 @@ public class AirStuck extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRotation(RotationEvent event) {
         // visual only
         switch ((int) mode.getInput()) {

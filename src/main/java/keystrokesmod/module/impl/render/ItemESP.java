@@ -1,5 +1,7 @@
 package keystrokesmod.module.impl.render;
 
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.utility.Utils;
@@ -11,8 +13,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
@@ -93,8 +93,8 @@ public class ItemESP extends Module { // entirely skidded from raven b4 source l
         GlStateManager.popMatrix();
     }
 
-    @SubscribeEvent
-    public void onRenderWorldLast(RenderWorldLastEvent e) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         HashMap<Item, ArrayList<EntityItem>> hashMap = new HashMap<>();
         HashMap<Double, Integer> hashMap2 = new HashMap<>();
         for (Entity entity : mc.theWorld.loadedEntityList) {

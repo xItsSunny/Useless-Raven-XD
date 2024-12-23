@@ -15,8 +15,8 @@ import keystrokesmod.utility.render.RenderUtils;
 import keystrokesmod.utility.render.blur.GaussianBlur;
 import lombok.Getter;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -75,8 +75,8 @@ public class ArrayList extends Module implements Moveable {
         MoveableManager.register(this);
     }
 
-    @SubscribeEvent
-    public void onRenderTick(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onRenderTick(Render2DEvent event) {
         if (mc.currentScreen == null)
             render();
     }

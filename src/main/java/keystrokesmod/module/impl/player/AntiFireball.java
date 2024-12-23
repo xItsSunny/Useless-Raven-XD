@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.KillAura;
@@ -12,9 +12,8 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.item.*;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.world.EntityJoinWorldEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.lwjgl.input.Mouse;
 
 import java.util.HashSet;
@@ -42,7 +41,7 @@ public class AntiFireball extends Module {
         this.registerSetting(silentSwing = new ButtonSetting("Silent swing", false));
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @EventListener(priority = -1)
     public void onPreMotion(PreMotionEvent e) {
         if (!condition() || stopAttack()) {
             return;
@@ -64,7 +63,7 @@ public class AntiFireball extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent e) {
         if (!condition() || stopAttack()) {
             return;
@@ -102,15 +101,15 @@ public class AntiFireball extends Module {
         return null;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onEntityJoin(EntityJoinWorldEvent e) {
         if (!Utils.nullCheck()) {
             return;
         }
-        if (e.entity == mc.thePlayer) {
+        if (e.getEntity() == mc.thePlayer) {
             this.fireballs.clear();
-        } else if (e.entity instanceof EntityFireball && mc.thePlayer.getDistanceSqToEntity(e.entity) > 16.0) {
-            this.fireballs.add(e.entity);
+        } else if (e.getEntity() instanceof EntityFireball && mc.thePlayer.getDistanceSqToEntity(e.getEntity()) > 16.0) {
+            this.fireballs.add(e.getEntity());
         }
     }
 

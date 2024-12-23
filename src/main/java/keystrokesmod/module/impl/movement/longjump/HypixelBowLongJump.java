@@ -1,7 +1,9 @@
 package keystrokesmod.module.impl.movement.longjump;
 
-import keystrokesmod.Raven;
-import keystrokesmod.event.*;
+import keystrokesmod.Client;
+import keystrokesmod.event.player.PrePlayerInputEvent;
+import keystrokesmod.event.player.RotationEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.movement.LongJump;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -18,7 +20,7 @@ import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
@@ -41,7 +43,7 @@ public class HypixelBowLongJump extends SubMode<LongJump> {
         tick = 0;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S12PacketEntityVelocity && (state == State.SELF_DAMAGE_POST)) {
             S12PacketEntityVelocity packet = (S12PacketEntityVelocity) event.getPacket();
@@ -51,13 +53,13 @@ public class HypixelBowLongJump extends SubMode<LongJump> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRotation(RotationEvent event) {
         if (state == State.SELF_DAMAGE || state == State.SELF_DAMAGE_POST)
             event.setPitch(-90);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPrePlayerInput(PrePlayerInputEvent event) {
         int slot = getBow();
         if (slot == -1) {
@@ -68,19 +70,19 @@ public class HypixelBowLongJump extends SubMode<LongJump> {
             case SELF_DAMAGE:
                 if (SlotHandler.getCurrentSlot() == slot) {
                     PacketUtils.sendPacketNoEvent(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
-                    Raven.getExecutor().schedule(() -> PacketUtils.sendPacketNoEvent(new C07PacketPlayerDigging(
+                    Client.getExecutor().schedule(() -> PacketUtils.sendPacketNoEvent(new C07PacketPlayerDigging(
                             C07PacketPlayerDigging.Action.RELEASE_USE_ITEM,
                             BlockPos.ORIGIN, EnumFacing.UP
                     )), 200, TimeUnit.MILLISECONDS);
                     state = State.SELF_DAMAGE_POST;
                 }
                 SlotHandler.setCurrentSlot(slot);
-                event.setCanceled(true);
+                event.cancel();
                 MoveUtil.stop();
                 break;
             case SELF_DAMAGE_POST:
                 SlotHandler.setCurrentSlot(slot);
-                event.setCanceled(true);
+                event.cancel();
                 MoveUtil.stop();
                 break;
             case JUMP:

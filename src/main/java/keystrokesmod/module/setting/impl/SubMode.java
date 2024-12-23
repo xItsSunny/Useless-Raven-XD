@@ -1,6 +1,6 @@
 package keystrokesmod.module.setting.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.Setting;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ public abstract class SubMode<T extends Module> extends Module {
     }
 
     public void register() {
-        Raven.getModuleManager().addModule(this);
+        Client.getModuleManager().addModule(this);
     }
 
     @Override

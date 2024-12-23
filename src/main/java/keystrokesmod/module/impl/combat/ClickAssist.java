@@ -9,15 +9,13 @@ import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.clicks.CPSCalculator;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.client.MouseEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 
 public class ClickAssist extends Module {
-    private final DescriptionSetting description;
     private final SliderSetting chanceLeft;
     private final SliderSetting chanceRight;
     private final ButtonSetting rightClick;
@@ -33,7 +31,7 @@ public class ClickAssist extends Module {
 
     public ClickAssist() {
         super("ClickAssist", Module.category.combat, 0);
-        this.registerSetting(description = new DescriptionSetting("Boost your CPS."));
+        this.registerSetting(new DescriptionSetting("Boost your CPS."));
         this.registerSetting(disableInCreative = new ButtonSetting("Disable in creative", true));
         this.registerSetting(leftClick = new ButtonSetting("Left click", true));
         this.registerSetting(chanceLeft = new SliderSetting("Chance left", 80.0D, 0.0D, 100.0D, 1.0D));
@@ -60,15 +58,15 @@ public class ClickAssist extends Module {
         this.bot = null;
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onMouseUpdate(MouseEvent ev) {
         if (disableInCreative.isToggled() && mc.thePlayer.capabilities.isCreativeMode) {
             return;
         }
-        if (ev.button >= 0 && ev.buttonstate && Utils.nullCheck()) {
+        if (ev.getButton() >= 0 && ev.isButtonstate() && Utils.nullCheck()) {
             if (mc.currentScreen == null && !mc.thePlayer.isEating()) {
                 double ch;
-                if (ev.button == 0 && leftClick.isToggled() && chanceLeft.getInput() != 0.0D) {
+                if (ev.getButton() == 0 && leftClick.isToggled() && chanceLeft.getInput() != 0.0D) {
                     if (this.ignNL) {
                         this.ignNL = false;
                     } else {
@@ -92,7 +90,7 @@ public class ClickAssist extends Module {
                         this.bot.mousePress(16);
                         this.ignNL = true;
                     }
-                } else if (ev.button == 1 && rightClick.isToggled()) {
+                } else if (ev.getButton() == 1 && rightClick.isToggled()) {
                     if (this.ignNR) {
                         this.ignNR = false;
                     } else {

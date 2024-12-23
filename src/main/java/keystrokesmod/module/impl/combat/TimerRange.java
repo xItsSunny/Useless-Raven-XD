@@ -1,9 +1,9 @@
 package keystrokesmod.module.impl.combat;
 
 import akka.japi.Pair;
-import keystrokesmod.event.MoveEvent;
-import keystrokesmod.event.RotationEvent;
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.player.MoveEvent;
+import keystrokesmod.event.player.RotationEvent;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.other.RotationHandler;
@@ -16,8 +16,7 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
@@ -86,39 +85,39 @@ public class TimerRange extends Module {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onSendPacket(SendPacketEvent event) {
         switch (state) {
             case TIMER:
                 synchronized (delayedPackets) {
                     delayedPackets.add(event.getPacket());
-                    event.setCanceled(true);
+                    event.cancel();
                 }
                 break;
             case LAG:
                 if (event.getPacket() instanceof C03PacketPlayer) {
-                    event.setCanceled(true);
+                    event.cancel();
                 } else {
                     synchronized (delayedPackets) {
                         delayedPackets.add(event.getPacket());
-                        event.setCanceled(true);
+                        event.cancel();
                     }
                 }
                 break;
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMove(@NotNull MoveEvent event) {
         if (state == State.LAG) {
-            event.setCanceled(true);
+            event.cancel();
             mc.thePlayer.motionX = motionX;
             mc.thePlayer.motionY = motionY;
             mc.thePlayer.motionZ = motionZ;
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRotation(RotationEvent event) {
         if (state == State.LAG) {
             event.setYaw(yaw);

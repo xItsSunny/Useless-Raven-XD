@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.world;
 
-import keystrokesmod.event.MoveInputEvent;
+import keystrokesmod.event.client.PreTickEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.world.tower.*;
@@ -9,10 +9,8 @@ import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import org.lwjgl.input.Keyboard;
+import keystrokesmod.Client;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 import static keystrokesmod.module.ModuleManager.scaffold;
 
@@ -42,9 +40,9 @@ public class Tower extends Module {
         this.canBeEnabled = false;
 
         mode.enable();
-        MinecraftForge.EVENT_BUS.register(new Object() {
-            @SubscribeEvent
-            public void onUpdate(TickEvent.ClientTickEvent event) {
+        Client.EVENT_BUS.register(new Object() {
+            @EventListener
+            public void onUpdate(PreTickEvent event) {
                 if (!Utils.nullCheck()) return;
                 final boolean curCanTower = canTower();
                 if (!curCanTower && lastTowering && stopMotion.isToggled())

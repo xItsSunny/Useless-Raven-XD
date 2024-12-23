@@ -1,9 +1,9 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.clickgui.ClickGui;
-import keystrokesmod.event.MoveInputEvent;
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
@@ -17,7 +17,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.network.play.client.C0EPacketClickWindow;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.lwjgl.input.Keyboard;
 
 import static keystrokesmod.module.ModuleManager.*;
@@ -52,13 +52,13 @@ public class InvMove extends Module {
         this.registerSetting(targetNearbyCheck = new ButtonSetting("Target nearby check", true));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMoveInput(MoveInputEvent event) {
         if (mode.getInput() == 3 && canInvMove() && !(mc.currentScreen instanceof ClickGui))
             event.setJump(false);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (canInvMove()) {
             if (mc.currentScreen instanceof ClickGui && clickGui.isToggled()) {
@@ -113,11 +113,11 @@ public class InvMove extends Module {
         return false;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(SendPacketEvent event) {
         if (noOpenPacket.isToggled() && event.getPacket() instanceof C0BPacketEntityAction) {
             if (((C0BPacketEntityAction) event.getPacket()).getAction() == C0BPacketEntityAction.Action.OPEN_INVENTORY) {
-                event.setCanceled(true);
+                event.cancel();
             }
         }
 
@@ -128,7 +128,7 @@ public class InvMove extends Module {
 
             if (packet.getAction() == C0BPacketEntityAction.Action.OPEN_INVENTORY) {
                 clicked = false;
-                event.setCanceled(true);
+                event.cancel();
             }
         } else if (event.getPacket() instanceof C0EPacketClickWindow) {
             if (!clicked && !noOpenPacket.isToggled()) {

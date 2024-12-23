@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.movement.speed;
 
-import keystrokesmod.event.MoveInputEvent;
+import keystrokesmod.event.player.MoveInputEvent;
 import keystrokesmod.module.impl.movement.Speed;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
@@ -14,7 +14,7 @@ import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class GrimACSpeed extends SubMode<Speed> {
@@ -28,7 +28,7 @@ public class GrimACSpeed extends SubMode<Speed> {
         this.registerSetting(autoJump = new ButtonSetting("Auto jump", true));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMove(MoveInputEvent event) {
         if (MoveUtil.isMoving() && autoJump.isToggled())
             event.setJump(true);

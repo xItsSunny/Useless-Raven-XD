@@ -1,5 +1,7 @@
 package keystrokesmod.module.impl.combat;
 
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -14,10 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.client.MouseEvent;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -126,18 +125,18 @@ public class HitBox extends Module {
         return ((int) multiplier.getInput() == multiplier.getInput() ? (int) multiplier.getInput() + "" : multiplier.getInput()) + " " + multiplier.getPrettyInfo();
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @EventListener(priority = 2)
     public void m(MouseEvent e) {
         if (Utils.nullCheck()) {
-            if (e.button != 0 || !e.buttonstate || multiplier.getInput() == 1 || mc.thePlayer.isBlocking() || mc.currentScreen != null) {
+            if (e.getButton() != 0 || !e.isButtonstate() || multiplier.getInput() == 1 || mc.thePlayer.isBlocking() || mc.currentScreen != null) {
                 return;
             }
             call();
         }
     }
 
-    @SubscribeEvent
-    public void onRenderWorld(RenderWorldLastEvent e) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (showHitbox.isToggled() && Utils.nullCheck()) {
             for (Entity en : mc.theWorld.loadedEntityList) {
                 if (en != mc.thePlayer && en instanceof EntityLivingBase && ((EntityLivingBase) en).deathTime == 0 && !(en instanceof EntityArmorStand) && !en.isInvisible()) {

@@ -1,7 +1,8 @@
 package keystrokesmod.module.impl.movement.phase;
 
-import keystrokesmod.event.BlockAABBEvent;
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.world.BlockAABBEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.impl.movement.Phase;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.BlockUtils;
@@ -9,7 +10,6 @@ import keystrokesmod.utility.PacketUtils;
 import net.minecraft.block.BlockAir;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class VanillaPhase extends SubMode<Phase> {
@@ -20,7 +20,7 @@ public class VanillaPhase extends SubMode<Phase> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotionEvent(PreMotionEvent event) {
         this.phasing = false;
 
@@ -42,7 +42,7 @@ public class VanillaPhase extends SubMode<Phase> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onBlockAABB(@NotNull BlockAABBEvent event) {
         // Sets The Bounding Box To The Players Y Position.
         if (event.getBlock() instanceof BlockAir && phasing) {

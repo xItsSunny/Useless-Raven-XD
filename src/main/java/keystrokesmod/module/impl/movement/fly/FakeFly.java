@@ -1,15 +1,15 @@
 package keystrokesmod.module.impl.movement.fly;
 
-import keystrokesmod.event.ScaffoldPlaceEvent;
-import keystrokesmod.event.WorldChangeEvent;
+import keystrokesmod.event.player.ScaffoldPlaceEvent;
+import keystrokesmod.event.world.WorldChangeEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.Client;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -25,8 +25,8 @@ public class FakeFly extends SubMode<Fly> {
         super(name, parent);
         this.registerSetting(keep = new ButtonSetting("Keep", true));
 
-        MinecraftForge.EVENT_BUS.register(new Object() {
-            @SubscribeEvent
+        Client.EVENT_BUS.register(new Object() {
+            @EventListener
             public void onWorldChange(@NotNull WorldChangeEvent event) {
                 hiddenPos.clear();
             }
@@ -63,7 +63,7 @@ public class FakeFly extends SubMode<Fly> {
         scaffold.enable();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPlace(@NotNull ScaffoldPlaceEvent event) {
         MovingObjectPosition hitResult = event.getHitResult();
         hiddenPos.add(hitResult.getBlockPos().offset(hitResult.sideHit));

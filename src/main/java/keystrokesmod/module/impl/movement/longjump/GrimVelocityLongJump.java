@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.movement.longjump;
 
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.impl.movement.LongJump;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -15,8 +15,7 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.network.play.server.S27PacketExplosion;
 import net.minecraft.network.play.server.S32PacketConfirmTransaction;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Queue;
@@ -43,10 +42,10 @@ public class GrimVelocityLongJump extends SubMode<LongJump> {
         this.registerSetting(debug = new ButtonSetting("Debug", false));
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S27PacketExplosion) {
-            event.setCanceled(true);
+            event.cancel();
             delayedPackets.add(event.getPacket());
         }
         if (event.getPacket() instanceof S12PacketEntityVelocity) {
@@ -56,20 +55,20 @@ public class GrimVelocityLongJump extends SubMode<LongJump> {
                 lastVelocityTime = System.currentTimeMillis();
                 delayed = true;
             }
-            event.setCanceled(true);
+            event.cancel();
             delayedPackets.add(event.getPacket());
         } else if (event.getPacket() instanceof S32PacketConfirmTransaction) {
             if (delayed) {
                 if (System.currentTimeMillis() - lastVelocityTime >= (int) delayTime.getInput()) {
                     delayed = false;
                 }
-                event.setCanceled(true);
+                event.cancel();
                 delayedPackets.add(event.getPacket());
             }
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (!delayed && !delayedPackets.isEmpty()) {
             if (timer.isToggled())

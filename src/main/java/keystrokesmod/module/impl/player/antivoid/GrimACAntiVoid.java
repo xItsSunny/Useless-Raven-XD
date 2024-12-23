@@ -1,6 +1,10 @@
 package keystrokesmod.module.impl.player.antivoid;
 
-import keystrokesmod.event.*;
+import keystrokesmod.event.network.SendPacketEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.PreMoveEvent;
+import keystrokesmod.event.player.RotationEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.player.AntiVoid;
@@ -14,8 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,14 +54,14 @@ public class GrimACAntiVoid extends SubMode<AntiVoid> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMove(PreMoveEvent event) {
         if (airStuck) {
-            event.setCanceled(true);
+            event.cancel();
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onPreMotion(PreMotionEvent event) {
         if (airStuck) {
             event.setYaw(yaw);
@@ -66,7 +69,7 @@ public class GrimACAntiVoid extends SubMode<AntiVoid> {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onRotation(RotationEvent event) {
         if (airStuck) {
             event.setYaw(yaw);
@@ -74,7 +77,7 @@ public class GrimACAntiVoid extends SubMode<AntiVoid> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(@NotNull SendPacketEvent event) {
         if (!airStuck) return;
         if (event.getPacket() instanceof C03PacketPlayer) {
@@ -82,18 +85,18 @@ public class GrimACAntiVoid extends SubMode<AntiVoid> {
                 PacketUtils.sendPacketNoEvent(delayedPacket);
                 delayedPacket = null;
             }
-            event.setCanceled(true);
+            event.cancel();
         } else if (event.getPacket() instanceof C08PacketPlayerBlockPlacement && allowPearl.isToggled()) {
             ItemStack item = SlotHandler.getHeldItem();
             if (item != null && item.getItem() == Items.ender_pearl) {
                 PacketUtils.sendPacketNoEvent(new C03PacketPlayer.C05PacketPlayerLook(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch, mc.thePlayer.onGround));
                 delayedPacket = (C08PacketPlayerBlockPlacement) event.getPacket();
-                event.setCanceled(true);
+                event.cancel();
             }
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
             airStuck = false;

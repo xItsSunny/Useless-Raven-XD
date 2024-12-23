@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.other.chatai;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.impl.other.ChatAI;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -59,7 +59,7 @@ public class ChatGPTChatAI extends IChatAI {
         if (context == null || !keepContext.isToggled())
             context = new ConversationContext();
 
-        Raven.getExecutor().execute(() -> {
+        Client.getExecutor().execute(() -> {
             try {
                 Utils.sendMessage(ChatFormatting.GRAY + "Waiting for response...");
                 context = client.sendMessage(message, context, GPTModel.values()[(int) model.getInput()]);

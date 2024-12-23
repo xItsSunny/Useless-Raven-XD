@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.movement;
 
-import keystrokesmod.event.JumpEvent;
-import keystrokesmod.event.PrePlayerInputEvent;
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.JumpEvent;
+import keystrokesmod.event.player.PrePlayerInputEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.KillAura;
@@ -14,8 +14,7 @@ import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.MoveUtil;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 import static keystrokesmod.module.ModuleManager.killAura;
 import static keystrokesmod.module.ModuleManager.scaffold;
@@ -41,21 +40,21 @@ public class TargetStrafe extends Module {
         return mc.thePlayer.rotationYaw;
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onJump(JumpEvent event) {
         if (target != null && active) {
             event.setYaw(yaw);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onStrafe(PrePlayerInputEvent event) {
         if (target != null && active) {
             event.setYaw(yaw);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onPreUpdate(PreUpdateEvent event) {
         //  Disable if scaffold is enabled
         if (scaffold == null || scaffold.isEnabled() || killAura == null || !killAura.isEnabled()) {

@@ -1,7 +1,8 @@
 package keystrokesmod.module.impl.movement;
 
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.SprintEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.SprintEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -11,8 +12,7 @@ import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.movement.Move;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 public class Sprint extends Module {
     private final ModeSetting mode = new ModeSetting("Mode", new String[]{"Legit", "Omni"}, 0);
@@ -44,20 +44,18 @@ public class Sprint extends Module {
         return !event.isSprint();
     }
 
-    @SubscribeEvent
-    public void p(PlayerTickEvent e) {
+    @EventListener
+    public void p(PreUpdateEvent e) {
         if (Utils.nullCheck() && mc.inGameHasFocus) {
 
-            if (ModuleManager.scaffold.isEnabled() && disableWhileScaffold.isToggled()) {
-                KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), false);
-            } else {
-                KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), true);
-            }
-
+            KeyBinding.setKeyBindState(
+                    mc.gameSettings.keyBindSprint.getKeyCode(),
+                    !ModuleManager.scaffold.isEnabled() || !disableWhileScaffold.isToggled()
+            );
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (mode.getInput() != 1) return;
 

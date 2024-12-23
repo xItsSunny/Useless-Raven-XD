@@ -1,13 +1,12 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.MoveUtil;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.network.AttackEntityEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import static keystrokesmod.module.ModuleManager.hitSelect;
@@ -49,10 +48,10 @@ public class HitSelect extends Module {
         return MODES[(int) mode.getInput()];
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onAttack(@NotNull AttackEntityEvent event) {
         if (mode.getInput() == 1 && !currentShouldAttack) {
-            event.setCanceled(true);
+            event.cancel();
             return;
         }
 
@@ -60,7 +59,7 @@ public class HitSelect extends Module {
             attackTime = System.currentTimeMillis();
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @EventListener(priority = 2)
     public void onPreUpdate(PreUpdateEvent event) {
         currentShouldAttack = false;
 

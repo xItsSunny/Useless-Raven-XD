@@ -5,18 +5,20 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.List;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
 public class BackgroundUtils {
     public static final ResourceLocation RES_LOGO = new ResourceLocation("keystrokesmod:textures/backgrounds/ravenxd.png");
     private static final List<ResourceLocation> BACKGROUNDS = new ObjectArrayList<>();
+    private static final int WIDTH = 1920;
+    private static final int HEIGHT = 1080;
+    private static final double ASPECT_RATIO = (double) WIDTH / HEIGHT;
     private static final int MAX_INDEX;
 
     private static long lastRenderTime = -1;
@@ -24,11 +26,9 @@ public class BackgroundUtils {
     private static int shadow = 0;
 
     static {
-        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/1.png"));
-        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/2.png"));
-        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/3.png"));
-        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/4.png"));
-        BACKGROUNDS.add(new ResourceLocation("keystrokesmod:textures/backgrounds/5.png"));
+        for (int i = 1; i <= 7; i++) {
+            BACKGROUNDS.add(new ResourceLocation(String.format("keystrokesmod:textures/backgrounds/%d.png", i)));
+        }
         MAX_INDEX = BACKGROUNDS.size() - 1;
 
         lastBackground = BACKGROUNDS.get(Utils.randomizeInt(0, MAX_INDEX));
@@ -45,18 +45,38 @@ public class BackgroundUtils {
     }
 
     private static void renderBackground(final int width, final int height) {
+        if (Utils.nullCheck()) return;
+
         final long time = System.currentTimeMillis();
-        if (time - lastRenderTime > 30000) {
+        if (time - lastRenderTime > 3000) {
             lastBackground = BACKGROUNDS.get(Utils.randomizeInt(0, MAX_INDEX));
         }
         lastRenderTime = time;
 
-        if (!Utils.nullCheck())
-            RenderUtils.drawImage(lastBackground, 0, 0, width, height);
+        float renderWidth = width;
+        float renderHeight = height;
+        float x = 0;
+        float y = 0;
+
+        if (width != WIDTH || height != HEIGHT) {
+            double screenAspectRatio = (double) width / height;
+            if (screenAspectRatio != ASPECT_RATIO) {
+                if (screenAspectRatio > ASPECT_RATIO) {
+                    renderWidth = width;
+                    renderHeight = (float) (width / ASPECT_RATIO);
+                    y = (height - renderHeight) / 2;
+                } else {
+                    renderHeight = height;
+                    renderWidth = (float) (height * ASPECT_RATIO);
+                    x = (width - renderWidth) / 2;
+                }
+            }
+        }
+
+        RenderUtils.drawImage(lastBackground, x, y, renderWidth, renderHeight);
 
         if (shadow != 0) {
-            ScaledResolution resolution = new ScaledResolution(mc);
-            RenderUtils.drawBloomShadow(-16, -16, resolution.getScaledWidth() + 16, resolution.getScaledHeight() + 16, 4,
+            RenderUtils.drawBloomShadow(-16, -16, mc.displayWidth + 16, mc.displayHeight + 16, 4,
                     new Color(0, 0, 0, shadow), false
             );
         }

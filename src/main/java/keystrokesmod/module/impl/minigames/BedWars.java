@@ -1,6 +1,10 @@
 package keystrokesmod.module.impl.minigames;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.event.world.BlockPlaceEvent;
+import keystrokesmod.event.world.EntityJoinWorldEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -8,6 +12,7 @@ import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.render.RenderUtils;
+import lombok.Getter;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.BlockObsidian;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,11 +22,7 @@ import net.minecraft.item.ItemFireball;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.client.event.ClientChatReceivedEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.network.ClientChatReceivedEvent;
 
 import java.awt.*;
 import java.util.List;
@@ -33,6 +34,7 @@ public class BedWars extends Module {
     private static final double MAX_SPAWN_DISTANCE_SQUARED = 800;
     public static ButtonSetting whitelistOwnBed;
     public static boolean outsideSpawn = true;
+    @Getter
     private static BlockPos spawnPos;
     private final String[] SERVERS = new String[]{"Hypixel", "Pika/Jartex"};
     private final ModeSetting serverMode;
@@ -58,10 +60,6 @@ public class BedWars extends Module {
         this.registerSetting(shouldPing = new ButtonSetting("Should ping", true));
     }
 
-    public static BlockPos getSpawnPos() {
-        return spawnPos;
-    }
-
     public void onEnable() {
         armoredPlayer.clear();
         lastHeldMap.clear();
@@ -74,25 +72,25 @@ public class BedWars extends Module {
         outsideSpawn = true;
     }
 
-    @SubscribeEvent
-    public void onBlock(BlockEvent.PlaceEvent e) {
+    @EventListener
+    public void onBlock(BlockPlaceEvent e) {
         if (!Utils.nullCheck() || !obsidian.isToggled()) {
             return;
         }
-        if (!(e.state.getBlock() instanceof BlockObsidian)) {
+        if (!(e.getState().getBlock() instanceof BlockObsidian)) {
             return;
         }
         for (EnumFacing facing : EnumFacing.values()) {
-            if (BlockUtils.getBlock(e.pos.offset(facing)) instanceof BlockBed) {
-                obsidianPos.add(e.pos);
-                Utils.sendMessage(e.player.getDisplayName().getFormattedText() + " &7placed &dObsidian");
+            if (BlockUtils.getBlock(e.getPos().offset(facing)) instanceof BlockBed) {
+                obsidianPos.add(e.getPos());
+                Utils.sendMessage(e.getPlayer().getDisplayName().getFormattedText() + " &7placed &dObsidian");
                 break;
             }
         }
     }
 
-    @SubscribeEvent
-    public void onRenderWorld(RenderWorldLastEvent e) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (Utils.nullCheck()) {
             if (this.obsidianPos.isEmpty()) {
                 return;
@@ -112,12 +110,12 @@ public class BedWars extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onEntityJoinWorld(EntityJoinWorldEvent e) {
-        if (!Utils.nullCheck() || e.entity == null) {
+        if (!Utils.nullCheck() || e.getEntity() == null) {
             return;
         }
-        if (e.entity == mc.thePlayer) {
+        if (e.getEntity() == mc.thePlayer) {
             armoredPlayer.clear();
             lastHeldMap.clear();
         }
@@ -178,12 +176,12 @@ public class BedWars extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onChat(ClientChatReceivedEvent c) {
         if (!Utils.nullCheck()) {
             return;
         }
-        String strippedMessage = Utils.stripColor(c.message.getUnformattedText());
+        String strippedMessage = Utils.stripColor(c.getMessage().getUnformattedText());
         if (strippedMessage.startsWith(" ") && (strippedMessage.contains("Protect your bed and destroy the enemy beds.") || strippedMessage.contains("Goodluck with your BedWars Game"))) {
             Utils.sendMessage(this.getPrettyName() + ChatFormatting.GREEN + " game has started!");
             ping();

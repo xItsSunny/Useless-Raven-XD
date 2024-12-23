@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.RenderContainerEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.render.RenderContainerEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -11,7 +11,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -35,10 +35,10 @@ public class AutoChest extends Module {
         this.registerSetting(debug = new SliderSetting("Debug", 0, -48, 48, 1));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRenderContainer(RenderContainerEvent event) {
         if (silent.isToggled())
-            event.setCanceled(true);
+            event.cancel();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class AutoChest extends Module {
         clickDelay = 0;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (!(mc.currentScreen instanceof GuiContainer)) {
             clickDelay = Utils.randomizeInt(minDelay.getInput() / 50, maxDelay.getInput() / 50);

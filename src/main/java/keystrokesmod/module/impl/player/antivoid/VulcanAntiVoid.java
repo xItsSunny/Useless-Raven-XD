@@ -1,7 +1,8 @@
 package keystrokesmod.module.impl.player.antivoid;
 
-import keystrokesmod.event.BlockAABBEvent;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.world.BlockAABBEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.impl.player.AntiVoid;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
@@ -11,7 +12,6 @@ import net.minecraft.block.BlockAir;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class VulcanAntiVoid extends SubMode<AntiVoid> {
@@ -24,7 +24,7 @@ public class VulcanAntiVoid extends SubMode<AntiVoid> {
         this.registerSetting(distance = new SliderSetting("Distance", 5, 0, 10, 1));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onAABB(BlockAABBEvent event) {
         if (!Utils.nullCheck()) return;
         if (mc.thePlayer.fallDistance > distance.getInput())
@@ -39,7 +39,7 @@ public class VulcanAntiVoid extends SubMode<AntiVoid> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), false);

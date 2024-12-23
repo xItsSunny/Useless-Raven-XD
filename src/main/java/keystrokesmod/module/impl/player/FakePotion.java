@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -9,7 +9,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -46,10 +46,10 @@ public class FakePotion extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(SendPacketEvent event) {
         if (delayTransaction.isToggled() && event.getPacket() instanceof C0FPacketConfirmTransaction) {
-            event.setCanceled(true);
+            event.cancel();
             delayedPackets.add(event.getPacket());
         }
     }

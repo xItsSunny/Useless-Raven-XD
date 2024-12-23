@@ -1,7 +1,7 @@
 package keystrokesmod.mixins.impl.gui;
 
 
-import keystrokesmod.utility.Reflection;
+import keystrokesmod.utility.ReflectionUtils;
 import net.minecraftforge.fml.client.SplashProgress;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
@@ -49,9 +49,9 @@ public abstract class MixinSplashProgressThread {
             return;
         }
 
-        final Object texture = Reflection.getDeclared(SplashProgress.class, "logoTexture");
-        final float width = (float) Reflection.call(texture, "getWidth") / 2.0F / 2.0F;
-        final float height = (float) Reflection.call(texture, "getHeight") / 2.0F / 2.0F;
+        final Object texture = ReflectionUtils.getDeclared(SplashProgress.class, "logoTexture");
+        final float width = (float) ReflectionUtils.call(texture, "getWidth") / 2.0F / 2.0F;
+        final float height = (float) ReflectionUtils.call(texture, "getHeight") / 2.0F / 2.0F;
 
         switch (type) {
             case 0:

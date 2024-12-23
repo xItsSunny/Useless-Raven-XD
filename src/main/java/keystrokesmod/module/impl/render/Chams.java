@@ -6,7 +6,7 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.client.event.RenderPlayerEvent.Post;
 import net.minecraftforge.client.event.RenderPlayerEvent.Pre;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.lwjgl.opengl.GL11;
 
 import java.util.HashSet;
@@ -20,7 +20,7 @@ public class Chams extends Module {
         this.registerSetting(ignoreBots = new ButtonSetting("Ignore bots", false));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void r1(Pre e) {
         if (e.entity == mc.thePlayer) {
             return;
@@ -35,7 +35,7 @@ public class Chams extends Module {
         GL11.glPolygonOffset(1.0f, -1000000.0f);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void r2(Post e) {
         if (e.entity == mc.thePlayer) {
             return;

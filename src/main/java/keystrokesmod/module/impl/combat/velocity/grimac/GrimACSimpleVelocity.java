@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.combat.velocity.grimac;
 
-import keystrokesmod.event.PostVelocityEvent;
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.PostVelocityEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.mixins.impl.entity.EntityPlayerSPAccessor;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.velocity.GrimACVelocity;
@@ -16,7 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFood;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class GrimACSimpleVelocity extends SubMode<GrimACVelocity> {
@@ -37,7 +37,7 @@ public class GrimACSimpleVelocity extends SubMode<GrimACVelocity> {
         this.registerSetting(debug = new ButtonSetting("Debug", false));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (ModuleManager.blink.isEnabled()) return;
         if (unReduceTimes > 0 && mc.thePlayer.hurtTime > 0
@@ -69,7 +69,7 @@ public class GrimACSimpleVelocity extends SubMode<GrimACVelocity> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPostVelocity(PostVelocityEvent event) {
         unReduceTimes = (int) reduceTimes.getInput();
     }

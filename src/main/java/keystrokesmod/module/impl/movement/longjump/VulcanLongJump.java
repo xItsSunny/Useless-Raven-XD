@@ -1,10 +1,10 @@
 package keystrokesmod.module.impl.movement.longjump;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.movement.LongJump;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class VulcanLongJump extends SubMode<LongJump> {
@@ -24,7 +24,7 @@ public class VulcanLongJump extends SubMode<LongJump> {
         ticks = 0;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         ticks++;
         if (ticks == 1) {

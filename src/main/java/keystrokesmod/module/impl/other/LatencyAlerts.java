@@ -1,13 +1,12 @@
 package keystrokesmod.module.impl.other;
 
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
 import lombok.Getter;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 public class LatencyAlerts extends Module {
     @Getter
@@ -21,7 +20,7 @@ public class LatencyAlerts extends Module {
         this.registerSetting(minLatency = new SliderSetting("Min latency", 500, 50, 5000, 50, "ms"));
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @EventListener(priority = 2)
     public void onPacketReceive(ReceivePacketEvent e) {
         if (isFreeze()) {
             Utils.sendMessage("&7Packet loss detected: §c" + (System.currentTimeMillis() - lastPacket) + "&7ms");

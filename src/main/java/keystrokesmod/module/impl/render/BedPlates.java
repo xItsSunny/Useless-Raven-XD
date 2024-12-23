@@ -1,5 +1,7 @@
 package keystrokesmod.module.impl.render;
 
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -16,9 +18,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.world.EntityJoinWorldEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -109,17 +109,17 @@ public class BedPlates extends Module {
         this.bedBlocks.clear();
     }
 
-    @SubscribeEvent
-    public void onEntityJoin(EntityJoinWorldEvent e) {
-        if (e.entity == mc.thePlayer) {
+    @EventListener
+    public void onEntityJoin(@NotNull EntityJoinWorldEvent e) {
+        if (e.getEntity() == mc.thePlayer) {
             this.beds.clear();
             this.bedBlocks.clear();
             this.bed = null;
         }
     }
 
-    @SubscribeEvent
-    public void onRenderWorld(RenderWorldLastEvent e) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (Utils.nullCheck()) {
             if (firstBed.isToggled() && this.bed != null) {
                 if (!(mc.theWorld.getBlockState(bed[0]).getBlock() instanceof BlockBed)) {

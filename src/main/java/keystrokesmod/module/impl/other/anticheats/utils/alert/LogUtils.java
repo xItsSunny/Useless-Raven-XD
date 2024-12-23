@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.other.anticheats.utils.alert;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.impl.other.Anticheat;
 import keystrokesmod.utility.Utils;
 import net.minecraft.event.ClickEvent;
@@ -19,20 +19,20 @@ public class LogUtils {
             final ChatStyle chatStyle = new ChatStyle();
             chatStyle.setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/wdr " + player));
             ((IChatComponent) chatComponentText).appendSibling(new ChatComponentText(Utils.formatColor(" §7[§cWDR§7]")).setChatStyle(chatStyle));
-            Raven.mc.thePlayer.addChatMessage(chatComponentText);
+            Client.mc.thePlayer.addChatMessage(chatComponentText);
             if (Anticheat.getShouldPing().isToggled()) {
                 switch ((int) Anticheat.getPingSound().getInput()) {
                     case 0:
-                        Raven.mc.thePlayer.playSound("note.pling", 1, 1);
+                        Client.mc.thePlayer.playSound("note.pling", 1, 1);
                         break;
                     case 1:
-                        Raven.mc.thePlayer.playSound("keystrokesmod:alarm", 1, 1);
+                        Client.mc.thePlayer.playSound("keystrokesmod:alarm", 1, 1);
                         break;
                 }
 
             }
             if (Anticheat.getAutoReport().getInput() != 0) {
-                Raven.mc.thePlayer.sendChatMessage(
+                Client.mc.thePlayer.sendChatMessage(
                         Anticheat.getAutoReport().getOptions()[(int) Anticheat.getAutoReport().getInput()]
                                 + " "
                                 + Utils.stripColor(player)
@@ -43,7 +43,7 @@ public class LogUtils {
 
     public static void prefix(String prefix, String msg) {
         if (check()) {
-            Raven.mc.thePlayer.addChatMessage(new ChatComponentText(
+            Client.mc.thePlayer.addChatMessage(new ChatComponentText(
                     String.format("%s§r §r%s§r | %s§r", "§b§lTR§r§l>", prefix, msg)
             ));
         }
@@ -51,7 +51,7 @@ public class LogUtils {
 
     public static void custom(String msg) {
         if (check()) {
-            Raven.mc.thePlayer.addChatMessage(new ChatComponentText(
+            Client.mc.thePlayer.addChatMessage(new ChatComponentText(
                     String.format("%s§r §r%s§r", "§b§lTR§r§l>", msg)
             ));
         }
@@ -60,6 +60,6 @@ public class LogUtils {
     }
 
     private static boolean check() {
-        return Raven.mc.thePlayer != null;
+        return Client.mc.thePlayer != null;
     }
 }

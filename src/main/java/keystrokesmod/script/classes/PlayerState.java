@@ -1,6 +1,6 @@
 package keystrokesmod.script.classes;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 
 public class PlayerState {
     public double x;

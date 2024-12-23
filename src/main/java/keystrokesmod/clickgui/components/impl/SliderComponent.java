@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui.components.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Gui;
@@ -11,7 +11,6 @@ import keystrokesmod.utility.profile.ProfileModule;
 import keystrokesmod.utility.render.RenderUtils;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -88,8 +87,8 @@ public class SliderComponent extends Component {
                 }
                 parent.categoryComponent.render();
             }
-            if (Raven.currentProfile != null) {
-                ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+            if (Client.currentProfile != null) {
+                ((ProfileModule) Client.currentProfile.getModule()).saved = false;
             }
         }
 

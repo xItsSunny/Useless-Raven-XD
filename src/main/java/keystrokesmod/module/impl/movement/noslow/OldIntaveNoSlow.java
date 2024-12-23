@@ -1,11 +1,11 @@
 package keystrokesmod.module.impl.movement.noslow;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.utility.PacketUtils;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class OldIntaveNoSlow extends INoSlow {
@@ -13,7 +13,7 @@ public class OldIntaveNoSlow extends INoSlow {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (mc.thePlayer.isUsingItem()) {
             PacketUtils.sendPacket(new C09PacketHeldItemChange(SlotHandler.getCurrentSlot() % 8 + 1));

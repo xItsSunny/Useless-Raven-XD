@@ -1,7 +1,13 @@
 package keystrokesmod.module.impl.world;
 
-import keystrokesmod.Raven;
-import keystrokesmod.event.*;
+import keystrokesmod.Client;
+import keystrokesmod.event.player.PostUpdateEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.RotationEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.minigames.BedWars;
@@ -30,9 +36,6 @@ import net.minecraft.network.play.server.S27PacketExplosion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -107,7 +110,7 @@ public class BedAura extends Module {
         reset(true);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent e) {
         if (!Utils.nullCheck()) {
             return;
@@ -181,26 +184,26 @@ public class BedAura extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(ReceivePacketEvent e) {
         if (!Utils.nullCheck() || !cancelKnockback.isToggled() || currentBlock == null) {
             return;
         }
         if (e.getPacket() instanceof S12PacketEntityVelocity) {
             if (((S12PacketEntityVelocity) e.getPacket()).getEntityID() == mc.thePlayer.getEntityId()) {
-                e.setCanceled(true);
+                e.cancel();
             }
         } else if (e.getPacket() instanceof S27PacketExplosion) {
-            e.setCanceled(true);
+            e.cancel();
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPostUpdate(PostUpdateEvent e) {
         stopAutoblock = false;
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onRotation(RotationEvent e) {
         if ((rotate || breakProgress >= 1 || breakProgress == 0) && currentBlock != null && rotation.isToggled()) {
             float[] rotations = RotationUtils.getRotations(currentBlock, e.getYaw(), e.getPitch());
@@ -213,7 +216,7 @@ public class BedAura extends Module {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onPreMotion(PreMotionEvent e) {
         if ((rotate || breakProgress >= 1 || breakProgress == 0) && currentBlock != null) {
             if (RotationUtils.notInRange(currentBlock, range.getInput())) {
@@ -225,8 +228,8 @@ public class BedAura extends Module {
         }
     }
 
-    @SubscribeEvent
-    public void onRenderWorld(RenderWorldLastEvent renderWorldLastEvent) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (!renderOutline.isToggled() || currentBlock == null || !Utils.nullCheck()) {
             return;
         }
@@ -249,10 +252,6 @@ public class BedAura extends Module {
         } else if (lastSlot != -1) {
             mc.thePlayer.inventory.currentItem = lastSlot;
         }
-    }
-
-    public boolean cancelKnockback() {
-        return this.isEnabled() && this.currentBlock != null && this.cancelKnockback.isToggled();
     }
 
     private BlockPos @Nullable [] getBedPos() {
@@ -364,7 +363,7 @@ public class BedAura extends Module {
     }
 
     public void setPacketSlot(int slot) {
-        if (slot == currentSlot || slot == -1 || Raven.badPacketsHandler.playerSlot == slot) {
+        if (slot == currentSlot || slot == -1 || Client.badPacketsHandler.playerSlot == slot) {
             return;
         }
         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(slot));

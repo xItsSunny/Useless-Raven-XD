@@ -1,7 +1,7 @@
 package keystrokesmod.utility;
 
 import com.google.common.base.Predicates;
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerRotation;
 import net.minecraft.client.Minecraft;

@@ -1,5 +1,7 @@
 package keystrokesmod.module.impl.render;
 
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -15,9 +17,7 @@ import net.minecraft.block.BlockBed;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.event.render.Render2DEvent;
 
 public class BreakProgress extends Module {
     private final ModeSetting mode;
@@ -38,8 +38,8 @@ public class BreakProgress extends Module {
         this.registerSetting(progressBar = new ButtonSetting("Progress bar", false, bedAura::isToggled));
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onRender(Render2DEvent event) {
         progressAnimation.run(progress);
         progressObj.setProgress(progressAnimation.getValue());
         progressObj.setText("BedAura " + progressStr);
@@ -49,8 +49,8 @@ public class BreakProgress extends Module {
             ProgressManager.remove(progressObj);
     }
 
-    @SubscribeEvent
-    public void onRenderWorld(RenderWorldLastEvent e) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (this.progress == 0.0f || this.block == null || !Utils.nullCheck()) {
             return;
         }

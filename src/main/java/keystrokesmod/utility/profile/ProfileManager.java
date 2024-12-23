@@ -1,10 +1,10 @@
 package keystrokesmod.utility.profile;
 
 import com.google.gson.*;
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.clickgui.components.impl.CategoryComponent;
-import keystrokesmod.event.WorldChangeEvent;
+import keystrokesmod.event.world.WorldChangeEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.impl.other.KillMessage;
@@ -18,9 +18,8 @@ import keystrokesmod.module.setting.interfaces.InputSetting;
 import keystrokesmod.script.Manager;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.opengl.GL11;
 
 import java.io.File;
 import java.io.FileReader;
@@ -50,10 +49,10 @@ public class ProfileManager {
             saveProfile(new Profile("default", 0));
         }
 
-        Raven.getExecutor().schedule(this::updateLatest, 5, TimeUnit.MINUTES);
+        Client.getExecutor().schedule(this::updateLatest, 5, TimeUnit.MINUTES);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onWorldChange(WorldChangeEvent event) {
         updateLatest();
     }
@@ -68,15 +67,15 @@ public class ProfileManager {
         jsonObject.addProperty("killmessage", KillMessage.killMessage);
         jsonObject.addProperty("keybind", keyBind);
         JsonArray jsonArray = new JsonArray();
-        for (Module module : Raven.moduleManager.getModules()) {
+        for (Module module : Client.moduleManager.getModules()) {
             if (module.ignoreOnSave) {
                 continue;
             }
             JsonObject moduleInformation = getJsonObject(module);
             jsonArray.add(moduleInformation);
         }
-        if (Raven.scriptManager != null && Raven.scriptManager.scripts != null) {
-            for (Module module : Raven.scriptManager.scripts.values()) {
+        if (Client.scriptManager != null && Client.scriptManager.scripts != null) {
+            for (Module module : Client.scriptManager.scripts.values()) {
                 if (module.ignoreOnSave) {
                     continue;
                 }
@@ -172,15 +171,15 @@ public class ProfileManager {
             if (!file.getName().equals(name + ".json")) {
                 continue;
             }
-            if (Raven.scriptManager != null) {
-                for (Module module : Raven.scriptManager.scripts.values()) {
+            if (Client.scriptManager != null) {
+                for (Module module : Client.scriptManager.scripts.values()) {
                     if (module.canBeEnabled()) {
                         module.disable();
                         module.setBind(0);
                     }
                 }
             }
-            for (Module module : Raven.getModuleManager().getModules()) {
+            for (Module module : Client.getModuleManager().getModules()) {
                 if (module.canBeEnabled()) {
                     module.disable();
                     module.setBind(0);
@@ -224,9 +223,9 @@ public class ProfileManager {
                         continue;
                     }
 
-                    Module module = Raven.moduleManager.getModule(moduleName);
-                    if (module == null && moduleName.startsWith("sc-") && Raven.scriptManager != null) {
-                        for (Module module1 : Raven.scriptManager.scripts.values()) {
+                    Module module = Client.moduleManager.getModule(moduleName);
+                    if (module == null && moduleName.startsWith("sc-") && Client.scriptManager != null) {
+                        for (Module module1 : Client.scriptManager.scripts.values()) {
                             if (module1.getName().equals(moduleName.substring(3))) {
                                 module = module1;
                             }
@@ -239,7 +238,7 @@ public class ProfileManager {
 
                     loadFromJsonObject(moduleInformation, module);
 
-                    Raven.currentProfile = getProfile(name);
+                    Client.currentProfile = getProfile(name);
                 }
 
                 if (!Objects.equals(name, "latest")) {
@@ -385,7 +384,7 @@ public class ProfileManager {
                     categoryComponent.reloadModules(true);
                 }
             }
-            Utils.sendMessage("&b" + Raven.profileManager.getProfileFiles().size() + " &7profiles loaded.");
+            Utils.sendMessage("&b" + Client.profileManager.getProfileFiles().size() + " &7profiles loaded.");
         }
     }
 

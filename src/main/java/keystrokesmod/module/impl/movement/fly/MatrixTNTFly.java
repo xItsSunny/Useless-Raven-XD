@@ -1,12 +1,12 @@
 package keystrokesmod.module.impl.movement.fly;
 
-import keystrokesmod.event.MoveEvent;
-import keystrokesmod.event.PreVelocityEvent;
+import keystrokesmod.event.player.MoveEvent;
+import keystrokesmod.event.player.PreVelocityEvent;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class MatrixTNTFly extends SubMode<Fly> {
@@ -32,15 +32,15 @@ public class MatrixTNTFly extends SubMode<Fly> {
         velocityTicks = -1;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMove(MoveEvent event) {
         if (!fly) {
-            event.setCanceled(true);
+            event.cancel();
             mc.thePlayer.motionY = 0;
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreVelocity(@NotNull PreVelocityEvent event) {
         event.setMotionX((int) (event.getMotionX() * horizontalSpeed.getInput()));
         event.setMotionY(0);

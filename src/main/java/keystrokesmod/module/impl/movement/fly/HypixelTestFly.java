@@ -1,9 +1,9 @@
 package keystrokesmod.module.impl.movement.fly;
 
-import keystrokesmod.event.MoveInputEvent;
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.ReceivePacketEvent;
-import keystrokesmod.event.WorldChangeEvent;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
+import keystrokesmod.event.world.WorldChangeEvent;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -13,7 +13,7 @@ import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class HypixelTestFly extends SubMode<Fly> {
@@ -29,7 +29,7 @@ public class HypixelTestFly extends SubMode<Fly> {
         this.registerSetting(packet = new ButtonSetting("Packet", false));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (!Utils.nullCheck() || mc.thePlayer.ticksExisted < 20) return;
         if (mc.thePlayer.onGround) {
@@ -49,13 +49,13 @@ public class HypixelTestFly extends SubMode<Fly> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMoveInput(MoveInputEvent event) {
         if (!active)
-            event.setCanceled(true);
+            event.cancel();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(ReceivePacketEvent event) {
         if (!active && event.getPacket() instanceof S08PacketPlayerPosLook) {
             active = true;
@@ -73,7 +73,7 @@ public class HypixelTestFly extends SubMode<Fly> {
             Utils.getTimer().timerSpeed = 0.3f;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onWorldChange(WorldChangeEvent event) {
         active = false;
     }

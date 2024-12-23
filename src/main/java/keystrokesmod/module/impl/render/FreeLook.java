@@ -1,14 +1,13 @@
 package keystrokesmod.module.impl.render;
 
-import keystrokesmod.event.JumpEvent;
-import keystrokesmod.event.PrePlayerInputEvent;
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.player.JumpEvent;
+import keystrokesmod.event.player.PrePlayerInputEvent;
+import keystrokesmod.event.player.RotationEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.utility.RotationUtils;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
@@ -43,7 +42,7 @@ public class FreeLook extends Module {
         viewData = null;
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @EventListener(priority = 2)
     public void onPreMotion(RotationEvent event) {
         try {
             if (onlyIfPressed.isToggled() && !Keyboard.isKeyDown(this.getKeycode())) {
@@ -69,14 +68,14 @@ public class FreeLook extends Module {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onPreInput(@NotNull PrePlayerInputEvent event) {
         if (viewData != null) {
             event.setYaw(viewData.rotationYaw);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onJump(JumpEvent event) {
         if (viewData != null) {
             event.setYaw(viewData.rotationYaw);

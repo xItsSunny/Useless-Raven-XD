@@ -1,8 +1,15 @@
 package keystrokesmod.module.impl.combat;
 
 import akka.japi.Pair;
-import keystrokesmod.Raven;
-import keystrokesmod.event.*;
+import keystrokesmod.Client;
+import keystrokesmod.event.client.MouseEvent;
+import keystrokesmod.event.network.SendPacketEvent;
+import keystrokesmod.event.player.PostMotionEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.RotationEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.autoclicker.DragClickAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
@@ -36,11 +43,7 @@ import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Mouse;
@@ -283,12 +286,9 @@ public class KillAura extends IAutoClicker {
         };
     }
 
-    @SubscribeEvent
-    public void onRenderTick(TickEvent.RenderTickEvent ev) {
+    @EventListener
+    public void onRenderTick(Render2DEvent ev) {
         if (!Utils.nullCheck()) {
-            return;
-        }
-        if (ev.phase != TickEvent.Phase.START) {
             return;
         }
         if (target != null) {
@@ -300,8 +300,8 @@ public class KillAura extends IAutoClicker {
         }
     }
 
-    @SubscribeEvent
-    public void onRenderWorldLast(RenderWorldLastEvent event) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         Vec3 hitPos = aimSimulator.getHitPos();
         if (target != null) {
             if (rotations != null && dot.isToggled() && hitPos != null) {
@@ -324,7 +324,7 @@ public class KillAura extends IAutoClicker {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (gameNoAction() || playerNoAction()) {
             resetVariables();
@@ -364,16 +364,16 @@ public class KillAura extends IAutoClicker {
                 case 3:
                     if (lag) {
                         blinking = true;
-                        if (Raven.badPacketsHandler.playerSlot != mc.thePlayer.inventory.currentItem % 8 + 1) {
+                        if (Client.badPacketsHandler.playerSlot != mc.thePlayer.inventory.currentItem % 8 + 1) {
                             mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
-                            Raven.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem % 8 + 1;
+                            Client.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem % 8 + 1;
                             swapped = true;
                         }
                         lag = false;
                     } else {
                         // check here for ghost later
                         mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-                        Raven.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem;  // todo recode this with slot handler
+                        Client.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem;  // todo recode this with slot handler
                         swapped = false;
                         attackAndInteract(target, true);
                         sendBlock();
@@ -439,7 +439,7 @@ public class KillAura extends IAutoClicker {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @EventListener(priority = -1)
     public void onRotation(@NotNull RotationEvent event) {
         RotationData data = doRotationAction(new RotationData(event.getYaw(), event.getPitch()));
         if (data != null) {
@@ -466,14 +466,14 @@ public class KillAura extends IAutoClicker {
         return null;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPostMotion(PostMotionEvent e) {
         if (autoBlockMode.getInput() == 2 && block.get() && Utils.holdingSword()) {
             mc.getNetHandler().addToSendQueue(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onSendPacket(SendPacketEvent e) {
         if (!Utils.nullCheck() || !blinking) {
             return;
@@ -483,10 +483,10 @@ public class KillAura extends IAutoClicker {
             return;
         }
         blinkedPackets.add(e.getPacket());
-        e.setCanceled(true);
+        e.cancel();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(ReceivePacketEvent e) {
         if (gameNoAction() || !fixSlotReset.isToggled()) {
             return;
@@ -497,20 +497,20 @@ public class KillAura extends IAutoClicker {
                     if (((S2FPacketSetSlot) e.getPacket()).func_149174_e() == null || (((S2FPacketSetSlot) e.getPacket()).func_149174_e().getItem() != mc.thePlayer.getHeldItem().getItem())) {
                         return;
                     }
-                    e.setCanceled(true);
+                    e.cancel();
                 }
             }
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMouse(final @NotNull MouseEvent mouseEvent) {
-        if (mouseEvent.button == 0 && mouseEvent.buttonstate) {
+        if (mouseEvent.getButton() == 0 && mouseEvent.isButtonstate()) {
             if (target != null || swing) {
-                mouseEvent.setCanceled(true);
+                mouseEvent.cancel();
             }
-        } else if (mouseEvent.button == 1) {
-            rmbDown = mouseEvent.buttonstate;
+        } else if (mouseEvent.getButton() == 1) {
+            rmbDown = mouseEvent.isButtonstate();
             if (autoBlockMode.getInput() >= 1 && Utils.holdingSword() && block.get() && autoBlockMode.getInput() != 7) {
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
                 if (target == null && mc.objectMouseOver != null) {
@@ -522,7 +522,7 @@ public class KillAura extends IAutoClicker {
                         return;
                     }
                 }
-                mouseEvent.setCanceled(true);
+                mouseEvent.cancel();
             }
         }
     }
@@ -616,7 +616,7 @@ public class KillAura extends IAutoClicker {
 
     private void setBlockState(boolean state, boolean sendBlock, boolean sendUnBlock) {
         if (Utils.holdingSword()) {
-            if (sendBlock && !blocking && state && Utils.holdingSword() && !Raven.badPacketsHandler.C07) {
+            if (sendBlock && !blocking && state && Utils.holdingSword() && !Client.badPacketsHandler.C07) {
                 sendBlock();
             } else if (sendUnBlock && blocking && !state) {
                 unBlock();
@@ -809,9 +809,9 @@ public class KillAura extends IAutoClicker {
         if (!Utils.nullCheck()) return;
         releasePackets();
         blocking = false;
-        if (Raven.badPacketsHandler.playerSlot != mc.thePlayer.inventory.currentItem && swapped) {
+        if (Client.badPacketsHandler.playerSlot != mc.thePlayer.inventory.currentItem && swapped) {
             mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-            Raven.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem;
+            Client.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem;
             swapped = false;
         }
         if (lag && unblock) {
@@ -825,13 +825,12 @@ public class KillAura extends IAutoClicker {
             synchronized (blinkedPackets) {
                 for (Packet<?> packet : blinkedPackets) {
                     if (packet instanceof C09PacketHeldItemChange) {
-                        Raven.badPacketsHandler.playerSlot = ((C09PacketHeldItemChange) packet).getSlotId();
+                        Client.badPacketsHandler.playerSlot = ((C09PacketHeldItemChange) packet).getSlotId();
                     }
                     PacketUtils.sendPacketNoEvent(packet);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             Utils.sendModuleMessage(this, "&cThere was an error releasing blinked packets");
         }
         blinkedPackets.clear();

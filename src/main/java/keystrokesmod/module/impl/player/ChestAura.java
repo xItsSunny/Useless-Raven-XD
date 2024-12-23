@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.player;
 
 import akka.japi.Pair;
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.RotationEvent;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
 import keystrokesmod.module.impl.other.RotationHandler;
@@ -25,7 +25,7 @@ import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -66,7 +66,7 @@ public class ChestAura extends IAutoClicker {
         this.registerSetting(targetNearbyCheck = new ButtonSetting("Target nearby check", true));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (targetNearbyCheck.isToggled() && Utils.isTargetNearby()) {
             target = null;
@@ -120,7 +120,7 @@ public class ChestAura extends IAutoClicker {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRotation(RotationEvent event) {
         if (target == null) {
             lastYaw = null;

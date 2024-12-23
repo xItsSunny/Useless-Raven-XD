@@ -1,12 +1,12 @@
 package keystrokesmod.mixins.impl.client;
 
 
-import keystrokesmod.event.MoveInputEvent;
-import keystrokesmod.event.PostPlayerInputEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PostPlayerInputEvent;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.MovementInputFromOptions;
-import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+@SuppressWarnings("UnresolvedMixinReference")
 @Mixin(MovementInputFromOptions.class)
 public abstract class MixinMovementInputFromOptions extends MovementInput {
 
@@ -49,7 +50,7 @@ public abstract class MixinMovementInputFromOptions extends MovementInput {
 
         final MoveInputEvent moveInputEvent = new MoveInputEvent(moveForward, moveStrafe, jump, sneak, 0.3D);
 
-        MinecraftForge.EVENT_BUS.post(moveInputEvent);
+        Client.EVENT_BUS.post(moveInputEvent);
 
         final double sneakMultiplier = moveInputEvent.getSneakSlowDown();
         this.moveForward = moveInputEvent.getForward();
@@ -62,7 +63,7 @@ public abstract class MixinMovementInputFromOptions extends MovementInput {
             this.moveForward = (float) ((double) this.moveForward * sneakMultiplier);
         }
 
-        MinecraftForge.EVENT_BUS.post(new PostPlayerInputEvent());
+        Client.EVENT_BUS.post(new PostPlayerInputEvent());
         ci.cancel();
     }
 }

@@ -2,7 +2,7 @@ package keystrokesmod.mixins.impl.gui;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.render.BackgroundUtils;
@@ -22,6 +22,7 @@ import java.awt.*;
 import java.util.List;
 
 
+@SuppressWarnings("UnresolvedMixinReference")
 @Mixin(value = GuiMainMenu.class, priority = 1983)
 public abstract class MixinGuiMainMenu extends GuiScreen {
     @Unique
@@ -56,7 +57,7 @@ public abstract class MixinGuiMainMenu extends GuiScreen {
         ForgeHooksClient.renderMainMenu((GuiMainMenu) (Object) this, this.fontRendererObj, this.width, this.height);
         String s1 = "Copyright Mojang AB. Do not distribute!";
         this.drawString(this.fontRendererObj, s1, this.width - this.fontRendererObj.getStringWidth(s1) - 2, this.height - 10, -1);
-        String s2 = Raven.moduleCounter + " modules and " + Raven.settingCounter + " settings loaded!";
+        String s2 = Client.moduleCounter + " modules and " + Client.settingCounter + " settings loaded!";
         this.drawString(this.fontRendererObj, s2, this.width - this.fontRendererObj.getStringWidth(s2) - 2, 2, -1);
 
         super.drawScreen(p_drawScreen_1_, p_drawScreen_2_, p_drawScreen_3_);

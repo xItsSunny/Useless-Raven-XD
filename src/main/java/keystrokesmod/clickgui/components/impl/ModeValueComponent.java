@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui.components.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ModeValue;
@@ -52,7 +52,7 @@ public class ModeValueComponent extends Component {
         if (this.getSetting() != null && !this.getSetting().isVisible()) return;
 
         if (isHover(x, y) && this.parent.po) {
-            changeValue(b, Keyboard.isKeyDown(Raven.mc.gameSettings.keyBindSneak.getKeyCode()));
+            changeValue(b, Keyboard.isKeyDown(Client.mc.gameSettings.keyBindSneak.getKeyCode()));
             parent.categoryComponent.render();
         }
     }

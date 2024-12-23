@@ -1,12 +1,12 @@
 package keystrokesmod.module.impl.other;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
-import keystrokesmod.event.PreConnectEvent;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.network.PreConnectEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class FlagDetector extends Module {
@@ -16,7 +16,7 @@ public class FlagDetector extends Module {
         super("FlagDetector", category.other);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook && mc.thePlayer.ticksExisted > 40) {
             counter++;
@@ -24,7 +24,7 @@ public class FlagDetector extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onConnect(@NotNull PreConnectEvent event) {
         counter = 0;
     }

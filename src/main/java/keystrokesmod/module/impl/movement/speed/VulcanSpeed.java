@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.movement.speed;
 
-import keystrokesmod.event.PrePlayerInputEvent;
+import keystrokesmod.event.player.PrePlayerInputEvent;
 import keystrokesmod.module.impl.movement.Speed;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
@@ -9,7 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class VulcanSpeed extends SubMode<Speed> {
@@ -20,7 +20,7 @@ public class VulcanSpeed extends SubMode<Speed> {
         this.registerSetting(lowHop = new SliderSetting("Low hop", 2, 0, 4, 1));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPrePlayerInput(PrePlayerInputEvent event) {
         if (!MoveUtil.isMoving()) return;
         switch (parent.offGroundTicks) {

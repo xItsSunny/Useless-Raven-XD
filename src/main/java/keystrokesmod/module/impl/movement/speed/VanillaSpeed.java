@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.movement.speed;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.movement.Speed;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -8,7 +8,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class VanillaSpeed extends SubMode<Speed> {
@@ -35,7 +35,7 @@ public class VanillaSpeed extends SubMode<Speed> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (parent.noAction()) return;
 

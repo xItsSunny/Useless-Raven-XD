@@ -1,14 +1,14 @@
 package keystrokesmod.module.impl.movement.phase;
 
-import keystrokesmod.event.BlockAABBEvent;
-import keystrokesmod.event.WorldChangeEvent;
+import keystrokesmod.event.world.BlockAABBEvent;
+import keystrokesmod.event.world.WorldChangeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.Phase;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class GrimACPhase extends SubMode<Phase> {
@@ -31,7 +31,7 @@ public class GrimACPhase extends SubMode<Phase> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onWorldChange(WorldChangeEvent event) {
         if (!onlyMurderMystery.isToggled() || isMurderMystery())
             mc.thePlayer.motionY = motion.getInput();
@@ -39,7 +39,7 @@ public class GrimACPhase extends SubMode<Phase> {
             ModuleManager.blink.enable();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onAABB(BlockAABBEvent event) {
         if ((!onlyMurderMystery.isToggled() || isMurderMystery()) && mc.thePlayer.ticksExisted < 10)
             event.setBoundingBox(null);

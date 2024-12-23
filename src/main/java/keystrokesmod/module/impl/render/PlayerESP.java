@@ -1,7 +1,9 @@
 package keystrokesmod.module.impl.render;
 
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.world.AntiBot;
@@ -13,8 +15,6 @@ import keystrokesmod.utility.render.ColorUtils;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.awt.*;
 
@@ -81,7 +81,7 @@ public class PlayerESP extends Module {
 
         targets.clear();
         if (Utils.nullCheck()) {
-            if (Raven.debugger) {
+            if (Client.debugger) {
                 mc.theWorld.loadedEntityList.parallelStream()
                         .filter(entity -> entity instanceof EntityLivingBase && entity != mc.thePlayer)
                         .forEach(entity -> {
@@ -106,8 +106,8 @@ public class PlayerESP extends Module {
         }
     }
 
-    @SubscribeEvent
-    public void onRenderWorld(RenderWorldLastEvent e) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         targets.forEach((target, color) -> {
             try {
                 render(target, color);

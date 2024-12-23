@@ -1,14 +1,14 @@
 package keystrokesmod.module.impl.movement;
 
-import keystrokesmod.event.PushOutOfBlockEvent;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.world.PushOutOfBlockEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.movement.phase.*;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class Phase extends Module {
@@ -40,16 +40,16 @@ public class Phase extends Module {
         mode.disable();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook && cancelS08.isToggled())
-            event.setCanceled(true);
+            event.cancel();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPushOutOfBlock(PushOutOfBlockEvent event) {
         if (cancelPush.isToggled())
-            event.setCanceled(true);
+            event.cancel();
     }
 
     @Override

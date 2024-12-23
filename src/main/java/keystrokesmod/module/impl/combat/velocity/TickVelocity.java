@@ -1,12 +1,12 @@
 package keystrokesmod.module.impl.combat.velocity;
 
-import keystrokesmod.Raven;
-import keystrokesmod.event.PostVelocityEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.player.PostVelocityEvent;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
@@ -31,7 +31,7 @@ public class TickVelocity extends SubMode<Velocity> {
         this.registerSetting(resetTime = new SliderSetting("Reset time", 5000, 500, 10000, 500, "ms", onlyFirstHit::isToggled));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPostVelocity(PostVelocityEvent event) {
         final long time = System.currentTimeMillis();
 
@@ -40,7 +40,7 @@ public class TickVelocity extends SubMode<Velocity> {
         lastVelocityTime = time;
 
         if (chance.getInput() == 100 || Math.random() * 100 <= chance.getInput()) {
-            Raven.getExecutor().schedule(() -> {
+            Client.getExecutor().schedule(() -> {
                 if (mc.thePlayer.hurtTime > 0) {
                     mc.thePlayer.motionX *= horizontal.getInput() / 100;
                     mc.thePlayer.motionY *= vertical.getInput() / 100;

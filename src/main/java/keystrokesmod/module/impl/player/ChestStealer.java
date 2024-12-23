@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.Raven;
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.RenderContainerEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.render.RenderContainerEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -13,7 +13,7 @@ import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemEmptyMap;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -58,10 +58,10 @@ public class ChestStealer extends Module {
         Utils.correctValue(minCloseDelay, maxCloseDelay);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRenderContainer(RenderContainerEvent event) {
         if (silent.isToggled() && ContainerUtils.isChest(customChest.isToggled()))
-            event.setCanceled(true);
+            event.cancel();
     }
 
     @Override
@@ -74,7 +74,7 @@ public class ChestStealer extends Module {
                 if (delay == 0) {
                     state = State.STEAL;
                 } else {
-                    Raven.getExecutor().schedule(
+                    Client.getExecutor().schedule(
                             () -> state = State.STEAL,
                             delay,
                             TimeUnit.MILLISECONDS
@@ -87,7 +87,7 @@ public class ChestStealer extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         // Stop player movement on X and Z axes if `notMoving` is toggled and a chest is targeted
         if (notMoving.isToggled() && ContainerUtils.isChest(customChest.isToggled())) {

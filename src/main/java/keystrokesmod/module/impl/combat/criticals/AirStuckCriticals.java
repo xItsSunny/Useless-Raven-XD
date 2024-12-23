@@ -1,9 +1,8 @@
 package keystrokesmod.module.impl.combat.criticals;
 
-import keystrokesmod.event.PostVelocityEvent;
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.PreMoveEvent;
-import keystrokesmod.event.PreVelocityEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.PreMoveEvent;
+import keystrokesmod.event.player.PreVelocityEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.Criticals;
 import keystrokesmod.module.impl.combat.KillAura;
@@ -12,8 +11,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Utils;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class AirStuckCriticals extends SubMode<Criticals> {
@@ -48,7 +46,7 @@ public class AirStuckCriticals extends SubMode<Criticals> {
         active = lastActive = false;
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @EventListener(priority = 2)
     public void onPreMotion(PreMotionEvent event) {
         if (mc.thePlayer.onGround) {
             if (!Utils.jumpDown() && autoJump.isToggled() && canActive(true))
@@ -61,7 +59,7 @@ public class AirStuckCriticals extends SubMode<Criticals> {
         if (active) {
             stuckTicks++;
             if (cancelC03.isToggled())
-                event.setCanceled(true);
+                event.cancel();
         } else {
             stuckTicks = 0;
             if (lastActive) {
@@ -91,13 +89,13 @@ public class AirStuckCriticals extends SubMode<Criticals> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMove(PreMoveEvent event) {
         if (active)
-            event.setCanceled(true);
+            event.cancel();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreVelocity(PreVelocityEvent event) {
         disableTicks += (int) pauseOnVelocity.getInput();
     }

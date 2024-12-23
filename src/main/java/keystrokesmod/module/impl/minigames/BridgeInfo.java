@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.minigames;
 
+import keystrokesmod.event.render.Render2DEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
@@ -17,12 +18,10 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
-import net.minecraftforge.client.event.ClientChatReceivedEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import keystrokesmod.event.network.ClientChatReceivedEvent;
+import keystrokesmod.event.world.EntityJoinWorldEvent;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 import java.awt.*;
 import java.io.IOException;
@@ -34,7 +33,6 @@ public class BridgeInfo extends Module {
     public static ButtonSetting ep;
     private static int hudX = 5;
     private static int hudY = 70;
-    private final String bd = "the brid";
     private final String g1t = "Defend!";
     private final String g2t = "Jump in to score!";
     private final String qt = "First player to score 5 goals wins";
@@ -113,9 +111,9 @@ public class BridgeInfo extends Module {
         }
     }
 
-    @SubscribeEvent
-    public void a(RenderTickEvent ev) {
-        if (ev.phase == Phase.END && Utils.nullCheck() && this.ibd()) {
+    @EventListener
+    public void a(Render2DEvent ev) {
+        if (Utils.nullCheck() && this.ibd()) {
             if (mc.currentScreen != null || mc.gameSettings.showDebugInfo) {
                 return;
             }
@@ -128,10 +126,10 @@ public class BridgeInfo extends Module {
 
     }
 
-    @SubscribeEvent
+    @EventListener
     public void o(ClientChatReceivedEvent c) {
         if (Utils.nullCheck()) {
-            String s = Utils.stripColor(c.message.getUnformattedText());
+            String s = Utils.stripColor(c.getMessage().getUnformattedText());
             if (s.startsWith(" ")) {
                 if (s.contains(this.qt)) {
                     this.q = true;
@@ -149,9 +147,9 @@ public class BridgeInfo extends Module {
 
     }
 
-    @SubscribeEvent
+    @EventListener
     public void w(EntityJoinWorldEvent j) {
-        if (j.entity == mc.thePlayer) {
+        if (j.getEntity() == mc.thePlayer) {
             this.rv();
         }
 
@@ -159,12 +157,10 @@ public class BridgeInfo extends Module {
 
     private boolean ibd() {
         if (Utils.isHypixel()) {
-            Iterator var1 = Utils.gsl().iterator();
 
-            while (var1.hasNext()) {
-                String s = (String) var1.next();
+            for (String s : Utils.gsl()) {
                 String s2 = s.toLowerCase();
-                if (s2.contains("mode") && s2.contains(this.bd)) {
+                if (s2.contains("mode") && s2.contains("the brid")) {
                     return true;
                 }
             }

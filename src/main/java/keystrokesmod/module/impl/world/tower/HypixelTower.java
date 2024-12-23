@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.world.tower;
 
-import keystrokesmod.Raven;
-import keystrokesmod.event.MoveEvent;
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.player.MoveEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.world.Tower;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -16,8 +16,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 
@@ -57,7 +56,7 @@ public class HypixelTower extends SubMode<Tower> {
         return 8.0E-4 + Math.random() * 0.008;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMove(MoveEvent event) throws IllegalAccessException {
         if (mc.thePlayer.isPotionActive(Potion.jump)) return;
         final boolean airUnder = !BlockUtils.insideBlock(
@@ -113,7 +112,7 @@ public class HypixelTower extends SubMode<Tower> {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @EventListener(priority = -1)
     public void onPreUpdate(PreUpdateEvent event) {
         if (mc.thePlayer.onGround) {
             lastOnGroundY = (int) mc.thePlayer.posY;
@@ -140,7 +139,7 @@ public class HypixelTower extends SubMode<Tower> {
 
             Triple<BlockPos, EnumFacing, Vec3> placeSide = optionalPlaceSide.get();
 
-            Raven.getExecutor().schedule(() -> {
+            Client.getExecutor().schedule(() -> {
                 if (ModuleManager.scaffold.place(
                         new MovingObjectPosition(placeSide.getRight().toVec3(), placeSide.getMiddle(), placeSide.getLeft()),
                         false

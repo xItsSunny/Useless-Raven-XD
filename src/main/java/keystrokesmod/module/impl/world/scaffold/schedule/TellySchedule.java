@@ -1,16 +1,15 @@
 package keystrokesmod.module.impl.world.scaffold.schedule;
 
-import keystrokesmod.event.JumpEvent;
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.ScaffoldPlaceEvent;
+import keystrokesmod.event.player.JumpEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.ScaffoldPlaceEvent;
 import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.module.impl.world.scaffold.IScaffoldSchedule;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class TellySchedule extends IScaffoldSchedule {
@@ -42,13 +41,13 @@ public class TellySchedule extends IScaffoldSchedule {
         noPlace = false;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onScaffoldPlace(ScaffoldPlaceEvent event) {
         if (noPlace)
-            event.setCanceled(true);
+            event.cancel();
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @EventListener(priority = -1)
     public boolean onPreUpdate(PreUpdateEvent event) {
         if (parent.offGroundTicks == 0) {
             if (parent.onGroundTicks == 0)
@@ -78,9 +77,9 @@ public class TellySchedule extends IScaffoldSchedule {
         return true;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onJump(JumpEvent event) {
         if (parent.offGroundTicks == 0 && parent.onGroundTicks == 0)
-            event.setCanceled(true);
+            event.cancel();
     }
 }

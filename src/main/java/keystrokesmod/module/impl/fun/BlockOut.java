@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.fun;
 
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -15,7 +15,7 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.Comparator;
@@ -34,7 +34,7 @@ public class BlockOut extends Module {
         this.registerSetting(ignoreTeammates = new ButtonSetting("Ignore teammates", true));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (!Utils.nullCheck()) return;
 

@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.render;
 
+import keystrokesmod.event.render.PreRenderNameTag;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -16,8 +17,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 
@@ -61,10 +61,10 @@ public class Nametags extends Module {
         this.registerSetting(showStackSize = new ButtonSetting("Show stack size", true));
     }
 
-    @SubscribeEvent
-    public void onRenderLiving(RenderLivingEvent.Specials.@NotNull Pre<?> e) {
-        if (e.entity instanceof EntityPlayer && (e.entity != mc.thePlayer || renderSelf.isToggled()) && e.entity.deathTime == 0) {
-            final EntityPlayer entityPlayer = (EntityPlayer) e.entity;
+    @EventListener
+    public void onRenderNameTag(PreRenderNameTag e) {
+        if (e.getEntity() instanceof EntityPlayer && (e.getEntity() != mc.thePlayer || renderSelf.isToggled()) && e.getEntity().deathTime == 0) {
+            final EntityPlayer entityPlayer = (EntityPlayer) e.getEntity();
             if (!showInvis.isToggled() && entityPlayer.isInvisible()) {
                 return;
             }
@@ -72,7 +72,7 @@ public class Nametags extends Module {
             if (entityPlayer.getDisplayNameString().isEmpty() || (entityPlayer != mc.thePlayer && AntiBot.isBot(entityPlayer))) {
                 return;
             }
-            e.setCanceled(true);
+            e.cancel();
             String name;
             if (removeTags.isToggled()) {
                 name = entityPlayer.getName();
@@ -100,7 +100,7 @@ public class Nametags extends Module {
                 name = color + distance + "m§r " + name;
             }
             GlStateManager.pushMatrix();
-            GlStateManager.translate((float) e.x + 0.0f, (float) e.y + entityPlayer.height + 0.5f, (float) e.z);
+            GlStateManager.translate((float) e.getX() + 0.0f, (float) e.getY() + entityPlayer.height + 0.5f, (float) e.getZ());
             GL11.glNormal3f(0.0f, 1.0f, 0.0f);
             GlStateManager.rotate(-mc.getRenderManager().playerViewY, 0.0f, 1.0f, 0.0f);
             if (entityPlayer == mc.thePlayer && mc.gameSettings.thirdPersonView == 2) {

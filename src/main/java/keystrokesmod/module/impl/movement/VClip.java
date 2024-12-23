@@ -1,13 +1,13 @@
 package keystrokesmod.module.impl.movement;
 
-import keystrokesmod.Raven;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 import java.util.concurrent.TimeUnit;
 
@@ -33,16 +33,16 @@ public class VClip extends Module {
         }
 
         if (cancelS08.getInput() > 0) {
-            Raven.getExecutor().schedule(this::disable, (long) cancelS08.getInput() * 50, TimeUnit.MILLISECONDS);
+            Client.getExecutor().schedule(this::disable, (long) cancelS08.getInput() * 50, TimeUnit.MILLISECONDS);
         } else {
             disable();
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(ReceivePacketEvent event) {
         if (cancelS08.getInput() > 0 && event.getPacket() instanceof S08PacketPlayerPosLook) {
-            event.setCanceled(true);
+            event.cancel();
         }
     }
 }

@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.player;
 
 import akka.japi.Pair;
-import keystrokesmod.Raven;
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -19,7 +19,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemEmptyMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C0DPacketCloseWindow;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -104,7 +104,7 @@ public class InvManager extends Module {
                 if (delay == 0) {
                     state = State.TASKING;
                 } else {
-                    Raven.getExecutor().schedule(
+                    Client.getExecutor().schedule(
                             () -> state = State.TASKING,
                             delay,
                             TimeUnit.MILLISECONDS
@@ -116,7 +116,7 @@ public class InvManager extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (state != State.TASKING) return;
         int antiFreeze = 100;

@@ -1,15 +1,18 @@
 package keystrokesmod.utility.render.progress;
 
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.Set;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ProgressManager {
-    private static final Set<Progress> progresses = Collections.synchronizedSet(new ObjectOpenHashSet<>());
+    private static final Queue<Progress> progresses = new ConcurrentLinkedQueue<>();
+
+    static {
+        Client.EVENT_BUS.register(Render2DEvent.class, () -> progresses.forEach(Progress::render));
+    }
 
     public static void add(@NotNull Progress progress) {
         if (progresses.add(progress)) {
@@ -26,13 +29,6 @@ public class ProgressManager {
                 if (p.getPosY() > posY)
                     p.setPosY(p.getPosY() - 1);
             }
-        }
-    }
-
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
-        synchronized (progresses) {
-            progresses.forEach(Progress::render);
         }
     }
 }

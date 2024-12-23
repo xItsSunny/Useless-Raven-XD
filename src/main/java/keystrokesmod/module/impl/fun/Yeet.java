@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.fun;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.Module;
 import net.minecraft.crash.CrashReport;
 
@@ -15,7 +15,7 @@ public class Yeet extends Module {
     @Override
     public void onEnable() {
         enableTicks = 0;
-        Raven.mc.thePlayer.playSound("keystrokesmod:yeet", 1, 1);
+        Client.mc.thePlayer.playSound("keystrokesmod:yeet", 1, 1);
         mc.ingameGUI.displayTitle("还是PVP大佬", "", 10, 10, 10);
     }
 

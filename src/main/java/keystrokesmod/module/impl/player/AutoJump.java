@@ -1,11 +1,11 @@
 package keystrokesmod.module.impl.player;
 
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 public class AutoJump extends Module {
     public static ButtonSetting b;
@@ -20,8 +20,8 @@ public class AutoJump extends Module {
         this.ju(this.c = false);
     }
 
-    @SubscribeEvent
-    public void p(PlayerTickEvent e) {
+    @EventListener
+    public void p(PreUpdateEvent e) {
         if (Utils.nullCheck()) {
             if (mc.thePlayer.onGround && (!b.isToggled() || !mc.thePlayer.isSneaking())) {
                 if (Utils.onEdge()) {
@@ -32,7 +32,6 @@ public class AutoJump extends Module {
             } else if (this.c) {
                 this.ju(this.c = false);
             }
-
         }
     }
 

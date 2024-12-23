@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -10,8 +10,8 @@ import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFishingRod;
-import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.client.MouseEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.Nullable;
 
 public class RodAimbot extends Module {
@@ -41,9 +41,9 @@ public class RodAimbot extends Module {
         lookTicks = 0;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMouse(final MouseEvent mouseEvent) {
-        if (mouseEvent.button != 1 || !mouseEvent.buttonstate || !Utils.nullCheck() || mc.currentScreen != null) {
+        if (mouseEvent.getButton() != 1 || !mouseEvent.isButtonstate() || !Utils.nullCheck() || mc.currentScreen != null) {
             return;
         }
         if (mc.thePlayer.getCurrentEquippedItem() == null || !(mc.thePlayer.getCurrentEquippedItem().getItem() instanceof ItemFishingRod) || mc.thePlayer.fishEntity != null) {
@@ -53,13 +53,13 @@ public class RodAimbot extends Module {
         if (target == null) {
             return;
         }
-        mouseEvent.setCanceled(true);
+        mouseEvent.cancel();
         rightClick = true;
         rotate = true;
         lookTicks = 1;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (!Utils.nullCheck()) {
             return;

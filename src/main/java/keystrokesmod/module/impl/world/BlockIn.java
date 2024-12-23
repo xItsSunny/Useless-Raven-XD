@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.world;
 
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.RotationEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -22,7 +22,7 @@ import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 
@@ -65,7 +65,7 @@ public class BlockIn extends Module {
         lastSlot = -1;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(RotationEvent event) {
         if (currentRot == null) return;
         if (rotationMode.getInput() == 0) {
@@ -76,7 +76,7 @@ public class BlockIn extends Module {
         event.setPitch(currentRot.y);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (autoSwitch.isToggled() && lastSlot == -1) {
             int slot = Scaffold.getSlot();

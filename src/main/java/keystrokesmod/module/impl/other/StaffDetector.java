@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.other;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
+import keystrokesmod.event.world.WorldChangeEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.client.Notifications.NotificationTypes;
@@ -11,9 +12,7 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C01PacketChatMessage;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,7 +45,7 @@ public class StaffDetector extends Module {
         super("StaffDetector", category.other);
         this.registerSetting(stafflistMode, messageMode, detectionMode, autoLobby, alarm);
         loadStaffLists();
-        MinecraftForge.EVENT_BUS.register(this);
+        Client.EVENT_BUS.register(this);
     }
 
     private synchronized void loadStaffLists() {
@@ -57,7 +56,7 @@ public class StaffDetector extends Module {
             String filePath = stafflistPath + listName + ".txt";
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    Objects.requireNonNull(Raven.class.getResourceAsStream(filePath))))) {
+                    Objects.requireNonNull(Client.class.getResourceAsStream(filePath))))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     staffNames.add(line.trim());
@@ -156,8 +155,8 @@ public class StaffDetector extends Module {
         }
     }
 
-    @SubscribeEvent
-    public void onWorldLoad(WorldEvent.Load event) {
+    @EventListener
+    public void onWorldChange(WorldChangeEvent event) {
         flagged.clear();
     }
 }

@@ -7,9 +7,8 @@ import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.network.AttackEntityEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class SimpleSprintReset extends SubMode<IMoreKB> {
@@ -54,14 +53,14 @@ public class SimpleSprintReset extends SubMode<IMoreKB> {
             delayTicksLeft--;
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onAttack(AttackEntityEvent event) {
-        if (!Utils.nullCheck() || event.entityPlayer != mc.thePlayer || delayTicksLeft > 0) return;
-        if (!(event.target instanceof EntityLivingBase)) return;
-        if (playersOnly.isToggled() && !(event.target instanceof EntityPlayer)) return;
-        if (notWhileRunner.isToggled() && !Utils.inFov(180, event.target, mc.thePlayer)) return;
-        if (((EntityLivingBase) event.target).deathTime != 0) return;
-        if (AntiBot.isBot(event.target)) return;
+        if (!Utils.nullCheck() || delayTicksLeft > 0) return;
+        if (!(event.getTarget() instanceof EntityLivingBase)) return;
+        if (playersOnly.isToggled() && !(event.getTarget() instanceof EntityPlayer)) return;
+        if (notWhileRunner.isToggled() && !Utils.inFov(180, event.getTarget(), mc.thePlayer)) return;
+        if (((EntityLivingBase) event.getTarget()).deathTime != 0) return;
+        if (AntiBot.isBot(event.getTarget())) return;
 
         if (Math.random() > chance.getInput()) return;
 

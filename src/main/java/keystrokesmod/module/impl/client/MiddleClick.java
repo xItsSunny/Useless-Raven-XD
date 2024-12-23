@@ -8,8 +8,8 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemEnderPearl;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.lwjgl.input.Mouse;
 
 public class MiddleClick extends Module {
@@ -28,8 +28,8 @@ public class MiddleClick extends Module {
         hasClicked = false;
     }
 
-    @SubscribeEvent
-    public void onTick(TickEvent.RenderTickEvent e) {
+    @EventListener
+    public void onTick(Render2DEvent e) {
         if (!Utils.nullCheck())
             return;
         if (pearlEvent < 4) {

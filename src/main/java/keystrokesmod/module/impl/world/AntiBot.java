@@ -4,8 +4,8 @@ import com.mojang.authlib.GameProfile;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import keystrokesmod.Raven;
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.render.Freecam;
@@ -20,8 +20,8 @@ import net.minecraft.entity.monster.EntitySilverfish;
 import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C02PacketUseEntity;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.world.EntityJoinWorldEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -129,27 +129,27 @@ public class AntiBot extends Module {
     }
 
     private static @NotNull List<String> getTablist() {
-        return Raven.mc.getNetHandler().getPlayerInfoMap().parallelStream()
+        return Client.mc.getNetHandler().getPlayerInfoMap().parallelStream()
                 .map(NetworkPlayerInfo::getGameProfile)
-                .filter(profile -> profile.getId() != Raven.mc.thePlayer.getUniqueID())
+                .filter(profile -> profile.getId() != Client.mc.thePlayer.getUniqueID())
                 .map(GameProfile::getName)
                 .collect(Collectors.toList());
     }
 
-    @SubscribeEvent
+    @EventListener
     public void c(final EntityJoinWorldEvent entityJoinWorldEvent) {
-        if (entitySpawnDelay.isToggled() && entityJoinWorldEvent.entity instanceof EntityPlayer && entityJoinWorldEvent.entity != mc.thePlayer) {
-            entities.put((EntityPlayer) entityJoinWorldEvent.entity, System.currentTimeMillis());
+        if (entitySpawnDelay.isToggled() && entityJoinWorldEvent.getEntity() instanceof EntityPlayer && entityJoinWorldEvent.getEntity() != mc.thePlayer) {
+            entities.put((EntityPlayer) entityJoinWorldEvent.getEntity(), System.currentTimeMillis());
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(SendPacketEvent event) {
         if (cancelBotHit.isToggled() && event.getPacket() instanceof C02PacketUseEntity) {
             C02PacketUseEntity packet = (C02PacketUseEntity) event.getPacket();
             if (packet.getAction() == C02PacketUseEntity.Action.ATTACK) {
                 if (isBot(packet.getEntityFromWorld(mc.theWorld))) {
-                    event.setCanceled(true);
+                    event.cancel();
                 }
             }
         }

@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.player.nofall;
 
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.RotationEvent;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.player.NoFall;
@@ -18,7 +18,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class LegitNoFall extends SubMode<NoFall> {
@@ -37,7 +37,7 @@ public class LegitNoFall extends SubMode<NoFall> {
         this.registerSetting(switchToItem = new ButtonSetting("Switch to item", true));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(@NotNull PreUpdateEvent event) {
         if (inPosition()) {
             MovingObjectPosition rayCast = RotationUtils.rayCast(mc.playerController.getBlockReachDistance(), RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
@@ -47,7 +47,7 @@ public class LegitNoFall extends SubMode<NoFall> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRotation(RotationEvent event) {
         if (inPosition()) {
             if (lastPitch == -1) {

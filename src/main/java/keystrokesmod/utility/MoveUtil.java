@@ -12,7 +12,7 @@ import net.minecraft.util.MathHelper;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
 public class MoveUtil {
     public static final double WALK_SPEED = 0.221;

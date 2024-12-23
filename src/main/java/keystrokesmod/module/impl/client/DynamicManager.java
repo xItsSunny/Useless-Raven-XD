@@ -1,18 +1,18 @@
 package keystrokesmod.module.impl.client;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.clickgui.components.impl.ModuleComponent;
 import keystrokesmod.dynamic.Dynamic;
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import javax.tools.*;
@@ -51,7 +51,7 @@ public final class DynamicManager extends Module {
         this.registerSetting(new DescriptionSetting("Dynamics:", () -> !activeDynamics.isEmpty()));
         this.canBeEnabled = false;
 
-        directory = new File(Raven.mc.mcDataDir + File.separator + "keystrokes", "dynamics");
+        directory = new File(Client.mc.mcDataDir + File.separator + "keystrokes", "dynamics");
         if (!directory.exists()) {
             boolean success = directory.mkdirs();
             if (!success) {
@@ -78,7 +78,7 @@ public final class DynamicManager extends Module {
             if (file.exists() && file.isFile() && file.getName().endsWith(".jar"))
                 classPath.add(file);
         }
-        classPath.add(new File(Raven.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
+        classPath.add(new File(Client.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
         classPath.add(new File(Minecraft.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
         return classPath;
     }
@@ -98,7 +98,7 @@ public final class DynamicManager extends Module {
         return relativePath.replace(File.separator, ".").replace(".class", "");
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (needToLoad) {
             needToLoad = false;

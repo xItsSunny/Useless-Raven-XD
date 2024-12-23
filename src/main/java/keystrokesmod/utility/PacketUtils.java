@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
 public class PacketUtils {
     public static List<Packet<INetHandlerPlayServer>> skipSendEvent = new ArrayList<>();

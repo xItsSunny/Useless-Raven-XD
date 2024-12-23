@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.event.RightClickEvent;
+import keystrokesmod.event.client.RightClickEvent;
 import keystrokesmod.module.impl.combat.autoclicker.DragClickAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
@@ -14,7 +14,7 @@ import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.Utils;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 public class RightClicker extends IAutoClicker {
     private final ModeValue mode;
@@ -45,7 +45,7 @@ public class RightClicker extends IAutoClicker {
         mode.disable();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onClick(RightClickEvent event) {
         coolDown.start();
 

@@ -1,7 +1,9 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.event.player.RotationEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.LowCPSAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
@@ -25,8 +27,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
@@ -81,7 +81,7 @@ public class AutoRod extends IAutoClicker {
         clickMode.disable();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         target = null;
         if (KillAura.target != null) {
@@ -130,7 +130,7 @@ public class AutoRod extends IAutoClicker {
         return a;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRotation(RotationEvent event) {
         if (target == null) {
             lastYaw = lastPitch = null;
@@ -157,8 +157,8 @@ public class AutoRod extends IAutoClicker {
         return MoveUtil.predictedPos(entity, motion, result, predTicks);
     }
 
-    @SubscribeEvent
-    public void onRenderWorldLast(RenderWorldLastEvent event) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (drawPos.isToggled() && prediction.isToggled() && pos != null) {
             Blink.drawBox(pos);
         }

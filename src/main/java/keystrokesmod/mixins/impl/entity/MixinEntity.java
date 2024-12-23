@@ -1,14 +1,13 @@
 package keystrokesmod.mixins.impl.entity;
 
-import keystrokesmod.event.PrePlayerInputEvent;
-import keystrokesmod.event.SafeWalkEvent;
-import keystrokesmod.event.StepEvent;
+import keystrokesmod.event.player.PrePlayerInputEvent;
+import keystrokesmod.event.player.SafeWalkEvent;
+import keystrokesmod.event.player.StepEvent;
 import keystrokesmod.module.impl.other.RotationHandler;
-import keystrokesmod.utility.Utils;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.*;
-import net.minecraftforge.common.MinecraftForge;
+import keystrokesmod.Client;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+@SuppressWarnings("UnresolvedMixinReference")
 @Mixin(Entity.class)
 public abstract class MixinEntity {
 
@@ -32,15 +32,16 @@ public abstract class MixinEntity {
     public boolean onSafeWalk(@NotNull Entity instance) {
         if (instance instanceof EntityPlayerSP) {
             SafeWalkEvent event = new SafeWalkEvent(instance.isSneaking());
-            MinecraftForge.EVENT_BUS.post(event);
+            Client.EVENT_BUS.post(event);
             return event.isSafeWalk();
         }
         return instance.isSneaking();
     }
 
+    @SuppressWarnings("DiscouragedShift")
     @Inject(method = "moveEntity(DDD)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;setEntityBoundingBox(Lnet/minecraft/util/AxisAlignedBB;)V", ordinal = 8, shift = At.Shift.BY, by = 2))
     public void onPostStep(double x, double y, double z, CallbackInfo ci) {
-        MinecraftForge.EVENT_BUS.post(new StepEvent(this.getEntityBoundingBox().minY - this.posY));
+        Client.EVENT_BUS.post(new StepEvent(this.getEntityBoundingBox().minY - this.posY));
     }
 
     /**
@@ -51,16 +52,16 @@ public abstract class MixinEntity {
     public void moveFlying(float p_moveFlying_1_, float p_moveFlying_2_, float p_moveFlying_3_, CallbackInfo ci) {
         float yaw = ((Entity)(Object) this).rotationYaw;
         if((Object) this instanceof EntityPlayerSP) {
-            PrePlayerInputEvent prePlayerInput = new PrePlayerInputEvent(p_moveFlying_1_, p_moveFlying_2_, p_moveFlying_3_, RotationHandler.getMovementYaw((Entity) (Object) this));
-            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(prePlayerInput);
-            if (prePlayerInput.isCanceled()) {
+            PrePlayerInputEvent event = new PrePlayerInputEvent(p_moveFlying_1_, p_moveFlying_2_, p_moveFlying_3_, RotationHandler.getMovementYaw((Entity) (Object) this));
+            Client.EVENT_BUS.post(event);
+            if (event.isCancelled()) {
                 ci.cancel();
                 return;
             }
-            p_moveFlying_1_ = prePlayerInput.getStrafe();
-            p_moveFlying_2_ = prePlayerInput.getForward();
-            p_moveFlying_3_ = prePlayerInput.getFriction();
-            yaw = prePlayerInput.getYaw();
+            p_moveFlying_1_ = event.getStrafe();
+            p_moveFlying_2_ = event.getForward();
+            p_moveFlying_3_ = event.getFriction();
+            yaw = event.getYaw();
         }
 
         float f = p_moveFlying_1_ * p_moveFlying_1_ + p_moveFlying_2_ * p_moveFlying_2_;

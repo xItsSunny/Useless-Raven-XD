@@ -3,8 +3,8 @@ package keystrokesmod.module.impl.combat.ragebot.rapidfire;
 import keystrokesmod.module.impl.combat.RageBot;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class TimerRapidFire extends LegitRapidFire {
@@ -25,8 +25,8 @@ public class TimerRapidFire extends LegitRapidFire {
         fire = true;
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onRender(Render2DEvent event) {
         if (!Utils.nullCheck() || !fire) return;
 
         final long time = System.currentTimeMillis();

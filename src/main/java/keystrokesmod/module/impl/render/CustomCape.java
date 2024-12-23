@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.render;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -48,7 +48,7 @@ public final class CustomCape extends Module {
             try {
                 Desktop.getDesktop().open(directory);
             } catch (IOException ex) {
-                Raven.profileManager.directory.mkdirs();
+                Client.profileManager.directory.mkdirs();
                 Utils.sendMessage("&cError locating folder, recreated.");
             }
         }));
@@ -77,9 +77,9 @@ public final class CustomCape extends Module {
         for (String s : builtinCapes) {
             String name = s.toLowerCase();
             try {
-                InputStream stream = Raven.class.getResourceAsStream("/assets/keystrokesmod/textures/capes/" + name + ".png");
+                InputStream stream = Client.class.getResourceAsStream("/assets/keystrokesmod/textures/capes/" + name + ".png");
                 if (stream == null)
-                    stream = Raven.class.getResourceAsStream("/assets/keystrokesmod/textures/capes/" + s + ".png");
+                    stream = Client.class.getResourceAsStream("/assets/keystrokesmod/textures/capes/" + s + ".png");
                 if (stream == null)
                     continue;
                 BufferedImage bufferedImage = ImageIO.read(stream);

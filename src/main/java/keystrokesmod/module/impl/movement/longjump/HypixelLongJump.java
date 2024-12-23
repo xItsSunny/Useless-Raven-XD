@@ -1,9 +1,10 @@
 package keystrokesmod.module.impl.movement.longjump;
 
-import keystrokesmod.event.BlockAABBEvent;
-import keystrokesmod.event.PrePlayerInputEvent;
-import keystrokesmod.event.ReceivePacketEvent;
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.world.BlockAABBEvent;
+import keystrokesmod.event.player.PrePlayerInputEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
+import keystrokesmod.event.player.RotationEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.movement.LongJump;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -17,7 +18,6 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class HypixelLongJump extends SubMode<LongJump> {
@@ -27,13 +27,13 @@ public class HypixelLongJump extends SubMode<LongJump> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRotation(@NotNull RotationEvent event) {
         event.setYaw(mc.thePlayer.rotationYaw - 110);
         event.setPitch(85);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onBlockAABB(@NotNull BlockAABBEvent event) {
         if (BlockUtils.replaceable(event.getBlockPos())) {
             final double x = event.getBlockPos().getX(), y = event.getBlockPos().getY(), z = event.getBlockPos().getZ();
@@ -44,7 +44,7 @@ public class HypixelLongJump extends SubMode<LongJump> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPrePlayerInput(PrePlayerInputEvent event) {
         if (startY == -1) {
             if (mc.thePlayer.onGround)
@@ -71,7 +71,7 @@ public class HypixelLongJump extends SubMode<LongJump> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
             Notifications.sendNotification(Notifications.NotificationTypes.INFO, "Anti-cheat flagged.");

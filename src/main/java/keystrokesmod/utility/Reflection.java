@@ -1,7 +1,6 @@
 package keystrokesmod.utility;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import keystrokesmod.event.client.MouseEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.gui.GuiEnchantment;
@@ -13,7 +12,6 @@ import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.inventory.*;
@@ -23,24 +21,17 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.network.play.server.S27PacketExplosion;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.common.MinecraftForge;
+import keystrokesmod.Client;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Mouse;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.util.*;
 
 public class Reflection {
-    public static Field button;
-    public static Field buttonstate;
-    public static Field buttons;
     public static Field rightClickDelayTimerField;
     public static Field curBlockDamageMP;
     public static Field blockHitDelay;
@@ -80,9 +71,6 @@ public class Reflection {
             containerClasses.add(ContainerWorkbench.class);
             containerClasses.add(ContainerMerchant.class);
             containerClasses.add(ContainerHorseInventory.class);
-            button = MouseEvent.class.getDeclaredField("button");
-            buttonstate = MouseEvent.class.getDeclaredField("buttonstate");
-            buttons = Mouse.class.getDeclaredField("buttons");
 
             rightClickDelayTimerField = ReflectionHelper.findField(Minecraft.class, "field_71467_ac", "rightClickDelayTimer");
 
@@ -211,7 +199,7 @@ public class Reflection {
             } catch (NoSuchMethodException var4) {
                 try {
                     rightClickMouse = Minecraft.getMinecraft().getClass().getDeclaredMethod("rightClickMouse");
-                } catch (NoSuchMethodException var3) {
+                } catch (NoSuchMethodException ignored) {
                 }
             }
 
@@ -230,7 +218,7 @@ public class Reflection {
             } catch (NoSuchMethodException var4) {
                 try {
                     clickMouse = Minecraft.getMinecraft().getClass().getDeclaredMethod("func_147116_af");
-                } catch (NoSuchMethodException var3) {
+                } catch (NoSuchMethodException ignored) {
                 }
             }
 
@@ -242,10 +230,8 @@ public class Reflection {
                 getPlayerInfo = AbstractClientPlayer.class.getDeclaredMethod("getPlayerInfo");
             } catch (NoSuchMethodException var4) {
                 try {
-                    getPlayerInfo =
-
-                            AbstractClientPlayer.class.getDeclaredMethod("func_175155_b");
-                } catch (NoSuchMethodException var3) {
+                    getPlayerInfo = AbstractClientPlayer.class.getDeclaredMethod("func_175155_b");
+                } catch (NoSuchMethodException ignored) {
                 }
             }
 
@@ -255,31 +241,20 @@ public class Reflection {
         }
         catch (Exception e) {
             System.out.println("There was an error, relaunch the game.");
-            e.printStackTrace();
             sendMessage = true;
         }
     }
 
     public static void setButton(int t, boolean s) {
-        if (button != null && buttonstate != null && buttons != null) {
-            MouseEvent m = new MouseEvent();
-
-            try {
-                button.setAccessible(true);
-                button.set(m, t);
-                buttonstate.setAccessible(true);
-                buttonstate.set(m, s);
-                MinecraftForge.EVENT_BUS.post(m);
-                buttons.setAccessible(true);
-                ByteBuffer bf = (ByteBuffer) buttons.get(null);
-                buttons.setAccessible(false);
-                bf.put(t, (byte) (s ? 1 : 0));
-            } catch (IllegalAccessException var4) {
-            }
-        }
+        MouseEvent m = new MouseEvent();
+        m.setButton(t);
+        m.setButtonstate(s);
+        Client.EVENT_BUS.post(m);
+        if (!m.isCancelled())
+            ((ByteBuffer) ReflectionUtils.getDeclared(Mouse.class, "buttons")).put(t, (byte) (s ? 1 : 0));
     }
 
-    private static void addToMap(Class clazz, Field field) {
+    private static void addToMap(Class<?> clazz, Field field) {
         if (field == null || field.getType() != IInventory.class) {
             return;
         }
@@ -295,8 +270,7 @@ public class Reflection {
         try {
             Reflection.rightClickMouse.invoke(Minecraft.getMinecraft());
         }
-        catch (InvocationTargetException ex) {}
-        catch (IllegalAccessException ex2) {}
+        catch (InvocationTargetException | IllegalAccessException ignored) {}
     }
 
     public static void clickMouse() {
@@ -304,8 +278,7 @@ public class Reflection {
             try {
                 clickMouse.invoke(Minecraft.getMinecraft());
             }
-            catch (InvocationTargetException ex) {}
-            catch (IllegalAccessException ex2) {}
+            catch (InvocationTargetException | IllegalAccessException ignored) {}
         }
     }
 
@@ -313,124 +286,9 @@ public class Reflection {
         try {
             itemInUseCount.set(Minecraft.getMinecraft().thePlayer, blocking ? 1 : 0);
         } catch (Exception e) {
-            e.printStackTrace();
             Utils.sendMessage("§cFailed to set block state client-side.");
             return false;
         }
         return blocking;
-    }
-
-    @Data
-    @AllArgsConstructor
-    private static final class MethodData {
-        private final Class<?> aClass;
-        private final String method;
-        private final Class<?>[] params;
-
-        public MethodData(@NotNull Class<?> aClass, @NotNull String method, Object... params) {
-            this(aClass, method, Arrays.stream(params).map(Object::getClass).toArray(Class[]::new));
-        }
-    }
-
-    @Data
-    @AllArgsConstructor
-    private static final class FieldData {
-        private final Class<?> aClass;
-        private final String field;
-    }
-
-    private static final HashMap<MethodData, Method> methodMap = new HashMap<>();
-    private static final HashMap<FieldData, Field> fieldMap = new HashMap<>();
-
-    private static @NotNull Method getMethod(@NotNull MethodData data) {
-        if (!methodMap.containsKey(data)) {
-            try {
-                final Method target = data.getAClass().getDeclaredMethod(data.getMethod(), data.getParams());
-                target.setAccessible(true);
-                methodMap.put(data, target);
-                return target;
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return methodMap.get(data);
-    }
-
-    private static @NotNull Field getField(@NotNull FieldData data) {
-        if (!fieldMap.containsKey(data)) {
-            try {
-                final Field target = data.getAClass().getDeclaredField(data.getField());
-                target.setAccessible(true);
-
-                int modifiers = target.getModifiers();
-                if (Modifier.isFinal(modifiers)) {
-                    set(target, "modifiers", modifiers & ~Modifier.FINAL);
-                }
-
-                fieldMap.put(data, target);
-                return target;
-            } catch (NoSuchFieldException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return fieldMap.get(data);
-    }
-
-    public static Object call(@NotNull Object object, @NotNull String method, Object... params) {
-        final MethodData data = new MethodData(object.getClass(), method, params);
-
-        try {
-            return getMethod(data).invoke(object, params);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static Object get(@NotNull Object object, @NotNull String field) {
-        final FieldData data = new FieldData(object.getClass(), field);
-
-        try {
-            return getField(data).get(object);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static Object getDeclared(@NotNull Class<?> aClass, @NotNull String field) {
-        final FieldData data = new FieldData(aClass, field);
-
-        try {
-            return getField(data).get(null);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static <T> T get(@NotNull Object object, @NotNull String field, @NotNull Class<T> type) {
-        return type.cast(get(object, field));
-    }
-
-    public static <T> T get(@NotNull Class<?> aClass, @NotNull String field, @NotNull Class<T> type) {
-        return type.cast(getDeclared(aClass, field));
-    }
-
-    public static void set(@NotNull Object object, @NotNull String field, Object value) {
-        final FieldData data = new FieldData(object.getClass(), field);
-
-        try {
-            getField(data).set(object, value);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void set(@NotNull Class<?> aClass, @NotNull String field, Object value) {
-        final FieldData data = new FieldData(aClass, field);
-
-        try {
-            getField(data).set(null, value);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

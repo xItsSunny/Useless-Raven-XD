@@ -1,5 +1,7 @@
 package keystrokesmod.module.impl.minigames;
 
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.utility.Utils;
@@ -8,8 +10,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBow;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.awt.*;
 import java.util.List;
@@ -79,8 +79,8 @@ public class MurderMystery extends Module {
         this.clear();
     }
 
-    @SubscribeEvent
-    public void o(RenderWorldLastEvent e) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (Utils.nullCheck()) {
             if (!this.isMurderMystery()) {
                 this.clear();

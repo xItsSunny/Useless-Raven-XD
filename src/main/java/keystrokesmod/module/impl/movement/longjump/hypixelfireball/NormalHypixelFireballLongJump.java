@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.movement.longjump.hypixelfireball;
 
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.ReceivePacketEvent;
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.impl.movement.longjump.HypixelFireballLongJump;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -15,7 +15,7 @@ import net.minecraft.item.ItemFireball;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class NormalHypixelFireballLongJump extends SubMode<HypixelFireballLongJump> {
@@ -44,7 +44,7 @@ public class NormalHypixelFireballLongJump extends SubMode<HypixelFireballLongJu
         this.registerSetting(floatMotion = new SliderSetting("Float motion", 0, -0.5, 0.5, 0.01, doFloat::isToggled));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(@NotNull SendPacketEvent event) {
         Packet<?> packet = event.getPacket();
         if (packet instanceof C08PacketPlayerBlockPlacement
@@ -57,7 +57,7 @@ public class NormalHypixelFireballLongJump extends SubMode<HypixelFireballLongJu
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(ReceivePacketEvent event) {
         if (!Utils.nullCheck()) {
             return;
@@ -76,7 +76,7 @@ public class NormalHypixelFireballLongJump extends SubMode<HypixelFireballLongJu
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (!Utils.nullCheck()) {
             return;

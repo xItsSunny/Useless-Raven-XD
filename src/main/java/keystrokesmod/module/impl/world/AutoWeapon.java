@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.world;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -10,7 +10,7 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.lwjgl.input.Mouse;
 
 
@@ -43,7 +43,7 @@ public class AutoWeapon extends Module {
         SlotHandler.setCurrentSlot(currentItem);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent e) {
         if (!Utils.nullCheck() || !mc.inGameHasFocus || mc.currentScreen != null) {
             resetSlot();

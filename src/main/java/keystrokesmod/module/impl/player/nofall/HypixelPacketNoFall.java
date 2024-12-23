@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.player.nofall;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.KillAura;
 import keystrokesmod.module.impl.player.NoFall;
@@ -12,7 +12,7 @@ import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class HypixelPacketNoFall extends SubMode<NoFall> {
@@ -42,7 +42,7 @@ public class HypixelPacketNoFall extends SubMode<NoFall> {
         timed = false;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (mc.thePlayer.onGround)
             fallDistance = 0;

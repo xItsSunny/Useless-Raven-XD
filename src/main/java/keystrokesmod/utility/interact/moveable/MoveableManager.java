@@ -3,15 +3,15 @@ package keystrokesmod.utility.interact.moveable;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.gui.GuiChat;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.util.Set;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
 public class MoveableManager {
     private static final int BACKGROUND_COLOR = new Color(0, 0, 0, 80).getRGB();
@@ -29,8 +29,8 @@ public class MoveableManager {
         moveObjs.remove(object);
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onRender(Render2DEvent event) {
         if (!(mc.currentScreen instanceof GuiChat)) return;
         int x = Mouse.getEventX() * mc.currentScreen.width / mc.currentScreen.mc.displayWidth;
         int y = mc.currentScreen.height - Mouse.getEventY() * mc.currentScreen.height / mc.currentScreen.mc.displayHeight - 1;

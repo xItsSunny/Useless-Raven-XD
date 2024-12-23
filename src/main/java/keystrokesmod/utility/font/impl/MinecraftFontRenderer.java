@@ -4,7 +4,7 @@ import keystrokesmod.utility.font.CenterMode;
 import keystrokesmod.utility.font.IFont;
 import org.jetbrains.annotations.NotNull;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
 public class MinecraftFontRenderer implements IFont {
     public static MinecraftFontRenderer INSTANCE = new MinecraftFontRenderer();

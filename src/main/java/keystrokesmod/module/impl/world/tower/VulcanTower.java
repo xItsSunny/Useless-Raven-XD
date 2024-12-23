@@ -1,11 +1,11 @@
 package keystrokesmod.module.impl.world.tower;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.world.Tower;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class VulcanTower extends SubMode<Tower> {
@@ -23,7 +23,7 @@ public class VulcanTower extends SubMode<Tower> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (canTower() && mc.thePlayer.ticksExisted % 2 == 0 && !MoveUtil.isMoving()) {
             event.setPosX(event.getPosX() + 0.1);

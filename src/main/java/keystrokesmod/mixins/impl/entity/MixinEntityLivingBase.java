@@ -1,10 +1,11 @@
 package keystrokesmod.mixins.impl.entity;
 
 import com.google.common.collect.Maps;
-import keystrokesmod.event.JumpEvent;
-import keystrokesmod.event.MoveEvent;
-import keystrokesmod.event.PreMoveEvent;
-import keystrokesmod.event.SwingAnimationEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.player.JumpEvent;
+import keystrokesmod.event.player.MoveEvent;
+import keystrokesmod.event.player.PreMoveEvent;
+import keystrokesmod.event.render.SwingAnimationEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.exploit.viaversionfix.ViaVersionFixHelper;
 import keystrokesmod.module.impl.movement.Sprint;
@@ -20,7 +21,6 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,20 +33,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Map;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
+@SuppressWarnings("UnresolvedMixinReference")
 @Mixin(EntityLivingBase.class)
 public abstract class MixinEntityLivingBase extends Entity {
-    @Shadow protected abstract float getJumpUpwardsMotion();
-
-    @Shadow public float moveStrafing;
+    @Unique
+    private final Map<Integer, PotionEffect> raven_bS$activePotionsMap = Maps.newHashMap();
+    @Shadow
+    public float moveStrafing;
 
     public MixinEntityLivingBase(World worldIn) {
         super(worldIn);
     }
 
-    @Unique
-    private final Map<Integer, PotionEffect> raven_bS$activePotionsMap = Maps.newHashMap();
+    @Shadow
+    protected abstract float getJumpUpwardsMotion();
 
     @Unique
     public PotionEffect raven_XD$getActivePotionEffect(@NotNull Potion potionIn) {
@@ -62,9 +64,9 @@ public abstract class MixinEntityLivingBase extends Entity {
     public void onPreMoveEntity(float moveForward, float moveStrafing, CallbackInfo ci) {
         if ((Object) this instanceof EntityPlayerSP) {
             PreMoveEvent event = new PreMoveEvent();
-            MinecraftForge.EVENT_BUS.post(event);
+            Client.EVENT_BUS.post(event);
 
-            if (event.isCanceled())
+            if (event.isCancelled())
                 ci.cancel();
         }
     }
@@ -73,9 +75,9 @@ public abstract class MixinEntityLivingBase extends Entity {
     public void onMoveEntity(EntityLivingBase instance, double x, double y, double z) {
         if (instance instanceof EntityPlayerSP) {
             MoveEvent event = new MoveEvent(x, y, z);
-            MinecraftForge.EVENT_BUS.post(event);
+            Client.EVENT_BUS.post(event);
 
-            if (event.isCanceled())
+            if (event.isCancelled())
                 return;
 
             x = event.getX();
@@ -100,9 +102,9 @@ public abstract class MixinEntityLivingBase extends Entity {
             rotationYaw = RotationUtils.renderYaw;
             mc.thePlayer.rotationYawHead = RotationUtils.renderYaw;
         }
-        float f = MathHelper.wrapAngleTo180_float(p_1101461 - ((EntityLivingBase)(Object)this).renderYawOffset);
-        ((EntityLivingBase)(Object)this).renderYawOffset += f * 0.3F;
-        float f1 = MathHelper.wrapAngleTo180_float(rotationYaw - ((EntityLivingBase)(Object)this).renderYawOffset);
+        float f = MathHelper.wrapAngleTo180_float(p_1101461 - ((EntityLivingBase) (Object) this).renderYawOffset);
+        ((EntityLivingBase) (Object) this).renderYawOffset += f * 0.3F;
+        float f1 = MathHelper.wrapAngleTo180_float(rotationYaw - ((EntityLivingBase) (Object) this).renderYawOffset);
         boolean flag = f1 < 90.0F || f1 >= 90.0F;
 
         if (f1 < -75.0F) {
@@ -113,10 +115,10 @@ public abstract class MixinEntityLivingBase extends Entity {
             f1 = 75.0F;
         }
 
-        ((EntityLivingBase)(Object)this).renderYawOffset = rotationYaw - f1;
+        ((EntityLivingBase) (Object) this).renderYawOffset = rotationYaw - f1;
 
         if (f1 * f1 > 2500.0F) {
-            ((EntityLivingBase)(Object)this).renderYawOffset += f1 * 0.2F;
+            ((EntityLivingBase) (Object) this).renderYawOffset += f1 * 0.2F;
         }
 
         if (flag) {
@@ -132,20 +134,20 @@ public abstract class MixinEntityLivingBase extends Entity {
      */
     @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
     protected void jump(CallbackInfo ci) {
-        JumpEvent jumpEvent = new JumpEvent((float) MoveUtil.jumpMotion(), RotationHandler.getMovementYaw(this));
-        MinecraftForge.EVENT_BUS.post(jumpEvent);
-        if (jumpEvent.isCanceled()) {
+        JumpEvent event = new JumpEvent((float) MoveUtil.jumpMotion(), RotationHandler.getMovementYaw(this));
+        Client.EVENT_BUS.post(event);
+        if (event.isCancelled()) {
             return;
         }
 
-        this.motionY = jumpEvent.getMotionY();
+        this.motionY = event.getMotionY();
 
         if (this.raven_XD$isPotionActive(Potion.jump)) {
             this.motionY += (float) (this.raven_XD$getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F;
         }
 
         if (this.isSprinting()) {
-            float f = jumpEvent.getYaw() * 0.017453292F;
+            float f = event.getYaw() * 0.017453292F;
 
             if (Sprint.omni()) {
                 f = (float) (MoveUtil.direction() * (180 / Math.PI));
@@ -175,7 +177,7 @@ public abstract class MixinEntityLivingBase extends Entity {
     @Inject(method = "getArmSwingAnimationEnd", at = @At("RETURN"), cancellable = true)
     private void onGetArmSwingAnimationEnd(@NotNull CallbackInfoReturnable<Integer> cir) {
         SwingAnimationEvent swingAnimationEvent = new SwingAnimationEvent(cir.getReturnValue());
-        MinecraftForge.EVENT_BUS.post(swingAnimationEvent);
+        Client.EVENT_BUS.post(swingAnimationEvent);
 
         cir.setReturnValue((int) (swingAnimationEvent.getAnimationEnd() * Utils.getTimer().timerSpeed));
     }
@@ -185,8 +187,9 @@ public abstract class MixinEntityLivingBase extends Entity {
      * In 1.8, the minimum motion before reset is 0.005, but in 1.12, this value is 0.003.
      * To reduce overwrites, I make this redirect mixin.
      * It works like this:
-     *     abs(motion) < 0.003
-     *   = abs(motion) + 0.002 < 0.005
+     * abs(motion) < 0.003
+     * = abs(motion) + 0.002 < 0.005
+     *
      * @param motion the single axis motion of current entity
      * @return abs result
      */

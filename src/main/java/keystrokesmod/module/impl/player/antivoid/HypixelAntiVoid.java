@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.player.antivoid;
 
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.impl.player.AntiVoid;
 import keystrokesmod.module.impl.player.blink.NormalBlink;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -11,7 +11,7 @@ import keystrokesmod.utility.Utils;
 import lombok.Getter;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +35,7 @@ public class HypixelAntiVoid extends SubMode<AntiVoid> {
         instance = this;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (mc.thePlayer.capabilities.allowFlying) return;
         if (mc.thePlayer.ticksExisted <= 50) return;

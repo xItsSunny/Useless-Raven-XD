@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.render;
 
+import keystrokesmod.event.render.Render2DEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.player.ChestStealer;
@@ -17,11 +18,9 @@ import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
-import net.minecraftforge.common.MinecraftForge;
+import keystrokesmod.Client;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,7 +64,7 @@ public class HUD extends Module {
         this.registerSetting(font = new ModeSetting("Font", new String[]{"Minecraft", "Product Sans", "Regular", "Tenacity"}, 0));
         this.registerSetting(new ButtonSetting("Edit position", () -> {
             final EditScreen screen = new EditScreen();
-            MinecraftForge.EVENT_BUS.register(screen);
+            Client.EVENT_BUS.register(screen);
             mc.displayGuiScreen(screen);
         }));
         this.registerSetting(alignRight = new ButtonSetting("Align right", false));
@@ -149,9 +148,9 @@ public class HUD extends Module {
         }
     }
 
-    @SubscribeEvent
-    public void onRenderTick(@NotNull RenderTickEvent ev) {
-        if (ev.phase != TickEvent.Phase.END || !Utils.nullCheck()) {
+    @EventListener
+    public void onRenderTick(@NotNull Render2DEvent ev) {
+        if (!Utils.nullCheck()) {
             return;
         }
         if (isAlphabeticalSort != alphabeticalSort.isToggled()) {
@@ -189,7 +188,7 @@ public class HUD extends Module {
                     RenderUtils.drawRect(alignRight.isToggled() ? n3 + width : n3 - 2, n - 1, alignRight.isToggled() ? n3 + width + 1 : n3 - 1, n + Math.round(getFontRenderer().height() + 1), e);
                 }
                 getFontRenderer().drawString(text, n3, n, e, dropShadow.isToggled());
-                n += Math.round(getFontRenderer().height() + 2);
+                n += (int) Math.round(getFontRenderer().height() + 2);
             }
         } catch (Exception exception) {
             Utils.sendMessage("&cAn error occurred rendering HUD. check your logs");
@@ -245,7 +244,7 @@ public class HUD extends Module {
 
         @Override
         public void onGuiClosed() {
-            MinecraftForge.EVENT_BUS.unregister(this);
+            Client.EVENT_BUS.unregister(this);
         }
 
         public void drawScreen(int mX, int mY, float pt) {
@@ -281,8 +280,8 @@ public class HUD extends Module {
             super.drawScreen(mX, mY, pt);
         }
 
-        @SubscribeEvent
-        public void onRenderTick(RenderTickEvent event) {
+        @EventListener
+        public void onRenderTick(Render2DEvent event) {
             TargetHUD.renderExample();
             ModuleManager.watermark.render();
         }

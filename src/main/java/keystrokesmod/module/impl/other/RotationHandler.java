@@ -1,9 +1,9 @@
 package keystrokesmod.module.impl.other;
 
-import keystrokesmod.event.MoveInputEvent;
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.RotationEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.movement.TargetStrafe;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -19,9 +19,8 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.Client;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -121,7 +120,7 @@ public final class RotationHandler extends Module {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onPreUpdate(PreUpdateEvent event) {
         prevRotationYaw = getRotationYaw();
         prevRotationPitch = getRotationPitch();
@@ -148,7 +147,7 @@ public final class RotationHandler extends Module {
         if (getRotationPitch() == mc.thePlayer.rotationPitch) rotationPitch = null;
 
         RotationEvent rotationEvent = new RotationEvent(getRotationYaw(), getRotationPitch(), MoveFix.values()[(int) defaultMoveFix.getInput()]);
-        MinecraftForge.EVENT_BUS.post(rotationEvent);
+        Client.EVENT_BUS.post(rotationEvent);
         isSet = (rotationEvent.isSet() || rotationYaw != null || rotationPitch != null) && rotationEvent.isSmoothBack();
         if (isSet) {
             rotationYaw = rotationEvent.getYaw();
@@ -165,7 +164,7 @@ public final class RotationHandler extends Module {
      *
      * @param event before update living entity (move)
      */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @EventListener(priority = 2)
     public void onMoveInput(MoveInputEvent event) {
         if (isSet) {
             switch (moveFix) {
@@ -211,7 +210,7 @@ public final class RotationHandler extends Module {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onPreMotion(PreMotionEvent event) {
         if (rotationYaw != null) {
             final float yaw = rotationYaw;

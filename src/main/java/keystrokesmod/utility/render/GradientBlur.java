@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL12;
 import java.awt.*;
 import java.nio.IntBuffer;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
 /**
  * @author TIMER_err

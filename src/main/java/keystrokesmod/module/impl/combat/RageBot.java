@@ -1,9 +1,9 @@
 package keystrokesmod.module.impl.combat;
 
 import akka.japi.Pair;
-import keystrokesmod.Raven;
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.RotationEvent;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.LowCPSAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
@@ -34,8 +34,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.*;
@@ -113,15 +113,15 @@ public class RageBot extends IAutoClicker {
         this.registerSetting(notWhileKillAura = new ButtonSetting("Not while killAura", true));
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
-        if (Raven.debugger) {
+    @EventListener
+    public void onRender(Render2DEvent event) {
+        if (Client.debugger) {
             ItemStack stack = mc.thePlayer.inventory.armorInventory[3];
             Utils.sendMessage(String.valueOf(((ItemArmor) stack.getItem()).getColor(stack)));
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRotation(RotationEvent event) {
         if (!(perfect.isToggled() && mc.thePlayer.experience % 1 != 0) && !(notWhileKillAura.isToggled() && KillAura.target != null)) {
             final Vec3 eyePos = Utils.getEyePos();
@@ -223,7 +223,7 @@ public class RageBot extends IAutoClicker {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (targeted && autoSwitch.isToggled()) {
             int bestArm = ((IRapidFire) rapidFire.getSelected()).getBestArm();

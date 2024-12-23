@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.client;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -30,9 +30,9 @@ public class Gui extends Module {
     }
 
     public void onEnable() {
-        if (Utils.nullCheck() && mc.currentScreen != Raven.clickGui) {
-            mc.displayGuiScreen(Raven.clickGui);
-            Raven.clickGui.initMain();
+        if (Utils.nullCheck() && mc.currentScreen != Client.clickGui) {
+            mc.displayGuiScreen(Client.clickGui);
+            Client.clickGui.initMain();
         }
         this.disable();
     }

@@ -1,7 +1,8 @@
 package keystrokesmod.module.impl.combat.velocity;
 
-import keystrokesmod.event.BlockAABBEvent;
-import keystrokesmod.event.PostVelocityEvent;
+import keystrokesmod.event.world.BlockAABBEvent;
+import keystrokesmod.event.player.PostVelocityEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
@@ -9,7 +10,6 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -38,7 +38,7 @@ public class KarhuVelocity extends SubMode<Velocity> {
         needToBoundingPos.clear();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPostVelocity(PostVelocityEvent event) {
         BlockPos pos = new BlockPos(mc.thePlayer);
 
@@ -55,7 +55,7 @@ public class KarhuVelocity extends SubMode<Velocity> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onBlockAABB(@NotNull BlockAABBEvent event) {
         if (mc.thePlayer.hurtTime <= startHurtTime.getInput() && mc.thePlayer.hurtTime > stopHurtTime.getInput()) {
             BlockPos pos = event.getBlockPos();

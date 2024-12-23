@@ -1,6 +1,6 @@
 package keystrokesmod.utility.render.shader;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.utility.render.RenderUtils;
 import lombok.AllArgsConstructor;
 import net.minecraft.client.Minecraft;
@@ -83,7 +83,7 @@ public abstract class Shader {
                     true, false
             );
             if (multithreading)
-                Raven.getExecutor().execute(task);
+                Client.getExecutor().execute(task);
             else task.run();
             disposing = false;
         };

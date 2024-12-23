@@ -1,14 +1,14 @@
 package keystrokesmod.module.impl.movement.phase;
 
-import keystrokesmod.event.BlockAABBEvent;
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.WorldChangeEvent;
+import keystrokesmod.event.world.BlockAABBEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.world.WorldChangeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.mixins.impl.client.PlayerControllerMPAccessor;
 import keystrokesmod.module.impl.movement.Phase;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import static keystrokesmod.module.ModuleManager.blink;
@@ -56,7 +56,7 @@ public class WatchdogPhase extends SubMode<Phase> {
         lastHittingBlock = currentHittingBlock;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (this.phase) {
             this.phaseTime++;
@@ -77,7 +77,7 @@ public class WatchdogPhase extends SubMode<Phase> {
         phase = true;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onBlockAABB(BlockAABBEvent event) {
         if (this.phase) {
             if (exceptGround.isToggled() && event.getBlockPos().getY() < mc.thePlayer.posY)
@@ -86,7 +86,7 @@ public class WatchdogPhase extends SubMode<Phase> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onWorldChange(@NotNull WorldChangeEvent event) {
         this.phase = false;
         this.phaseTime = 0;

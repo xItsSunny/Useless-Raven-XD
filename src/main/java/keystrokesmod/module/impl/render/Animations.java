@@ -1,6 +1,10 @@
 package keystrokesmod.module.impl.render;
 
-import keystrokesmod.event.*;
+import keystrokesmod.event.network.SendPacketEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.render.RenderItemEvent;
+import keystrokesmod.event.render.SwingAnimationEvent;
 import keystrokesmod.mixins.impl.render.ItemRendererAccessor;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.combat.KillAura;
@@ -17,7 +21,7 @@ import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 
@@ -78,7 +82,7 @@ public class Animations extends Module {
 
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(SendPacketEvent event) {
         if (Utils.nullCheck()
                 && swingWhileDigging.isToggled()
@@ -86,10 +90,10 @@ public class Animations extends Module {
                 && event.getPacket() instanceof C0APacketAnimation
                 && mc.thePlayer.isUsingItem()
         )
-            event.setCanceled(true);
+            event.cancel();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (Utils.nullCheck()
                 && fakeSlotReset.isToggled()
@@ -103,7 +107,7 @@ public class Animations extends Module {
     }
 
     @SuppressWarnings("IntegerDivisionInFloatingPointContext")
-    @SubscribeEvent
+    @EventListener
     public void onRenderItem(@NotNull RenderItemEvent event) {
         try {
             if (event.getItemToRender().getItem() instanceof ItemMap) {
@@ -308,7 +312,7 @@ public class Animations extends Module {
                         break;
                 }
 
-                event.setCanceled(true);
+                event.cancel();
 
             } else {
                 switch ((int) swingAnimation.getInput()) {
@@ -345,13 +349,13 @@ public class Animations extends Module {
                         break;
                 }
 
-                event.setCanceled(true);
+                event.cancel();
             }
         } catch (Exception ignored) {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         try {
             if (mc.thePlayer.swingProgressInt == 1) {
@@ -363,7 +367,7 @@ public class Animations extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSwingAnimation(@NotNull SwingAnimationEvent event) {
 
         if ((mc.thePlayer.getItemInUseCount() == 1 || mc.thePlayer.isUsingItem()) && modifyAnimations.isToggled()) {

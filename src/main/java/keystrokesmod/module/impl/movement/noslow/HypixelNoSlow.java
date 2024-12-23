@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.movement.noslow;
 
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.player.blink.NormalBlink;
@@ -15,7 +15,7 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +32,7 @@ public class HypixelNoSlow extends INoSlow {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (mc.thePlayer.onGround) {
             offGroundTicks = 0;
@@ -79,7 +79,7 @@ public class HypixelNoSlow extends INoSlow {
         blink.disable();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(@NotNull SendPacketEvent event) {
         if (event.getPacket() instanceof C08PacketPlayerBlockPlacement && !mc.thePlayer.isUsingItem()) {
             C08PacketPlayerBlockPlacement blockPlacement = (C08PacketPlayerBlockPlacement) event.getPacket();
@@ -89,14 +89,14 @@ public class HypixelNoSlow extends INoSlow {
                     mc.thePlayer.jump();
                 }
                 send = true;
-                event.setCanceled(true);
+                event.cancel();
             }
         } else if (event.getPacket() instanceof C07PacketPlayerDigging) {
             C07PacketPlayerDigging packet = (C07PacketPlayerDigging) event.getPacket();
             if (packet.getStatus() == C07PacketPlayerDigging.Action.RELEASE_USE_ITEM) {
                 if (send) {
                     // or get bad packet flag
-                    event.setCanceled(true);
+                    event.cancel();
                 }
                 send = false;
             }

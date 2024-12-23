@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.world;
 
-import keystrokesmod.event.RightClickEvent;
+import keystrokesmod.event.client.RightClickEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -10,10 +11,7 @@ import keystrokesmod.utility.Reflection;
 import keystrokesmod.utility.Utils;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
-import org.jetbrains.annotations.NotNull;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 public class FastPlace extends Module {
     public SliderSetting tickDelay;
@@ -26,41 +24,39 @@ public class FastPlace extends Module {
         this.registerSetting(pitchCheck = new ButtonSetting("Pitch check", false));
     }
 
-    @SubscribeEvent
-    public void a(@NotNull PlayerTickEvent e) {
-        if (e.phase == Phase.END) {
-            if (ModuleManager.scaffold.stopFastPlace()) {
-                return;
+    @EventListener
+    public void a(PreUpdateEvent e) {
+        if (ModuleManager.scaffold.stopFastPlace()) {
+            return;
+        }
+        if (Utils.nullCheck() && mc.inGameHasFocus && Reflection.rightClickDelayTimerField != null) {
+            if (blocksOnly.isToggled()) {
+                ItemStack item = SlotHandler.getHeldItem();
+                if (item == null || !(item.getItem() instanceof ItemBlock)) {
+                    return;
+                }
             }
-            if (Utils.nullCheck() && mc.inGameHasFocus && Reflection.rightClickDelayTimerField != null) {
-                if (blocksOnly.isToggled()) {
-                    ItemStack item = SlotHandler.getHeldItem();
-                    if (item == null || !(item.getItem() instanceof ItemBlock)) {
+
+            try {
+                int c = (int) tickDelay.getInput();
+                if (c == 0) {
+                    Reflection.rightClickDelayTimerField.set(mc, 0);
+                } else {
+                    if (c == 4) {
                         return;
                     }
-                }
 
-                try {
-                    int c = (int) tickDelay.getInput();
-                    if (c == 0) {
-                        Reflection.rightClickDelayTimerField.set(mc, 0);
-                    } else {
-                        if (c == 4) {
-                            return;
-                        }
-
-                        int d = Reflection.rightClickDelayTimerField.getInt(mc);
-                        if (d == 4) {
-                            Reflection.rightClickDelayTimerField.set(mc, c);
-                        }
+                    int d = Reflection.rightClickDelayTimerField.getInt(mc);
+                    if (d == 4) {
+                        Reflection.rightClickDelayTimerField.set(mc, c);
                     }
-                } catch (IllegalAccessException | IndexOutOfBoundsException ignored) {
                 }
+            } catch (IllegalAccessException | IndexOutOfBoundsException ignored) {
             }
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRightClick(RightClickEvent event) {
         try {
             int c = (int) tickDelay.getInput();

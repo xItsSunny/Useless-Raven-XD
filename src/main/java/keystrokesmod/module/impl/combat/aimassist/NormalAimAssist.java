@@ -15,8 +15,8 @@ import keystrokesmod.utility.aim.AimSimulator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -176,12 +176,12 @@ public class NormalAimAssist extends SubMode<AimAssist> {
         if (mc.currentScreen != null || !mc.inGameHasFocus) return true;
         if (weaponOnly.isToggled() && !Utils.holdingWeapon()) return true;
         if (yawNoise == null || pitchNoise == null) return true;
-        if (clickAim.isToggled() && !Utils.isLeftClicking()) return true;
+        if (clickAim.isToggled() && Utils.isNotLeftClicking()) return true;
         return checkBlockBreak.isToggled() && ((PlayerControllerMPAccessor) mc.playerController).isHittingBlock();
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onRender(Render2DEvent event) {
         long time = System.currentTimeMillis();
         if (nextNoiseRefreshTime == -1 || time >= nextNoiseRefreshTime + nextNoiseEmptyTime) {
             nextNoiseRefreshTime = (long) (time + Math.random() * 60 + 80);

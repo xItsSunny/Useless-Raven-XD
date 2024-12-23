@@ -1,9 +1,9 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.PreMoveEvent;
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.PreVelocityEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.PreMoveEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.PreVelocityEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -18,11 +18,11 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 
 public class AutoGapple extends Module {
     private final SliderSetting minHealth;
@@ -42,7 +42,7 @@ public class AutoGapple extends Module {
     private boolean toCancel = false;
 
     public AutoGapple() {
-        super("AutoGapple", category.combat, "Made for QuickMacro.");
+        super("AutoGapple", category.combat);
         this.registerSetting(minHealth = new SliderSetting("Min health", 10, 1, 20, 1));
         this.registerSetting(eatTicks = new SliderSetting("Eat ticks", 31, 31, 35, 1));
         this.registerSetting(pauseOnVelocity = new SliderSetting("Pause on velocity", 1, 0, 2, 1));
@@ -67,7 +67,7 @@ public class AutoGapple extends Module {
         progress.setProgress(0);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (!Utils.nullCheck()
                 || mc.thePlayer.isDead
@@ -78,14 +78,12 @@ public class AutoGapple extends Module {
         }
 
         if (stored >= eatTicks.getInput() && working) {
-            reset();
-
             int foodSlot = getFoodSlot();
             int curSlot = SlotHandler.getCurrentSlot();
             if (foodSlot != curSlot) {
                 SlotHandler.setCurrentSlot(foodSlot);
             }
-            mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, SlotHandler.getHeldItem());
+            PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
             PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.DROP_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
             Utils.sendMessage("send.");
             for (int i = 0; i < stored; i++) {
@@ -94,6 +92,8 @@ public class AutoGapple extends Module {
             if (foodSlot != curSlot) {
                 SlotHandler.setCurrentSlot(curSlot);
             }
+
+            reset();
         }
 
         if (getFoodSlot() != -1) {
@@ -103,12 +103,12 @@ public class AutoGapple extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreVelocity(PreVelocityEvent event) {
         pauseTicks += (int) pauseOnVelocity.getInput();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMove(PreMoveEvent event) {
         if (!working) return;
 
@@ -120,17 +120,17 @@ public class AutoGapple extends Module {
         if (pauseTicks > 0) {
             pauseTicks--;
         } else {
-            event.setCanceled(true);
+            event.cancel();
             stored++;
             storeDelayed = false;
             toCancel = true;
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onPreMotion(PreMotionEvent event) {
         if (toCancel)
-            event.setCanceled(true);
+            event.cancel();
         toCancel = false;
     }
 
@@ -146,8 +146,8 @@ public class AutoGapple extends Module {
         return slot;
     }
 
-    @SubscribeEvent
-    public void onRenderTick(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onRenderTick(Render2DEvent event) {
         animation.run(eatTicks.getInput() - stored);
         if (working && visual.isToggled()) {
             progress.setProgress((eatTicks.getInput() - animation.getValue()) / eatTicks.getInput());

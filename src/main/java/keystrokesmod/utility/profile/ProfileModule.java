@@ -1,6 +1,6 @@
 package keystrokesmod.utility.profile;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Settings;
@@ -16,24 +16,24 @@ public class ProfileModule extends Module {
         this.profile = profile;
         this.registerSetting(new ButtonSetting("Save profile", () -> {
             Utils.sendMessage("&7Saved profile: &b" + getName());
-            Raven.profileManager.saveProfile(this.profile);
+            Client.profileManager.saveProfile(this.profile);
             saved = true;
         }));
         this.registerSetting(new ButtonSetting("Remove profile", () -> {
             Utils.sendMessage("&7Removed profile: &b" + getName());
-            Raven.profileManager.deleteProfile(getName());
+            Client.profileManager.deleteProfile(getName());
         }));
     }
 
     @Override
     public void toggle() {
         if (mc.currentScreen instanceof ClickGui || mc.currentScreen == null) {
-            if (this.profile == Raven.currentProfile) {
+            if (this.profile == Client.currentProfile) {
                 return;
             }
-            Raven.profileManager.loadProfile(this.getName());
+            Client.profileManager.loadProfile(this.getName());
 
-            Raven.currentProfile = profile;
+            Client.currentProfile = profile;
 
             if (Settings.sendMessage.isToggled()) {
                 Utils.sendMessage("&7Enabled profile: &b" + this.getName());
@@ -44,9 +44,9 @@ public class ProfileModule extends Module {
 
     @Override
     public boolean isEnabled() {
-        if (Raven.currentProfile == null) {
+        if (Client.currentProfile == null) {
             return false;
         }
-        return Raven.currentProfile.getModule() == this;
+        return Client.currentProfile.getModule() == this;
     }
 }

@@ -1,11 +1,11 @@
 package keystrokesmod.module.impl.movement.speed.hypixel;
 
-import keystrokesmod.event.PrePlayerInputEvent;
+import keystrokesmod.event.player.PrePlayerInputEvent;
 import keystrokesmod.module.impl.movement.speed.HypixelSpeed;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class GroundStrafeSpeed extends SubMode<HypixelSpeed> {
@@ -13,7 +13,7 @@ public class GroundStrafeSpeed extends SubMode<HypixelSpeed> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPrePlayerInput(PrePlayerInputEvent event) {
         if (parent.parent.noAction()) return;
 

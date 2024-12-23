@@ -5,7 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -39,13 +39,13 @@ public class I18nManager {
             Map<Module, I18nModule> moduleMap = new Object2ObjectOpenHashMap<>();
             Map<String, String> replaceMap = new Object2ObjectOpenHashMap<>();
 
-            try (InputStream stream = Objects.requireNonNull(Raven.class.getResourceAsStream("/assets/keystrokesmod/i18n/" + s + ".json"))) {
+            try (InputStream stream = Objects.requireNonNull(Client.class.getResourceAsStream("/assets/keystrokesmod/i18n/" + s + ".json"))) {
                 JsonObject jsonObject = getJsonObject(stream);
 
                 if (jsonObject.has("modules")) {
                     JsonObject modulesObject = jsonObject.getAsJsonObject("modules");
 
-                    for (Module module : Raven.getModuleManager().getModules()) {
+                    for (Module module : Client.getModuleManager().getModules()) {
                         if (modulesObject.has(module.getName())) {
                             moduleMap.put(module, getI18nModule(module, modulesObject.getAsJsonObject(module.getName())));
                         }

@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.movement.noslow;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
@@ -18,7 +18,7 @@ public class NCPNoSlow extends INoSlow {
     @Override
     public void onUpdate() {
         if (!mc.thePlayer.isUsingItem()) return;
-        if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.badPacketsHandler.C07) {
+        if (mc.thePlayer.ticksExisted % 3 == 0 && !Client.badPacketsHandler.C07) {
             mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 1, null, 0, 0, 0));
         }
     }

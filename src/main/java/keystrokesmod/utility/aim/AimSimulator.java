@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Range;
 import java.util.ArrayList;
 import java.util.List;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
 public class AimSimulator {
     private double xRandom = 0;

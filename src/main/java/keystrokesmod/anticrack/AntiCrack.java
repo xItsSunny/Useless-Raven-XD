@@ -3,7 +3,6 @@ package keystrokesmod.anticrack;
 import keystrokesmod.utility.ReflectionUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import tech.skidonion.obfuscator.annotations.NativeObfuscation;
 import tech.skidonion.obfuscator.annotations.Renamer;
 import tech.skidonion.obfuscator.inline.Inline;
 
@@ -83,7 +82,6 @@ public final class AntiCrack {
         throw null;
     }
 
-    @NativeObfuscation.Inline
     private static @NotNull Class<?> classForName(Object name) {
         try {
             return Class.forName(String.valueOf(name));

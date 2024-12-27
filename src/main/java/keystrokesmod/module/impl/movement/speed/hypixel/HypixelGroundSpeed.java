@@ -33,9 +33,15 @@ public class HypixelGroundSpeed extends SubMode<HypixelSpeed> {
 
     @EventListener(priority = 1)
     public void onPreUpdate(PreMotionEvent event) {
+        if (parent.parent.noAction()) {
+            blink.disable();
+            return;
+        }
+
         if (mc.thePlayer.onGround) {
             mc.thePlayer.motionX *= 1.114 - MoveUtil.getSpeedEffect() * .01 - Math.random() * 1E-4;
             mc.thePlayer.motionZ *= 1.114 - MoveUtil.getSpeedEffect() * .01 - Math.random() * 1E-4;
+            MoveUtil.strafe();
         }
 
         if (mc.thePlayer.onGround && mc.thePlayer.ticksExisted % 2 == 0) {

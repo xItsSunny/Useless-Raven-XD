@@ -99,7 +99,6 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting polar;
     private final ButtonSetting postPlace;
     private final ButtonSetting lookView;
-    private final ButtonSetting stopSprintAtStart;
     private final ButtonSetting esp;
     private final ModeSetting theme;
     private final ButtonSetting raytrace;
@@ -204,7 +203,6 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(safeWalkOnNoBlocks = new ButtonSetting("Safewalk on no blocks", true));
         this.registerSetting(showBlockCount = new ButtonSetting("Show block count", true));
         this.registerSetting(stopAtStart = new ButtonSetting("Stop at start", false));
-        this.registerSetting(stopSprintAtStart = new ButtonSetting("Stop sprint at start", false));
         this.registerSetting(silentSwing = new ButtonSetting("Silent swing", false));
         this.registerSetting(noSwing = new ButtonSetting("No swing", false, silentSwing::isToggled));
         this.registerSetting(tower = new ButtonSetting("Tower", false));
@@ -226,7 +224,7 @@ public class Scaffold extends IAutoClicker {
 
     public static boolean sprint() {
         if (ModuleManager.scaffold.isEnabled()
-                && ModuleManager.scaffold.sprint.getInput() > 0
+                && ModuleManager.scaffold.sprint.getInput() != 0
                 && (!ModuleManager.scaffold.fastOnRMB.isToggled() || Mouse.isButtonDown(1))) {
             return ((IScaffoldSprint) ModuleManager.scaffold.sprint.getSelected()).isSprint();
         }
@@ -303,10 +301,6 @@ public class Scaffold extends IAutoClicker {
 
         if (stopAtStart.isToggled()) {
             stopMoving = true;
-        }
-
-        if (stopSprintAtStart.isToggled()) {
-            mc.thePlayer.setSprinting(false);
         }
 
     }

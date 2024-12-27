@@ -32,7 +32,7 @@ public class AutoUpdate {
                     break;
                 case OLD:
                     Utils.sendMessageAnyWay(ChatFormatting.RED + "You are not at latest version." +
-                            ChatFormatting.RESET + " current: " + Watermark.VERSION + "  latest: " + result.getLatestVersion());
+                            ChatFormatting.RESET + " current: " + Client.VERSION + "  latest: " + result.getLatestVersion());
                     Utils.sendMessageAnyWay("Run command 'update' to download latest version.");
                     break;
             }
@@ -101,7 +101,7 @@ public class AutoUpdate {
             String ver = jsonObject.get("tag_name").getAsString().substring(1);
             String url = jsonObject.getAsJsonArray("assets").get(0).getAsJsonObject().get("browser_download_url").getAsString();
 
-            if (ver.equals(Watermark.VERSION)) {
+            if (ver.equals(Client.VERSION)) {
                 return new Result(Result.Type.LATEST, url, ver);
             } else {
                 return new Result(Result.Type.OLD, url, ver);

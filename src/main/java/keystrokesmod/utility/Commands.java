@@ -9,7 +9,6 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Settings;
 import keystrokesmod.module.impl.exploit.ClientSpoofer;
-import keystrokesmod.module.impl.fun.NoteBot;
 import keystrokesmod.module.impl.minigames.DuelsStats;
 import keystrokesmod.module.impl.other.FakeChat;
 import keystrokesmod.module.impl.other.KillMessage;
@@ -236,7 +235,6 @@ public class Commands {
                         }
                     }
                 }
-                ModuleManager.sort();
             } else if (firstArg.equals("resetgui")) {
                 ClickGui.resetPosition();
                 print(ChatFormatting.GREEN + "Reset ClickGUI position!", 1);
@@ -392,14 +390,6 @@ public class Commands {
                 } catch (Exception e) {
                     print("Fail to export module settings.", 1);
                 }
-            } else if (firstArg.equals("notebot")) {
-                if (!hasArgs) {
-                    print(invSyn, 1);
-                    return;
-                }
-
-                NoteBot.fileName = c.substring(8);
-                print("&aSet noteBot file to " + NoteBot.fileName, 1);
             } else if (firstArg.equals("friend") || firstArg.equals("f")) {
                 if (!hasArgs) {
                     print(invSyn, 1);

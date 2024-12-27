@@ -88,7 +88,6 @@ public class Module {
                     this.isToggled = false;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
                 Utils.sendMessage("&cFailed to check keybinding. Setting to none");
                 this.keycode = 0;
             }
@@ -108,9 +107,6 @@ public class Module {
         }
         this.setEnabled(true);
         ModuleManager.organizedModules.add(this);
-        if (ModuleManager.hud.isEnabled()) {
-            ModuleManager.sort();
-        }
 
         if (this.script != null) {
             Client.scriptManager.onEnable(script);
@@ -152,7 +148,6 @@ public class Module {
 
     public final void setPrettyInfo(String name) {
         this.prettyInfo = name;
-        ModuleManager.sort();
     }
 
     public String getName() {
@@ -167,7 +162,6 @@ public class Module {
 
     public final void setPrettyName(String name) {
         this.prettyName = name;
-        ModuleManager.sort();
     }
 
     public @Nullable String getToolTip() {

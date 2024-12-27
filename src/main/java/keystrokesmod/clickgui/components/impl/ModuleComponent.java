@@ -8,7 +8,7 @@ import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.utility.render.RenderUtils;
-import keystrokesmod.utility.profile.Manager;
+import keystrokesmod.utility.profile.ProfileManagerModule;
 import keystrokesmod.utility.profile.ProfileModule;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
@@ -120,7 +120,7 @@ public class ModuleComponent implements IComponent {
         if (this.mod.script != null && this.mod.script.error) {
             button_rgb = INVALID_COLOR;
         }
-        if (this.mod.moduleCategory() == Module.category.profiles && !(this.mod instanceof Manager) && !((ProfileModule) this.mod).saved && Client.currentProfile.getModule() == this.mod) {
+        if (this.mod.moduleCategory() == Module.category.profiles && !(this.mod instanceof ProfileManagerModule) && !((ProfileModule) this.mod).saved && Client.currentProfile.getModule() == this.mod) {
             button_rgb = UNSAVED_COLOR;
         }
         GL11.glPushMatrix();

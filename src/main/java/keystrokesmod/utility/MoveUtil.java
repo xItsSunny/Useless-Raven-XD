@@ -4,6 +4,7 @@ import keystrokesmod.mixins.impl.entity.EntityAccessor;
 import keystrokesmod.module.impl.movement.TargetStrafe;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerMove;
 import keystrokesmod.script.classes.Vec3;
+import keystrokesmod.utility.movement.Move;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
@@ -68,6 +69,10 @@ public class MoveUtil {
     public static void stop() {
         mc.thePlayer.motionX = 0;
         mc.thePlayer.motionZ = 0;
+    }
+
+    public static float getYawFromMovement() {
+        return mc.thePlayer.rotationYaw + Move.fromMovement(mc.thePlayer.moveForward, mc.thePlayer.moveStrafing).getDeltaYaw();
     }
 
     /**

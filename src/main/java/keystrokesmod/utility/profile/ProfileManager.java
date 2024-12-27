@@ -7,6 +7,7 @@ import keystrokesmod.clickgui.components.impl.CategoryComponent;
 import keystrokesmod.event.world.WorldChangeEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;
+import keystrokesmod.module.impl.exploit.ClientSpoofer;
 import keystrokesmod.module.impl.other.KillMessage;
 import keystrokesmod.module.impl.render.HUD;
 import keystrokesmod.module.impl.render.TargetHUD;
@@ -17,21 +18,18 @@ import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.module.setting.interfaces.InputSetting;
 import keystrokesmod.script.Manager;
 import keystrokesmod.utility.Utils;
-import net.minecraft.client.Minecraft;
 import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static keystrokesmod.Client.mc;
+
 public class ProfileManager {
-    public static Minecraft mc = Minecraft.getMinecraft();
+    public static final String PROFILE_VERSION = "1";
+
     public File directory;
     public final List<Profile> profiles = new ArrayList<>();
 
@@ -49,7 +47,7 @@ public class ProfileManager {
             saveProfile(new Profile("default", 0));
         }
 
-        Client.getExecutor().schedule(this::updateLatest, 5, TimeUnit.MINUTES);
+        Client.getExecutor().scheduleWithFixedDelay(this::updateLatest, 2, 2, TimeUnit.MINUTES);
     }
 
     @EventListener
@@ -63,8 +61,11 @@ public class ProfileManager {
 
     private @NotNull JsonObject fromCurrentState(int keyBind) {
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("clientVersion", Client.VERSION);
+        jsonObject.addProperty("profileVersion", PROFILE_VERSION);
         jsonObject.addProperty("clientName", Watermark.customName);
         jsonObject.addProperty("killmessage", KillMessage.killMessage);
+        jsonObject.addProperty("clientbrand", ClientSpoofer.customBrand);
         jsonObject.addProperty("keybind", keyBind);
         JsonArray jsonArray = new JsonArray();
         for (Module module : Client.moduleManager.getModules()) {
@@ -120,8 +121,8 @@ public class ProfileManager {
             moduleInformation.addProperty("keybind", module.getKeycode());
         }
         if (module instanceof HUD) {
-            moduleInformation.addProperty("posX", HUD.hudX);
-            moduleInformation.addProperty("posY", HUD.hudY);
+            moduleInformation.addProperty("posX", HUD.posX);
+            moduleInformation.addProperty("posY", HUD.posY);
         }
         if (module instanceof TargetHUD) {
             moduleInformation.addProperty("posX", TargetHUD.posX);
@@ -197,11 +198,23 @@ public class ProfileManager {
                     failedMessage("load", name);
                     return;
                 }
+//                if (profileJson.has("profileVersion")) {
+//                    String profileVersion = profileJson.get("profileVersion").getAsString();
+//                    if (!profileVersion.equals(PROFILE_VERSION)) {
+//                        Notifications.sendNotification(Notifications.NotificationTypes.WARN, String.format(
+//                                "Outdated profile! The profile version is '%s', but the client supports '%s'.",
+//                                profileVersion, PROFILE_VERSION
+//                        ), 10000);
+//                    }
+//                }
                 if (profileJson.has("clientName")) {
                     Watermark.customName = profileJson.get("clientName").getAsString();
                 }
                 if (profileJson.has("killmessage")) {
                     KillMessage.killMessage = profileJson.get("killmessage").getAsString();
+                }
+                if (profileJson.has("clientbrand")) {
+                    ClientSpoofer.customBrand = profileJson.get("clientbrand").getAsString();
                 }
 
                 for (JsonElement moduleJson : modules) {
@@ -284,10 +297,10 @@ public class ProfileManager {
 
         if (module.getName().equals("HUD")) {
             if (moduleInformation.has("posX")) {
-                HUD.hudX = moduleInformation.get("posX").getAsInt();
+                HUD.posX = moduleInformation.get("posX").getAsInt();
             }
             if (moduleInformation.has("posY")) {
-                HUD.hudY = moduleInformation.get("posY").getAsInt();
+                HUD.posY = moduleInformation.get("posY").getAsInt();
             }
         }
 

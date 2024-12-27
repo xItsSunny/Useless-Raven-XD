@@ -10,5 +10,4 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SprintEvent extends Event {
     private boolean sprint;
-    private boolean omni;
 }

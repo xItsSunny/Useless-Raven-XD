@@ -77,34 +77,34 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
 
         final String renderText = name + " " + healthText;
         final ScaledResolution scaled = new ScaledResolution(mc);
-        current$minX = scaled.getScaledWidth() / 2 + posX;
-        current$minY = scaled.getScaledHeight() / 2 + 15 + posY;
-        current$maxX = current$minX + (int) Math.round(getFont().width(renderText)) + 12;
-        current$maxY = current$minY + 16 + 12;
+        minX = scaled.getScaledWidth() / 2 + posX;
+        minY = scaled.getScaledHeight() / 2 + 15 + posY;
+        maxX = minX + (int) Math.round(getFont().width(renderText)) + 12;
+        maxY = minY + 16 + 12;
 
         if (background.isToggled()) {
             RenderUtils.drawBloomShadow(
-                    (float) (current$minX - RECT_SHADOW_DIST), (float) (current$minY - RECT_SHADOW_DIST),
-                    (float) (current$maxX - current$minX + RECT_SHADOW_DIST * 2.0), (float) (current$maxY - current$minY + RECT_SHADOW_DIST * 2.0),
+                    (float) (minX - RECT_SHADOW_DIST), (float) (minY - RECT_SHADOW_DIST),
+                    (float) (maxX - minX + RECT_SHADOW_DIST * 2.0), (float) (maxY - minY + RECT_SHADOW_DIST * 2.0),
                     6, 8, BACKGROUND_COLOR, false);
         }
 
         if (blur.isToggled()) {
             GaussianBlur.startBlur();
             RenderUtils.drawBloomShadow(
-                    current$minX, current$minY,
-                    current$maxX - current$minX, current$maxY - current$minY,
+                    minX, minY,
+                    maxX - minX, maxY - minY,
                     6, 8, -1, false);
             GaussianBlur.endBlur(4, 1);
         }
 
         int healthTextColor = Utils.getColorForHealth(health);
-        getFont().drawString(name, current$minX + TEXT_DIST_TO_RECT, current$minY + TEXT_DIST_TO_RECT, -1, shadow.isToggled());
-        getFont().drawString(healthText, current$minX + TEXT_DIST_TO_RECT + getFont().width(name), current$minY + TEXT_DIST_TO_RECT, healthTextColor, shadow.isToggled());
+        getFont().drawString(name, minX + TEXT_DIST_TO_RECT, minY + TEXT_DIST_TO_RECT, -1, shadow.isToggled());
+        getFont().drawString(healthText, minX + TEXT_DIST_TO_RECT + getFont().width(name), minY + TEXT_DIST_TO_RECT, healthTextColor, shadow.isToggled());
 
-        float healthBar = (float) (int) (current$maxX - 6 + (current$minX + 6 - current$maxX - 6) * (1.0 - ((health < 0.05) ? 0.05 : health)));
-        if (healthBar - current$minX + 3 < 0) { // if goes below, the rounded health bar glitches out
-            healthBar = current$minX + 3;
+        float healthBar = (float) (int) (maxX - 6 + (minX + 6 - maxX - 6) * (1.0 - ((health < 0.05) ? 0.05 : health)));
+        if (healthBar - minX + 3 < 0) { // if goes below, the rounded health bar glitches out
+            healthBar = minX + 3;
         }
 
         float lastHealthBar;
@@ -116,16 +116,16 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
             lastHealthBar = healthBar;
         }
 
-        RenderUtils.drawRoundedGradientRect((float) current$minX + 6, (float) current$maxY - 9, (float) healthBarAnimation2.getValue(), (float) (current$maxY - 4), 4.0f,
+        RenderUtils.drawRoundedGradientRect((float) minX + 6, (float) maxY - 9, (float) healthBarAnimation2.getValue(), (float) (maxY - 4), 4.0f,
                 Utils.merge(Theme.getGradients((int) theme.getInput())[0], 100), Utils.merge(Theme.getGradients((int) theme.getInput())[0], 60),
                 Utils.merge(Theme.getGradients((int) theme.getInput())[1], 100), Utils.merge(Theme.getGradients((int) theme.getInput())[1], 60));
 
-        RenderUtils.drawRoundedGradientRect((float) current$minX + 6, (float) current$maxY - 9, lastHealthBar, (float) (current$maxY - 4), 4.0f,
+        RenderUtils.drawRoundedGradientRect((float) minX + 6, (float) maxY - 9, lastHealthBar, (float) (maxY - 4), 4.0f,
                 Utils.merge(Theme.getGradients((int) theme.getInput())[0], 210), Utils.merge(Theme.getGradients((int) theme.getInput())[0], 210),
                 Utils.merge(Theme.getGradients((int) theme.getInput())[1], 210), Utils.merge(Theme.getGradients((int) theme.getInput())[1], 210));
 
         if (healthColor.isToggled()) {
-            RenderUtils.drawRoundedRectangle((float) current$minX + 6, (float) current$maxY - 9, lastHealthBar, (float) (current$maxY - 4), 4.0f, healthTextColor);
+            RenderUtils.drawRoundedRectangle((float) minX + 6, (float) maxY - 9, lastHealthBar, (float) (maxY - 4), 4.0f, healthTextColor);
         }
     }
 }

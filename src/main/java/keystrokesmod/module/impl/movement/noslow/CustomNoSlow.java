@@ -1,12 +1,8 @@
 package keystrokesmod.module.impl.movement.noslow;
 
 import keystrokesmod.event.network.SendPacketEvent;
-import keystrokesmod.event.player.PostMotionEvent;
-import keystrokesmod.event.player.PostUpdateEvent;
-import keystrokesmod.event.player.PreMotionEvent;
-import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.*;
 import keystrokesmod.module.impl.movement.NoSlow;
-import keystrokesmod.module.impl.movement.Sprint;
 import keystrokesmod.module.impl.movement.noslow.customnoslow.SimpleCustomNoSlow;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -71,13 +67,7 @@ public class CustomNoSlow extends INoSlow {
 
             if (mode.getInput() == 1 || mode.getInput() == 3)
                 event.setSprinting(false);
-            if (mode.getInput() == 2 || mode.getInput() == 3)
-                Sprint.omni = true;
         } else {
-            if (usingTicks > 0) {
-                Sprint.omni = false;
-            }
-
             usingTicks = 0;
         }
 
@@ -85,6 +75,12 @@ public class CustomNoSlow extends INoSlow {
         SimpleCustomNoSlow noSlow = getNoSlow();
         if (noSlow != null)
             noSlow.onPreMotion(event);
+    }
+
+    @EventListener(priority = -2)
+    public void onSprint(SprintEvent event) {
+        if (mode.getInput() == 2 || mode.getInput() == 3)
+            event.setSprint(true);
     }
 
     @EventListener(priority = -2)
@@ -119,10 +115,6 @@ public class CustomNoSlow extends INoSlow {
         sword.disable();
         bow.disable();
         rest.disable();
-
-        if (usingTicks > 0) {
-            Sprint.omni = false;
-        }
     }
 
     private @Nullable SimpleCustomNoSlow getNoSlow() {

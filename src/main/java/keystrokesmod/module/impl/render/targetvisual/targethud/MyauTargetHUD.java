@@ -73,21 +73,21 @@ public class MyauTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
         final int n3 = mc.fontRendererObj.getStringWidth(TargetName) + n2 + 20;
         final int n4 = scaledResolution.getScaledWidth() / 2 - n3 / 2 + posX;
         final int n5 = scaledResolution.getScaledHeight() / 2 + 15 + posY;
-        current$minX = n4 - n2;
-        current$minY = n5 - n2;
-        current$maxX = n4 + n3;
-        current$maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + n2;
+        minX = n4 - n2;
+        minY = n5 - n2;
+        maxX = n4 + n3;
+        maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + n2;
 
         final int n10 = 255;
         final int n11 = Math.min(n10, 110);
         final int n12 = Math.min(n10, 210);
 
         if (background.isToggled())
-            RenderUtils.drawRect(current$minX, current$minY, current$maxX, current$maxY + 7, Utils.merge(Color.black.getRGB(), Math.min(n10, 60)));
+            RenderUtils.drawRect(minX, minY, maxX, maxY + 7, Utils.merge(Color.black.getRGB(), Math.min(n10, 60)));
 
-        final int n13 = current$minX + 6 + 27;
-        final int n14 = current$maxX - 2;
-        final int n15 = (int) (current$maxY + 0.45);
+        final int n13 = minX + 6 + 27;
+        final int n14 = maxX - 2;
+        final int n15 = (int) (maxY + 0.45);
 
         RenderUtils.drawRect(n13, n15, n14, n15 + 4, Utils.merge(Color.black.getRGB(), n11));
 
@@ -126,8 +126,8 @@ public class MyauTargetHUD extends SubMode<TargetHUD> implements ITargetVisual {
 
         if (target instanceof AbstractClientPlayer) {
             AbstractClientPlayer player = (AbstractClientPlayer) target;
-            double targetX = current$minX + 4;
-            double targetY = current$minY + 3;
+            double targetX = minX + 4;
+            double targetY = minY + 3;
             GlStateManager.color(1, 1, 1, 1);
             RenderUtils.renderPlayer2D((float) targetX, (float) targetY, 25, 25, player);
             if (hurtRender.isToggled()) {

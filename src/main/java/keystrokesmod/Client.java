@@ -3,6 +3,7 @@ package keystrokesmod;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import keystrokesmod.anticrack.AntiCrack;
 import keystrokesmod.event.client.PreTickEvent;
 import keystrokesmod.event.render.Render2DEvent;
 import keystrokesmod.eventbus.EventBus;
@@ -34,15 +35,18 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
         version = "KMV5",
         acceptedMinecraftVersions = "[1.8.9]"
 )
-public class Client {
+public final class Client {
+    public static final String NAME = "Raven XD";
+    public static final String VERSION = "Developing build";
+
     public static boolean debugger = false;
-    public static Minecraft mc;
+    public static Minecraft mc = Minecraft.getMinecraft();
     private static KeySrokeRenderer keySrokeRenderer;
     private static boolean isKeyStrokeConfigGuiToggled;
     @Getter
     private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
     @Getter
-    public static ModuleManager moduleManager;
+    public static ModuleManager moduleManager = new ModuleManager();
     public static final EventBus EVENT_BUS = new EventBus();
     public static ClickGui clickGui;
     public static ProfileManager profileManager;
@@ -53,9 +57,8 @@ public class Client {
     public static int moduleCounter;
     public static int settingCounter;
 
-    public Client() {
-        mc = Minecraft.getMinecraft();
-        moduleManager = new ModuleManager();
+    static {
+        AntiCrack.init();
     }
 
     @EventHandler
@@ -79,17 +82,15 @@ public class Client {
         profileManager.loadProfile();
         Reflection.setKeyBindings();
         scriptManager.loadScripts();
-        scriptManager.loadScripts();
         Client.EVENT_BUS.register(ModuleManager.tower);
         Client.EVENT_BUS.register(ModuleManager.rotationHandler);
         Client.EVENT_BUS.register(ModuleManager.slotHandler);
-        Client.EVENT_BUS.register(ModuleManager.dynamicManager);
-        Client.EVENT_BUS.register(new MoveableManager());
         Client.EVENT_BUS.register(profileManager);
 
         I18nManager.init();
         AutoUpdate.init();
         EventDispatcher.init();
+        MoveableManager.init();
     }
 
     @EventListener

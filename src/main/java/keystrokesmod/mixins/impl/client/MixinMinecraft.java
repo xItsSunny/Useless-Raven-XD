@@ -10,7 +10,6 @@ import keystrokesmod.module.impl.combat.Reach;
 import keystrokesmod.module.impl.exploit.ExploitFixer;
 import keystrokesmod.module.impl.render.Animations;
 import keystrokesmod.module.impl.render.FreeLook;
-import keystrokesmod.module.impl.render.Watermark;
 import keystrokesmod.utility.ReflectionUtils;
 import keystrokesmod.utility.render.BackgroundUtils;
 import net.minecraft.client.Minecraft;
@@ -91,7 +90,7 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "createDisplay", at = @At(value = "RETURN"))
     private void onSetTitle(@NotNull CallbackInfo ci) {
-        Display.setTitle("Raven XD " + Watermark.VERSION);
+        Display.setTitle(String.format("%s %s", Client.NAME, Client.VERSION));
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))

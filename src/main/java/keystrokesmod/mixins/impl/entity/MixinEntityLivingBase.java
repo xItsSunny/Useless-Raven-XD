@@ -137,6 +137,7 @@ public abstract class MixinEntityLivingBase extends Entity {
         JumpEvent event = new JumpEvent((float) MoveUtil.jumpMotion(), RotationHandler.getMovementYaw(this));
         Client.EVENT_BUS.post(event);
         if (event.isCancelled()) {
+            ci.cancel();
             return;
         }
 
@@ -148,11 +149,6 @@ public abstract class MixinEntityLivingBase extends Entity {
 
         if (this.isSprinting()) {
             float f = event.getYaw() * 0.017453292F;
-
-            if (Sprint.omni()) {
-                f = (float) (MoveUtil.direction() * (180 / Math.PI));
-                f *= 0.017453292F;
-            }
 
             this.motionX -= MathHelper.sin(f) * 0.2F;
             this.motionZ += MathHelper.cos(f) * 0.2F;

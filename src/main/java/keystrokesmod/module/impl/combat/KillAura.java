@@ -151,7 +151,7 @@ public class KillAura extends IAutoClicker {
                 .setDefaultValue("Normal")
         );
         this.registerSetting(attackMode = new ModeSetting("Attack mode", new String[]{"Legit", "Packet"}, 1));
-        String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial", "QuickMacro", "Hypixel"};
+        String[] autoBlockModes = new String[]{"Manual", "Vanilla", "Post", "Swap", "Interact A", "Interact B", "Fake", "Partial", "QuickMacro", "Hypixel", "HypixelTest"};
         this.registerSetting(autoBlockMode = new ModeSetting("Autoblock", autoBlockModes, 0));
         final ModeOnly autoBlock = new ModeOnly(autoBlockMode, 0).reserve();
         this.registerSetting(smartBlock = new ButtonSetting("Smart block", false, autoBlock));
@@ -348,12 +348,13 @@ public class KillAura extends IAutoClicker {
                 mc.thePlayer.swingItem();
                 RecordClick.click();
             } else {
-                mc.thePlayer.sendQueue.addToSendQueue(new C0APacketAnimation());
+                PacketUtils.sendPacket(new C0APacketAnimation());
                 RecordClick.click();
             }
         }
         int input = (int) autoBlockMode.getInput();
-        if (block.get() && (input == 3 || input == 4 || input == 5 || input == 8 || input == 9) && Utils.holdingSword()) {
+        if (block.get() && (input == 3 || input == 4 || input == 5 || input == 8 || input == 9 || input == 10) 
+                && Utils.holdingSword()) {
             setBlockState(block.get(), false, false);
             if (ModuleManager.bedAura.stopAutoblock) {
                 resetBlinkState(false);
@@ -365,14 +366,14 @@ public class KillAura extends IAutoClicker {
                     if (lag) {
                         blinking = true;
                         if (Client.badPacketsHandler.playerSlot != mc.thePlayer.inventory.currentItem % 8 + 1) {
-                            mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
+                            PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
                             Client.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem % 8 + 1;
                             swapped = true;
                         }
                         lag = false;
                     } else {
                         // check here for ghost later
-                        mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                        PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                         Client.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem;  // todo recode this with slot handler
                         swapped = false;
                         attackAndInteract(target, true);
@@ -412,6 +413,29 @@ public class KillAura extends IAutoClicker {
                     } else {
                         // attack while blinked
                         if (!attackAndInteract(target, true, Utils.getEyePos(target))) {
+                            break;  // perfect hit support
+                        }
+                        releasePackets(); // release
+                        blinking = false;
+                        sendBlock(); // send block without blinking
+                        lag = true;
+                    }
+                    break;
+                case 10:
+                    if (lag) {
+                        blinking = true;
+                        Vec3 hitVec = Utils.getEyePos();
+                        PacketUtils.sendPacket(new C02PacketUseEntity(target, new Vec3(
+                                hitVec.x - target.posX, 
+                                hitVec.y - target.posY, 
+                                hitVec.z - target.posZ
+                        ).toVec3()));
+                        PacketUtils.sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
+                        unBlock();  // unblock while blinking
+                        lag = false;
+                    } else {
+                        // attack while blinked
+                        if (!attack(target)) {
                             break;  // perfect hit support
                         }
                         releasePackets(); // release
@@ -460,8 +484,8 @@ public class KillAura extends IAutoClicker {
             this.rotations = new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch};
         }
         if (autoBlockMode.getInput() == 2 && block.get() && Utils.holdingSword()) {
-            mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
-            mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+            PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
+            PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
         }
         return null;
     }
@@ -595,6 +619,9 @@ public class KillAura extends IAutoClicker {
             case 4:
             case 5:
             case 9: // hypixel
+                setBlockState(block.get(), false, false);
+                break;
+            case 10: // hypixel test
                 setBlockState(block.get(), false, false);
                 break;
             case 6: // fake
@@ -762,7 +789,7 @@ public class KillAura extends IAutoClicker {
             if (sendInteractAt) {
                 if (hitVec != null) {
                     hitVec = new Vec3(hitVec.x - target.posX, hitVec.y - target.posY, hitVec.z - target.posZ);
-                    mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, hitVec.toVec3()));
+                    PacketUtils.sendPacket(new C02PacketUseEntity(target, hitVec.toVec3()));
                 }
             }
             PacketUtils.sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
@@ -810,7 +837,7 @@ public class KillAura extends IAutoClicker {
         releasePackets();
         blocking = false;
         if (Client.badPacketsHandler.playerSlot != mc.thePlayer.inventory.currentItem && swapped) {
-            mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+            PacketUtils.sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
             Client.badPacketsHandler.playerSlot = mc.thePlayer.inventory.currentItem;
             swapped = false;
         }

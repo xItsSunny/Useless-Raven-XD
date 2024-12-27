@@ -24,7 +24,7 @@ import static keystrokesmod.Client.mc;
 public final class EventDispatcher {
     private static final EventDispatcher INSTANCE = new EventDispatcher();
 
-    private static WorldClient lastWorld;
+    private static WorldClient lastWorld = null;
 
     public static void init() {
         Client.EVENT_BUS.register(INSTANCE);

@@ -7,6 +7,8 @@ import keystrokesmod.module.impl.render.targetvisual.targethud.*;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.interact.moveable.Moveable;
+import keystrokesmod.utility.interact.moveable.MoveableManager;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.MovingObjectPosition;
@@ -15,13 +17,13 @@ import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.Nullable;
 
-public class TargetHUD extends Module {
+public class TargetHUD extends Module implements Moveable {
     public static int posX = 70;
     public static int posY = 30;
-    public static int current$minX;
-    public static int current$maxX;
-    public static int current$minY;
-    public static int current$maxY;
+    public static int minX;
+    public static int maxX;
+    public static int minY;
+    public static int maxY;
     private static ModeValue mode;
     private static @Nullable EntityLivingBase target = null;
     private final ButtonSetting onlyKillAura;
@@ -47,25 +49,23 @@ public class TargetHUD extends Module {
             final int n3 = mc.fontRendererObj.getStringWidth(target.getDisplayName().getFormattedText()) + n2;
             final int n4 = scaledResolution.getScaledWidth() / 2 - n3 / 2 + posX;
             final int n5 = scaledResolution.getScaledHeight() / 2 + 15 + posY;
-            current$minX = n4 - n2;
-            current$minY = n5 - n2;
-            current$maxX = n4 + n3;
-            current$maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + n2;
+            minX = n4 - n2;
+            minY = n5 - n2;
+            maxX = n4 + n3;
+            maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + n2;
 
             ((ITargetVisual) mode.getSubModeValues().get((int) mode.getInput())).render(target);
         }
     }
 
-    public static void renderExample() {
-        render(mc.thePlayer);
-    }
-
     @Override
     public void onEnable() {
         mode.enable();
+        MoveableManager.register(this);
     }
 
     public void onDisable() {
+        MoveableManager.unregister(this);
         mode.disable();
 
         target = null;
@@ -122,5 +122,40 @@ public class TargetHUD extends Module {
             return;
         }
         render(target);
+    }
+
+    @Override
+    public void render() {
+        render(mc.thePlayer);
+    }
+
+    @Override
+    public int getMinX() {
+        return minX;
+    }
+
+    @Override
+    public int getMaxX() {
+        return maxX;
+    }
+
+    @Override
+    public int getMinY() {
+        return minY;
+    }
+
+    @Override
+    public int getMaxY() {
+        return maxY;
+    }
+
+    @Override
+    public void moveX(int amount) {
+        posX += amount;
+    }
+
+    @Override
+    public void moveY(int amount) {
+        posY += amount;
     }
 }

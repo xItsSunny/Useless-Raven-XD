@@ -23,7 +23,6 @@
     "entity.MixinEntityPlayer",
     "entity.MixinEntityPlayerSP",
     "gui.MixinGuiButton",
-    "gui.MixinGuiChat",
     "gui.MixinGuiConnecting",
     "gui.MixinGuiContainer",
     "gui.MixinGuiDownloadTerrain",
@@ -46,7 +45,6 @@
     "network.S14PacketEntityAccessor",
     "network.S27PacketExplosionAccessor",
     "render.ItemRendererAccessor",
-    "render.MixinBlockRendererDispatcher",
     "render.MixinEntityRenderer",
     "render.MixinFontRenderer",
     "render.MixinItemRenderer",
@@ -55,11 +53,10 @@
     "render.MixinModelBiped",
     "render.MixinRendererLivingEntity",
     "render.RenderManagerAccessor",
-    "world.BlockNoteAccessor",
     "world.MixinBlock",
     "world.MixinBlockLadder",
     "world.MixinBlockWeb",
-    "world.ScoreAccessor"
+    "world.MixinWorld"
   ],
   "server": [],
   "injectors": {

@@ -47,7 +47,7 @@ public class HypixelJumpSprint extends JumpSprint {
                     (float) Utils.limit(data.getPitch() - parent.getRandom() * 5, -90, 90)
             );
         }
-        return super.onFinalRotation(data);
+        return data;
     }
 
     @EventListener

@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.client;
 
+import keystrokesmod.Client;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.notification.DefaultNotification;
@@ -30,6 +31,9 @@ public class Notifications extends Module {
         );
         this.registerSetting(chatNoti = new ButtonSetting("Show in chat", false));
         this.registerSetting(moduleToggled = new ButtonSetting("Module toggled", true));
+        canBeEnabled = false;
+        Client.EVENT_BUS.register(this);
+        mode.enable();
     }
 
     public static void sendNotification(NotificationTypes notificationType, String message) {
@@ -53,17 +57,6 @@ public class Notifications extends Module {
         } else {
             Utils.sendMessage("&7[&1LI&7-" + ((notificationType == NotificationTypes.INFO) ? "&1" : notificationType == NotificationTypes.WARN ? "&e" : "&4") + notificationType.toString() + "&7]&r " + message);
         }
-    }
-
-    @Override
-    public void onEnable() {
-        mode.enable();
-        notifs.clear();
-    }
-
-    @Override
-    public void onDisable() {
-        mode.disable();
     }
 
     @EventListener

@@ -4,8 +4,6 @@ public interface Moveable {
 
     void render();
 
-    boolean isDisabled();
-
     int getMinX();
 
     int getMaxX();

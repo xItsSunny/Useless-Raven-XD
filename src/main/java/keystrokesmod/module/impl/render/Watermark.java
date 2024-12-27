@@ -10,7 +10,9 @@ import keystrokesmod.module.setting.utils.ModeOnly;
 import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.font.IFont;
+import keystrokesmod.utility.interact.moveable.Moveable;
 import keystrokesmod.utility.render.RenderUtils;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.inventory.GuiChest;
@@ -27,18 +29,21 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
-public class Watermark extends Module {
-    public static final String VERSION = "2.14.1";
+public class Watermark extends Module implements Moveable {
     public static final Map<String, ResourceLocation> WATERMARK = new Object2ObjectOpenHashMap<>();
 
     public static String customName = "CustomClient";
 
     public static int posX = 5;
     public static int posY = 5;
-    public static int current$minX = 0;
-    public static double current$maxX = 0;
-    public static int current$minY = 0;
-    public static int current$maxY = 0;
+    @Getter
+    private int minX = 0;
+    @Getter
+    private int maxX = 0;
+    @Getter
+    private int minY = 0;
+    @Getter
+    private int maxY = 0;
     private final ModeSetting mode;
     private final ModeSetting watermarkText;
     private final ModeSetting watermarkPhoto;
@@ -77,6 +82,7 @@ public class Watermark extends Module {
         render();
     }
 
+    @Override
     public void render() {
         switch ((int) mode.getInput()) {
             case 0:
@@ -95,7 +101,7 @@ public class Watermark extends Module {
 
                 if (!text.isEmpty()) {
                     if (showVersion.isToggled())
-                        text += VERSION;
+                        text += Client.VERSION;
                     if (lowercase.isToggled())
                         text = text.toLowerCase();
 
@@ -111,10 +117,10 @@ public class Watermark extends Module {
 
                     font.drawString(text, posX, posY, Theme.getGradient((int) theme.getInput(), 0), shadow.isToggled());
 
-                    current$minX = posX;
-                    current$maxX = current$minX + font.width(text);
-                    current$minY = posY;
-                    current$maxY = (int) (current$minY + Math.round(font.height()));
+                    minX = posX;
+                    maxX = (int) Math.round(minX + font.width(text));
+                    minY = posY;
+                    maxY = (int) Math.round(minY + font.height());
                 }
                 break;
             case 1:
@@ -128,5 +134,15 @@ public class Watermark extends Module {
                 }
                 break;
         }
+    }
+
+    @Override
+    public void moveX(int amount) {
+        posX += amount;
+    }
+
+    @Override
+    public void moveY(int amount) {
+        posY += amount;
     }
 }

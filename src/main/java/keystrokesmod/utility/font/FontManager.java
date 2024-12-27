@@ -17,8 +17,11 @@ public class FontManager {
     public static FontRenderer
             regular16, regular22,
             icon20,
-            productSans16, productSans20, productSansLight, productSansMedium,
-            tenacity16, tenacity20, tenacity80;
+            productSans16,
+            productSans20,
+            productSansMedium,
+            tenacity16,
+            tenacity20;
 
     private static int prevScale;
     private static final Map<ObjectIntImmutablePair<Fonts>, FontRenderer> fontsMap = new Object2ObjectOpenHashMap<>(10);
@@ -37,11 +40,9 @@ public class FontManager {
             icon20 = getFont(Fonts.ICON, 20);
             productSans16 = getFont(Fonts.PRODUCT_SANS_REGULAR, 16);
             productSans20 = getFont(Fonts.PRODUCT_SANS_REGULAR, 20);
-            productSansLight = getFont(Fonts.PRODUCT_SANS_LIGHT, 22);
             productSansMedium = getFont(Fonts.PRODUCT_SANS_MEDIUM, 22);
-            tenacity16 = getFont(Fonts.PRODUCT_SANS_REGULAR, 16);
+            tenacity16 = getFont(Fonts.TENACITY, 16);
             tenacity20 = getFont(Fonts.TENACITY, 20);
-            tenacity80 = getFont(Fonts.TENACITY, 80);
         }
     }
 
@@ -64,7 +65,6 @@ public class FontManager {
         REGULAR("Regular", "regular.ttf"),
         ICON("Icon", "icon.ttf"),
         PRODUCT_SANS_REGULAR("ProductSans regular", "product_sans_regular.ttf"),
-        PRODUCT_SANS_LIGHT("ProductSans light", "product_sans_light.ttf"),
         PRODUCT_SANS_MEDIUM("ProductSans medium", "product_sans_medium.ttf"),
         TENACITY("Tenacity", "tenacity.ttf"),
         MAPLESTORY("Maplestory", "MAPLESTORY_OTF_BOLD.OTF");

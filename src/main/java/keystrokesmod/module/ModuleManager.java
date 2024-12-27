@@ -89,7 +89,6 @@ public class ModuleManager {
     public static AutoRespawn autoRespawn;
     public static Clutch clutch;
     public static Ambience ambience;
-    public static DynamicManager dynamicManager;
     public static Disabler disabler;
     public static BridgeAssist bridgeAssist;
     public static Watermark watermark;
@@ -99,7 +98,6 @@ public class ModuleManager {
     public static Jesus jesus;
     public static ExploitFixer exploitFixer;
     public static AutoRegister autoRegister;
-    public static NoteBot noteBot;
     public static ViewPackets viewPackets;
     public static RageBot rageBot;
     public static HitLog hitLog;
@@ -117,7 +115,6 @@ public class ModuleManager {
     public static BedDefender bedDefender;
     public static ChestAura chestAura;
     public static AutoRod autoRod;
-    //    public static AbilitiesBedWars abilitiesBedWars;
     public static ClientTheme clientTheme;
     public static AutoChest autoChest;
     public static Teleport teleport;
@@ -127,32 +124,16 @@ public class ModuleManager {
     public static RemoteShop remoteShop;
     public static Regen regen;
     public static ChatAI chatAI;
-    public static keystrokesmod.module.impl.render.ArrayList arrayList;
     public static InvMove invMove;
     public static MotionCamera motionCamera;
+    public static Optimize optimize;
 
     static List<Module> modules = new ArrayList<>();
 
-    private static double getWidth(@NotNull Module module) {
-        String text = module.getPrettyName()
-                + ((HUD.showInfo.isToggled() && !module.getPrettyInfo().isEmpty()) ? " " + module.getPrettyInfo() : "");
-        return HUD.getFontRenderer().width(HUD.lowercase.isToggled() ? text.toLowerCase() : text);
-    }
-
-    public static void sort() {
-        if (HUD.alphabeticalSort.isToggled()) {
-            organizedModules.sort(Comparator.comparing(Module::getPrettyName));
-        } else {
-            organizedModules.sort((c1, c2) -> Double.compare(getWidth(c2), getWidth(c1)));
-        }
-    }
-
     public void register() {
-
         // client
         this.addModule(commandChat = new CommandChat());
         this.addModule(commandLine = new CommandLine());
-        this.addModule(dynamicManager = new DynamicManager());
         this.addModule(new Gui());
         // this.addModule(new NyaProxy());
         this.addModule(new Settings());
@@ -160,6 +141,7 @@ public class ModuleManager {
         this.addModule(notifications = new Notifications());
         this.addModule(new DiscordRpc());
         this.addModule(language = new Language());
+        this.addModule(optimize = new Optimize());
 
         // combat
         this.addModule(new AimAssist());
@@ -190,7 +172,6 @@ public class ModuleManager {
         this.addModule(new SlyPort());
         this.addModule(new AntiAim());
         this.addModule(hitLog = new HitLog());
-        this.addModule(noteBot = new NoteBot());
         this.addModule(blockOut = new BlockOut());
 //        this.addModule(abilitiesBedWars = new AbilitiesBedWars());
         this.addModule(new Yeet());
@@ -302,7 +283,6 @@ public class ModuleManager {
         this.addModule(new Explosions());
         this.addModule(new KillMessage());
         this.addModule(clientTheme = new ClientTheme());
-        this.addModule(arrayList = new keystrokesmod.module.impl.render.ArrayList());
         this.addModule(motionCamera = new MotionCamera());
 
         // world
@@ -338,8 +318,8 @@ public class ModuleManager {
         // enable
         antiBot.enable();
         commandChat.enable();
-        notifications.enable();
         clientTheme.enable();
+        optimize.enable();
         modules.sort(Comparator.comparing(Module::getPrettyName));
     }
 

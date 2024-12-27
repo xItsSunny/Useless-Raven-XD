@@ -8,6 +8,8 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.utility.Utils;
 
 public class ProfileModule extends Module {
+    private static long lastToggleTime = -1;
+
     private final Profile profile;
     public boolean saved = true;
 
@@ -27,6 +29,11 @@ public class ProfileModule extends Module {
 
     @Override
     public void toggle() {
+        long curTime = System.currentTimeMillis();
+        if (curTime - lastToggleTime < 50)
+            return;
+        lastToggleTime = curTime;
+
         if (mc.currentScreen instanceof ClickGui || mc.currentScreen == null) {
             if (this.profile == Client.currentProfile) {
                 return;

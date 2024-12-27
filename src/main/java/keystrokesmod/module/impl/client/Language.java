@@ -28,7 +28,6 @@ public class Language extends Module {
                     for (Module module : Client.getModuleManager().getModules()) {
                         module.setI18nObject(map.getOrDefault(module, null));
                     }
-                    ModuleManager.sort();
                 }
             });
         }
@@ -48,6 +47,5 @@ public class Language extends Module {
         for (Module module : Client.getModuleManager().getModules()) {
             module.setI18nObject(null);
         }
-        ModuleManager.sort();
     }
 }

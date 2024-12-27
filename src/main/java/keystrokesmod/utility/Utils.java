@@ -383,9 +383,11 @@ public final class Utils {
         return mc.thePlayer != null && mc.theWorld != null;
     }
 
+    private static final List<String> HYPIXEL_IPS = Collections.unmodifiableList(Arrays.asList("hypixel.net", "nyaproxy.xyz", "nyap.buzz", "hyp"));
+
     public static boolean isHypixel() {
         return !mc.isSingleplayer() && mc.getCurrentServerData() != null
-                && mc.getCurrentServerData().serverIP.contains("hypixel.net");
+                && HYPIXEL_IPS.stream().anyMatch(mc.getCurrentServerData().serverIP::contains);
     } // I'm not sure how to handle it, such as Proxy IP.
 
     public static boolean isCraftiGames() {
@@ -980,8 +982,21 @@ public final class Utils {
         return stringbuilder.toString();
     }
 
+    public static float getEyeHeight() {
+        float f = mc.thePlayer.eyeHeight;
+        if (mc.thePlayer.isPlayerSleeping()) {
+            f = 0.2F;
+        }
+
+        if (mc.thePlayer.isSneaking()) {
+            f -= 0.08F;
+        }
+
+        return f;
+    }
+
     public static keystrokesmod.script.classes.Vec3 getEyePos(@NotNull Entity entity, keystrokesmod.script.classes.@NotNull Vec3 position) {
-        return position.add(new keystrokesmod.script.classes.Vec3(0, entity.getEyeHeight(), 0));
+        return position.add(new keystrokesmod.script.classes.Vec3(0, entity == mc.thePlayer ? getEyeHeight() : entity.getEyeHeight(), 0));
     }
 
     public static keystrokesmod.script.classes.Vec3 getEyePos(Entity entity) {

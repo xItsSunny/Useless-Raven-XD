@@ -9,11 +9,11 @@ import keystrokesmod.utility.Utils;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import tech.skidonion.obfuscator.annotations.NativeObfuscation.Inline;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.security.InvalidParameterException;
 import java.util.List;
@@ -53,7 +53,6 @@ public final class EventBus {
     }
 
     @SuppressWarnings("unchecked")
-    @Inline
     private <T> void doRegister(@NotNull Class<T> objClass, @Nullable T object) {
         for (Method method : objClass.getDeclaredMethods()) {
             boolean found = false;
@@ -110,7 +109,6 @@ public final class EventBus {
      * @param eventType 事件类型
      * @param runnable  需要注册的方法
      */
-    @Inline
     public <T extends Event> void register(@NotNull Class<T> eventType, @NotNull Runnable runnable) {
         register(eventType, event -> runnable.run());
     }
@@ -121,12 +119,10 @@ public final class EventBus {
      * @param eventType 事件类型
      * @param consumer 需要注册的方法
      */
-    @Inline
     public <T extends Event> void register(@NotNull Class<T> eventType, @NotNull Consumer<@NotNull T> consumer) {
         addHandler(new EventHandler<>(null, eventType, consumer, 0));
     }
 
-    @Inline
     private void addHandler(@NotNull EventHandler<? extends Event> eventHandler) {
         synchronized (eventHandlers) {
             final List<EventHandler<? extends Event>> prioryList;
@@ -192,7 +188,6 @@ public final class EventBus {
     }
 
     @SuppressWarnings("unchecked")
-    @Inline
     public <T extends Event> void post(T event) {
         if (event == null) return;
 
@@ -203,8 +198,17 @@ public final class EventBus {
             try {
                 ((EventHandler<T>) eventHandler).invoke(event);
             } catch (Throwable e) {
-                Utils.sendMessage(String.format("Exception while post event '%s'.",
-                        event.getClass().getSimpleName()));
+                Method method = eventHandler.getMethod();
+                String targetName;
+                if (method != null) {
+                    targetName = String.format("%s->%s", method.getDeclaringClass().getSimpleName(), method.getName());
+                    if (Modifier.isNative(method.getModifiers()))
+                        targetName += " <native method>";
+                } else {
+                    targetName = "Unknown Source";
+                }
+                Utils.sendMessage(String.format("Exception '%s' while post event '%s' to '%s': %s",
+                        e.getClass().getSimpleName(), event.getClass().getSimpleName(), targetName, e.getMessage()));
             }
 
             if (event instanceof CancellableEvent)

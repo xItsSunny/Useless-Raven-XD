@@ -27,7 +27,7 @@ public class HypixelLowHopMotionSpeed extends SubMode<HypixelLowHopSpeed> {
         toDisable = true;
     }
 
-    private class Impl extends SubMode<HypixelLowHopSpeed> {
+    public class Impl extends SubMode<HypixelLowHopSpeed> {
         private int offGroundTicks = 0;
 
         public Impl(String name, @NotNull HypixelLowHopSpeed parent) {
@@ -63,6 +63,7 @@ public class HypixelLowHopMotionSpeed extends SubMode<HypixelLowHopSpeed> {
             switch (offGroundTicks) {
                 case 1:
                     mc.thePlayer.motionY = 0.39;
+                    MoveUtil.strafe();
                     break;
                 case 3:
                     mc.thePlayer.motionY -= 0.13;

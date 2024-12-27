@@ -10,7 +10,7 @@ import keystrokesmod.utility.Timer;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.render.*;
 import keystrokesmod.utility.Utils;
-import keystrokesmod.utility.profile.Manager;
+import keystrokesmod.utility.profile.ProfileManagerModule;
 import keystrokesmod.utility.profile.Profile;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
@@ -92,7 +92,7 @@ public class CategoryComponent {
         int tY = this.buttonHeight + 3;
 
         if ((this.categoryName == Module.category.profiles && isProfile) || (this.categoryName == Module.category.scripts && !isProfile)) {
-            ModuleComponent manager = new ModuleComponent(isProfile ? new Manager() : new keystrokesmod.script.Manager(), this, tY);
+            ModuleComponent manager = new ModuleComponent(isProfile ? new ProfileManagerModule() : new keystrokesmod.script.Manager(), this, tY);
             this.modules.add(manager);
 
             if ((Client.profileManager == null && isProfile) || (Client.scriptManager == null && !isProfile)) {

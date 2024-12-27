@@ -43,14 +43,18 @@ public final class RotationHandler extends Module {
     private static MoveFix moveFix = MoveFix.None;
     private final ModeSetting smoothBack = new ModeSetting("Smooth back", new String[]{"None", "Default"}, 0);
     private final SliderSetting aimSpeed = new SliderSetting("Aim speed", 5, 1, 15, 0.1, new ModeOnly(smoothBack, 1));
+    private static final ButtonSetting hideRotation = new ButtonSetting("Hide rotation", false);
 
     public RotationHandler() {
         super("RotationHandler", category.other);
-        this.registerSetting(defaultMoveFix, smoothBack, aimSpeed);
+        this.registerSetting(defaultMoveFix, smoothBack, aimSpeed, hideRotation);
         this.registerSetting(new DescriptionSetting("Classic"));
         this.registerSetting(rotateBody, fullBody, randomYawFactor);
-        this.registerSetting(new DescriptionSetting("Debug"));
         this.canBeEnabled = false;
+    }
+
+    public static boolean hideRotation() {
+        return hideRotation.isToggled();
     }
 
     public static float getMovementYaw(Entity entity) {

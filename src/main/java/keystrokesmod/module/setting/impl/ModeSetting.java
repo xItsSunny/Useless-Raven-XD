@@ -82,6 +82,10 @@ public class ModeSetting extends Setting implements InputSetting {
         return getOptions();
     }
 
+    public String getSelected() {
+        return getPrettyOptions()[(int) getInput()];
+    }
+
     @Override
     public double getInput() {
         return value;

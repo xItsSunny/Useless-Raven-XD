@@ -31,9 +31,6 @@ public class Notifications extends Module {
         );
         this.registerSetting(chatNoti = new ButtonSetting("Show in chat", false));
         this.registerSetting(moduleToggled = new ButtonSetting("Module toggled", true));
-        canBeEnabled = false;
-        Client.EVENT_BUS.register(this);
-        mode.enable();
     }
 
     public static void sendNotification(NotificationTypes notificationType, String message) {

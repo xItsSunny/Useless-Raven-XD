@@ -16,7 +16,6 @@ public final class AntiCrack {
     @Renamer(obfuscated = false)
     private static final String TYPE = "Release";
 
-    @NativeObfuscation(obfuscated = false)
     public static void main(String[] args) {
         crash();
         init();

@@ -295,11 +295,11 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             --this.timeUntilPortal;
         }
 
+        this.movementInput.updatePlayerMoveState();
         boolean jumpDown = this.movementInput.jump;
         boolean sneakDown = this.movementInput.sneak;
         float minValueToSprint = 0.8F;
         boolean playerCanSprint = this.movementInput.moveForward >= minValueToSprint;
-        this.movementInput.updatePlayerMoveState();
 
         // no slow
         @SuppressWarnings("EqualsBetweenInconvertibleTypes")

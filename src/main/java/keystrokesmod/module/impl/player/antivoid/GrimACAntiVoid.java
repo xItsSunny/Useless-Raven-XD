@@ -13,6 +13,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
+import lombok.Getter;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C03PacketPlayer;
@@ -26,7 +27,8 @@ public class GrimACAntiVoid extends SubMode<AntiVoid> {
     private final SliderSetting distance;
     private final ButtonSetting allowPearl;
 
-    private boolean airStuck = false;
+    @Getter
+    private static boolean airStuck = false;
     private float yaw, pitch;
     private @Nullable C08PacketPlayerBlockPlacement delayedPacket = null;
 

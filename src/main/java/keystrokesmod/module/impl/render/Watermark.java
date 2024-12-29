@@ -11,6 +11,7 @@ import keystrokesmod.utility.Theme;
 import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.interact.moveable.Moveable;
+import keystrokesmod.utility.interact.moveable.MoveableManager;
 import keystrokesmod.utility.render.RenderUtils;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
@@ -144,5 +145,15 @@ public class Watermark extends Module implements Moveable {
     @Override
     public void moveY(int amount) {
         posY += amount;
+    }
+
+    @Override
+    public void onEnable() throws Throwable {
+        MoveableManager.register(this);
+    }
+
+    @Override
+    public void onDisable() throws Throwable {
+        MoveableManager.unregister(this);
     }
 }

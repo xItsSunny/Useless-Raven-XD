@@ -14,6 +14,6 @@ public interface EntityPlayerSPAccessor {
     @Accessor("serverSprintState")
     void setServerSprint(boolean serverSprint);
 
-    @Accessor("lastReportedYaw")
-    float getLastReportedYaw();
+    @Accessor("positionUpdateTicks")
+    int getPositionUpdateTicks();
 }

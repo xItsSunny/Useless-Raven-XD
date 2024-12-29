@@ -175,7 +175,6 @@ public final class ReflectionUtils {
         Consumer<?> result = fastMethodMap.get(method);
         if (result != null)
             return (Consumer<T>) result;
-
         MethodHandles.Lookup lookup = MethodHandles.lookup();
         MethodHandle methodHandle = lookup.unreflect(method);
         CallSite callSite = LambdaMetafactory.metafactory(
@@ -189,5 +188,9 @@ public final class ReflectionUtils {
         Consumer<T> target = (Consumer<T>) callSite.getTarget().invoke(object);
         fastMethodMap.put(method, target);
         return target;
+    }
+
+    public static boolean isFastMethod(Consumer<?> consumer) {
+        return fastMethodMap.containsValue(consumer);
     }
 }

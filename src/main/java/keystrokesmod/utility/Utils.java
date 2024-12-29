@@ -3,6 +3,7 @@ package keystrokesmod.utility;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.mojang.realmsclient.gui.ChatFormatting;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import keystrokesmod.Client;
 import keystrokesmod.event.client.ClickEvent;
 import keystrokesmod.event.client.MouseEvent;
@@ -44,6 +45,7 @@ import net.minecraft.scoreboard.*;
 import net.minecraft.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -1130,5 +1132,45 @@ public final class Utils {
 
     public static double limit(double value, double min, double max) {
         return Math.max(Math.min(value, max), min);
+    }
+
+    /**
+     * 返回一个反转视图的列表，而不修改原列表。
+     *
+     * @param list 原始列表
+     * @param <T>  列表的元素类型
+     * @return 反转视图的列表
+     */
+    public static <T> @NotNull List<T> reversed(@NotNull List<T> list) {
+        return new ReversedList<>(list);
+    }
+
+    /**
+     * 内部类：实现反转视图的列表。
+     */
+    private static class ReversedList<T> extends AbstractList<T> {
+        private final @NotNull List<T> original;
+
+        public ReversedList(@NotNull List<T> original) {
+            this.original = original;
+        }
+
+        @Override
+        public T get(int index) {
+            // 动态计算反转索引
+            int reversedIndex = size() - 1 - index;
+            return original.get(reversedIndex);
+        }
+
+        @Override
+        public T set(int index, T element) {
+            int reversedIndex = size() - 1 - index;
+            return original.set(reversedIndex, element);
+        }
+
+        @Override
+        public int size() {
+            return original.size();
+        }
     }
 }

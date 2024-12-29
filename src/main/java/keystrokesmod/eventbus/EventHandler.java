@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 @AllArgsConstructor
 public final class EventHandler<T extends Event> {
     private final @Nullable Method method;
+    private final @Nullable Object object;
     private final Class<T> eventType;
     private final Consumer<T> eventConsumer;
     private final int priory;

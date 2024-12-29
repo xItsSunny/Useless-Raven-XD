@@ -44,7 +44,7 @@ public final class Client {
     private static KeySrokeRenderer keySrokeRenderer;
     private static boolean isKeyStrokeConfigGuiToggled;
     @Getter
-    private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
+    private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(8);
     @Getter
     public static ModuleManager moduleManager = new ModuleManager();
     public static final EventBus EVENT_BUS = new EventBus();

@@ -164,21 +164,28 @@ public class HUD extends Module implements Moveable {
         int targetY = posY;
         minY = targetY;
         for (ModuleRender moduleRender : moduleRenders) {
-            int targetX = posX;
+            final double width = moduleRender.getWidth();
+            if (alignRight.isToggled()) {
+                minX = Math.min(minX, (int) Math.round(posX - width));
+                maxX = Math.max(maxX, posX);
+            } else {
+                minX = Math.min(minX, posX);
+                maxX = Math.max(maxX, (int) Math.round(posX + width));
+            }
+
+            int targetX = (int) Math.round(alignRight.isToggled() ? posX - width : posX);
             boolean ignored = moduleRender.isIgnored();
             if (ignored) {
-                targetX = -200;  // TODO calc it
+                targetX = alignRight.isToggled() ?
+                        (int) Math.ceil(mc.displayWidth + width * 2) :
+                        (int) Math.floor(-width * 2);
             }
 
             moduleRender.animationX.run(targetX);
             moduleRender.animationY.run(targetY);
-            double x = moduleRender.animationX.getValue();
-            double y = moduleRender.animationY.getValue();
-            double width = moduleRender.getWidth();
-            int color = Theme.getGradient((int) theme.getInput(), targetY);
-
-            minX = Math.min(minX, posX);
-            maxX = Math.max(maxX, (int) Math.round(posX + width));
+            final double x = moduleRender.animationX.getValue();
+            final double y = moduleRender.animationY.getValue();
+            final int color = Theme.getGradient((int) theme.getInput(), targetY);
 
             // render
             if (background.isToggled()) {

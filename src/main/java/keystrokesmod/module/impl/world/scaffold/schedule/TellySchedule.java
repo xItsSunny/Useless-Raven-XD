@@ -3,6 +3,7 @@ package keystrokesmod.module.impl.world.scaffold.schedule;
 import keystrokesmod.event.player.JumpEvent;
 import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.event.player.ScaffoldPlaceEvent;
+import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.module.impl.world.scaffold.IScaffoldSchedule;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -18,6 +19,8 @@ public class TellySchedule extends IScaffoldSchedule {
     private final SliderSetting jumpDownTicks;
 
     private boolean noPlace = false;
+    private boolean lastDiagonal = false;
+    private boolean jumped = false;
 
     public TellySchedule(String name, @NotNull Scaffold parent) {
         super(name, parent);
@@ -28,12 +31,51 @@ public class TellySchedule extends IScaffoldSchedule {
 
     @Override
     public boolean noPlace() {
-        return noPlace || mc.thePlayer.onGround && parent.placeBlock == null;
+        return noPlace || (mc.thePlayer.onGround && parent.placeBlock == null);
     }
 
     @Override
     public boolean noRotation() {
         return noPlace();
+    }
+
+    @EventListener(priority = -1)
+    public void onPreUpdate(PreUpdateEvent event) {
+        if (parent.offGroundTicks == 0) {
+            RotationHandler.setRotationYaw(mc.thePlayer.rotationYaw);
+            RotationHandler.setRotationPitch(mc.thePlayer.rotationPitch);
+            noPlace = true;
+            lastDiagonal = false;
+            if (parent.onGroundTicks >= 1 && !jumped && MoveUtil.isMoving() && !Utils.jumpDown()) {
+                mc.thePlayer.jump();
+                jumped = true;
+            }
+        } else {
+            jumped = false;
+            if (BlockUtils.insideBlock(mc.thePlayer.getEntityBoundingBox().offset(
+                    mc.thePlayer.motionX, mc.thePlayer.motionY + 0.1, mc.thePlayer.motionZ))) {
+                noPlace = true;
+            } else {
+                if (Utils.jumpDown()) {
+                    if (parent.offGroundTicks >= (int) jumpDownTicks.getInput()) {
+                        noPlace = false;
+                        lastDiagonal = false;
+                    }
+                } else {
+                    if (parent.isDiagonal() || lastDiagonal) {
+                        if (parent.offGroundTicks == (int) diagonalTicks.getInput()) {
+                            noPlace = false;
+                            lastDiagonal = true;
+                        }
+                    } else {
+                        if (parent.offGroundTicks == (int) straightTicks.getInput()) {
+                            noPlace = false;
+                            lastDiagonal = false;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -43,38 +85,8 @@ public class TellySchedule extends IScaffoldSchedule {
 
     @EventListener
     public void onScaffoldPlace(ScaffoldPlaceEvent event) {
-        if (noPlace)
+        if (noPlace())
             event.cancel();
-    }
-
-    @EventListener(priority = -1)
-    public boolean onPreUpdate(PreUpdateEvent event) {
-        if (parent.offGroundTicks == 0) {
-            if (parent.onGroundTicks == 0)
-                noPlace = true;
-            else if (MoveUtil.isMoving() && !Utils.jumpDown())
-                mc.thePlayer.jump();
-        } else if (BlockUtils.insideBlock(mc.thePlayer.getEntityBoundingBox().offset(mc.thePlayer.motionX, mc.thePlayer.motionY + 0.1, mc.thePlayer.motionZ))) {
-            noPlace = true;
-        } else {
-            if (Utils.jumpDown()) {
-                if (parent.offGroundTicks >= (int) jumpDownTicks.getInput()) {
-                    noPlace = false;
-                }
-            } else {
-                if (parent.isDiagonal()) {
-                    if (parent.offGroundTicks == (int) diagonalTicks.getInput()) {
-                        noPlace = false;
-                    }
-                } else {
-                    if (parent.offGroundTicks == (int) straightTicks.getInput()) {
-                        noPlace = false;
-                    }
-                }
-            }
-        }
-
-        return true;
     }
 
     @EventListener

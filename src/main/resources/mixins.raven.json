@@ -30,8 +30,6 @@
     "gui.MixinGuiMultiplayer",
     "gui.MixinGuiScreen",
     "gui.MixinGuiSlot",
-    "gui.MixinSplashProgress",
-    "gui.MixinSplashProgressThread",
     "network.C02PacketUseEntityAccessor",
     "network.C03PacketPlayerAccessor",
     "network.C07PacketPlayerDiggingAccessor",

@@ -1,14 +1,15 @@
 package keystrokesmod.utility.render.progress;
 
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import keystrokesmod.Client;
 import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Collections;
+import java.util.Set;
 
 public class ProgressManager {
-    private static final Queue<Progress> progresses = new ConcurrentLinkedQueue<>();
+    private static final Set<Progress> progresses = Collections.synchronizedSet(new ObjectOpenHashSet<>());
 
     static {
         Client.EVENT_BUS.register(Render2DEvent.class, () -> progresses.forEach(Progress::render));

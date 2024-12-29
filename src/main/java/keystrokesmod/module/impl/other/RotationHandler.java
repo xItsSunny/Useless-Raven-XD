@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.other;
 
+import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.event.player.MoveInputEvent;
 import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.event.player.PreUpdateEvent;
@@ -128,7 +129,7 @@ public final class RotationHandler extends Module {
     public void onPreUpdate(PreUpdateEvent event) {
         prevRotationYaw = getRotationYaw();
         prevRotationPitch = getRotationPitch();
-        if (isSet && mc.currentScreen == null) {
+        if (isSet && (mc.currentScreen == null || mc.currentScreen instanceof ClickGui)) {
             float viewYaw = RotationUtils.normalize(mc.thePlayer.rotationYaw);
             float viewPitch = RotationUtils.normalize(mc.thePlayer.rotationPitch);
 

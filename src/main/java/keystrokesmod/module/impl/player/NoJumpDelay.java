@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.client.PreTickEvent;
 import keystrokesmod.mixins.impl.entity.EntityLivingBaseAccessor;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
@@ -16,9 +16,9 @@ public class NoJumpDelay extends Module {
     }
 
     @EventListener
-    public void onPreUpdate(PreUpdateEvent event) {
-        if (!notWhileScaffold.isToggled() || !ModuleManager.scaffold.isEnabled()) {
-            ((EntityLivingBaseAccessor) mc.thePlayer).setJumpTicks(0);
-        }
+    public void onPreTick(PreTickEvent event) {
+        if (notWhileScaffold.isToggled() && ModuleManager.scaffold.isEnabled())
+            return;
+        ((EntityLivingBaseAccessor) mc.thePlayer).setJumpTicks(0);
     }
 }

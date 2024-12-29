@@ -92,10 +92,4 @@ public abstract class MixinMinecraft {
     private void onSetTitle(@NotNull CallbackInfo ci) {
         Display.setTitle(String.format("%s %s", Client.NAME, Client.VERSION));
     }
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void onInit(GameConfiguration p_i45547_1_, CallbackInfo ci) {
-        ReflectionUtils.setDeclared(Minecraft.class, "field_110444_H", BackgroundUtils.getLogoPng());
-        ReflectionUtils.set(this, "field_152354_ay", BackgroundUtils.getLogoPng());
-    }
 }

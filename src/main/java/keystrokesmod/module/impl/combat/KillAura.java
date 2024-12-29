@@ -3,6 +3,7 @@ package keystrokesmod.module.impl.combat;
 import akka.japi.Pair;
 import keystrokesmod.Client;
 import keystrokesmod.event.client.MouseEvent;
+import keystrokesmod.event.client.PreTickEvent;
 import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.event.player.PostMotionEvent;
 import keystrokesmod.event.player.PreUpdateEvent;
@@ -43,7 +44,6 @@ import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.S2FPacketSetSlot;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
-import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Mouse;
@@ -72,11 +72,12 @@ public class KillAura extends IAutoClicker {
     private final ModeSetting rotationMode;
     private final ModeSetting moveFixMode;
     private final ModeSetting rayCastMode;
-    private final SliderSetting rotationSpeed;
+    private final SliderSetting minRotationSpeed;
+    private final SliderSetting maxRotationSpeed;
+    private final SliderSetting minRotationAccuracy;
+    private final SliderSetting maxRotationAccuracy;
     private final ButtonSetting nearest;
-    private final SliderSetting nearestAccuracy;
     private final ButtonSetting lazy;
-    private final SliderSetting lazyAccuracy;
     private final ButtonSetting constant;
     private final ButtonSetting constantOnlyIfNotMoving;
     private final ButtonSetting noise;
@@ -167,13 +168,14 @@ public class KillAura extends IAutoClicker {
         this.registerSetting(new DescriptionSetting("Rotation"));
         this.registerSetting(rotationMode = new ModeSetting("Rotation", rotationModes, 1));
         final ModeOnly doRotation = new ModeOnly(rotationMode, 1, 2);
-        this.registerSetting(rotationSpeed = new SliderSetting("Rotation speed", 10, 0, 10, 0.05, doRotation));
+        this.registerSetting(minRotationSpeed = new SliderSetting("Min rotation speed", 180, 0, 180, 1, doRotation));
+        this.registerSetting(maxRotationSpeed = new SliderSetting("Max rotation speed", 180, 0, 180, 1, doRotation));
+        this.registerSetting(minRotationAccuracy = new SliderSetting("Min rotation accuracy", 180, 0, 180, 1, doRotation));
+        this.registerSetting(maxRotationAccuracy = new SliderSetting("Max rotation accuracy", 180, 0, 180, 1, doRotation));
         this.registerSetting(moveFixMode = new ModeSetting("Move fix", RotationHandler.MoveFix.MODES, 0, new ModeOnly(rotationMode, 1)));
         this.registerSetting(rayCastMode = new ModeSetting("Ray cast", new String[]{"None", "Normal", "Strict"}, 1, doRotation));
         this.registerSetting(nearest = new ButtonSetting("Nearest", false, doRotation));
-        this.registerSetting(nearestAccuracy = new SliderSetting("Nearest accuracy", 1, 0.8, 1, 0.01, doRotation.extend(nearest)));
         this.registerSetting(lazy = new ButtonSetting("Lazy", false, doRotation));
-        this.registerSetting(lazyAccuracy = new SliderSetting("Lazy accuracy", 0.95, 0.6, 1, 0.01, doRotation.extend(lazy)));
         this.registerSetting(constant = new ButtonSetting("Constant", false, doRotation));
         this.registerSetting(constantOnlyIfNotMoving = new ButtonSetting("Constant only if not moving", false, doRotation.extend(constant)));
         this.registerSetting(noise = new ButtonSetting("Noise", false, doRotation));
@@ -240,6 +242,8 @@ public class KillAura extends IAutoClicker {
 
     @Override
     public void guiUpdate() {
+        Utils.correctValue(minRotationSpeed, maxRotationSpeed);
+        Utils.correctValue(minRotationAccuracy, maxRotationAccuracy);
         Utils.correctValue(attackRange, swingRange);
         Utils.correctValue(swingRange, preAimRange);
     }
@@ -251,8 +255,8 @@ public class KillAura extends IAutoClicker {
     }
 
     private float[] getRotations() {
-        aimSimulator.setNearest(nearest.isToggled(), nearestAccuracy.getInput());
-        aimSimulator.setLazy(lazy.isToggled(), lazyAccuracy.getInput());
+        aimSimulator.setNearest(nearest.isToggled());
+        aimSimulator.setLazy(lazy.isToggled());
         aimSimulator.setNoise(noise.isToggled(),
                 new Pair<>((float) noiseHorizontal.getInput(), (float) noiseVertical.getInput()),
                 noiseAimSpeed.getInput(), (long) noiseDelay.getInput());
@@ -269,9 +273,6 @@ public class KillAura extends IAutoClicker {
 
         Pair<Float, Float> result = aimSimulator.getRotation(target);
 
-        if (rotationSpeed.getInput() == 10)
-            return new float[]{result.first(), result.second()};
-
         Double gcdValue = null;
 
         if (gcd.isToggled()) {
@@ -280,14 +281,17 @@ public class KillAura extends IAutoClicker {
             gcdValue += gcdOffset.getInput();
         }
 
+        float rotationSpeed = (float) Utils.randomizeDouble(minRotationSpeed.getInput(), maxRotationSpeed.getInput());
+        double rotationAccuracy = Utils.randomizeDouble(minRotationAccuracy.getInput(), maxRotationAccuracy.getInput());
+
         return new float[]{
-                AimSimulator.rotMove(result.first(), rotations[0], (float) rotationSpeed.getInput(), gcdValue),
-                AimSimulator.rotMove(result.second(), rotations[1], (float) rotationSpeed.getInput(), gcdValue)
+                AimSimulator.rotMove(result.first(), rotations[0], rotationSpeed, gcdValue, rotationAccuracy),
+                AimSimulator.rotMove(result.second(), rotations[1], rotationSpeed, gcdValue, rotationAccuracy)
         };
     }
 
     @EventListener
-    public void onRenderTick(Render2DEvent ev) {
+    public void onPreTick(PreTickEvent ev) {
         if (!Utils.nullCheck()) {
             return;
         }

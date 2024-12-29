@@ -18,6 +18,7 @@ import net.minecraft.inventory.ContainerChest;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.network.play.client.C0EPacketClickWindow;
 import keystrokesmod.eventbus.annotations.EventListener;
+import net.minecraft.network.play.client.C16PacketClientStatus;
 import org.lwjgl.input.Keyboard;
 
 import static keystrokesmod.module.ModuleManager.*;
@@ -115,24 +116,25 @@ public class InvMove extends Module {
 
     @EventListener
     public void onSendPacket(SendPacketEvent event) {
-        if (noOpenPacket.isToggled() && event.getPacket() instanceof C0BPacketEntityAction) {
-            if (((C0BPacketEntityAction) event.getPacket()).getAction() == C0BPacketEntityAction.Action.OPEN_INVENTORY) {
+        if (noOpenPacket.isToggled()) {
+            if (event.getPacket() instanceof C16PacketClientStatus
+                    && ((C16PacketClientStatus) event.getPacket()).getStatus() == C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT) {
                 event.cancel();
             }
         }
 
         if ((int) mode.getInput() != 2) return;
 
-        if (event.getPacket() instanceof C0BPacketEntityAction) {
-            C0BPacketEntityAction packet = (C0BPacketEntityAction) event.getPacket();
+        if (event.getPacket() instanceof C16PacketClientStatus) {
+            C16PacketClientStatus packet = (C16PacketClientStatus) event.getPacket();
 
-            if (packet.getAction() == C0BPacketEntityAction.Action.OPEN_INVENTORY) {
+            if (packet.getStatus() == C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT) {
                 clicked = false;
                 event.cancel();
             }
         } else if (event.getPacket() instanceof C0EPacketClickWindow) {
             if (!clicked && !noOpenPacket.isToggled()) {
-                PacketUtils.sendPacketNoEvent(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.OPEN_INVENTORY));
+                PacketUtils.sendPacketNoEvent(new C16PacketClientStatus(C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT));
             }
             clicked = true;
         }

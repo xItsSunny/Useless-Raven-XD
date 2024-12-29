@@ -1,5 +1,6 @@
 package keystrokesmod.eventbus;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -16,9 +17,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.security.InvalidParameterException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -28,8 +27,9 @@ import java.util.function.Consumer;
 @Getter
 @SuppressWarnings("unused")
 public final class EventBus {
-    private final Map<Class<? extends Event>, List<EventHandler<? extends Event>>> eventHandlers
+    private final Map<Class<? extends Event>, List<EventHandler<?>>> eventHandlers
             = new Object2ObjectOpenHashMap<>(10);
+    private final Set<EventHandler<?>> registeredHandlers = new ObjectOpenHashSet<>(10);
 
     /**
      * 向事件总线注册对象的所有带有 {@link EventListener} 注解的方法
@@ -54,6 +54,7 @@ public final class EventBus {
 
     @SuppressWarnings("unchecked")
     private <T> void doRegister(@NotNull Class<T> objClass, @Nullable T object) {
+        if (objClass == Object.class) return;
         for (Method method : objClass.getDeclaredMethods()) {
             boolean found = false;
             for (Annotation annotation : method.getDeclaredAnnotations()) {
@@ -98,9 +99,10 @@ public final class EventBus {
                 };
             }
 
-            addHandler(new EventHandler<>(method, type, eventConsumer,
+            addHandler(new EventHandler<>(method, object, type, eventConsumer,
                     method.getAnnotation(EventListener.class).priority()));
         }
+        doRegister(objClass.getSuperclass(), object);
     }
 
     /**
@@ -120,26 +122,29 @@ public final class EventBus {
      * @param consumer 需要注册的方法
      */
     public <T extends Event> void register(@NotNull Class<T> eventType, @NotNull Consumer<@NotNull T> consumer) {
-        addHandler(new EventHandler<>(null, eventType, consumer, 0));
+        addHandler(new EventHandler<>(null, null, eventType, consumer, 0));
     }
 
     private void addHandler(@NotNull EventHandler<? extends Event> eventHandler) {
+        if (registeredHandlers.contains(eventHandler)) return;
+        registeredHandlers.add(eventHandler);
+
+        final List<EventHandler<? extends Event>> prioryList;
+        Class<? extends Event> type = eventHandler.getEventType();
+
         synchronized (eventHandlers) {
-            final List<EventHandler<? extends Event>> prioryList;
-            Class<? extends Event> type = eventHandler.getEventType();
             if (!eventHandlers.containsKey(type)) {
-                prioryList = new ObjectArrayList<>(1);
+                prioryList = new ObjectArrayList<>(Collections.singleton(eventHandler));
                 eventHandlers.put(type, prioryList);
+                return;
             } else {
                 prioryList = eventHandlers.get(type);
             }
 
-            int addToIndex = 0;
-            for (int i = 0; i < prioryList.size(); i++) {
-                if (prioryList.get(i).getPriory() < eventHandler.getPriory()) {
-                    addToIndex = i;
-                    break;
-                }
+            int addToIndex = Collections.binarySearch(prioryList, eventHandler,
+                    Comparator.comparingInt(EventHandler::getPriory));
+            if (addToIndex < 0) {
+                addToIndex = -addToIndex - 1;
             }
             prioryList.add(addToIndex, eventHandler);
         }
@@ -149,13 +154,10 @@ public final class EventBus {
      * 从事件总线取消注册对象的所有带有 {@link EventListener} 注解的方法
      * @param object 需要取消注册的对象
      */
-    public void unregister(Object object) {
-        if (object == null) return;
-
-        final Set<Method> methods = new ObjectOpenHashSet<>(object.getClass().getDeclaredMethods());
+    public void unregister(@NotNull Object object) {
         synchronized (eventHandlers) {
             for (List<EventHandler<? extends Event>> list : eventHandlers.values()) {
-                list.removeIf(eventHandler -> methods.contains(eventHandler.getMethod()));
+                list.removeIf(eventHandler -> eventHandler.getObject() == object);
             }
         }
     }
@@ -207,8 +209,15 @@ public final class EventBus {
                 } else {
                     targetName = "Unknown Source";
                 }
-                Utils.sendMessage(String.format("Exception '%s' while post event '%s' to '%s': %s",
-                        e.getClass().getSimpleName(), event.getClass().getSimpleName(), targetName, e.getMessage()));
+                if (ReflectionUtils.isFastMethod(eventHandler.getEventConsumer())) {
+                    targetName += " <fast method>";
+                }
+                Utils.sendMessage(String.format("%sException '%s%s%s' while post event '%s%s%s' to '%s%s%s': %s%s",
+                        ChatFormatting.RED,
+                        ChatFormatting.AQUA, e.getClass().getSimpleName(), ChatFormatting.RED,
+                        ChatFormatting.RESET, event.getClass().getSimpleName(), ChatFormatting.RED,
+                        ChatFormatting.RESET, targetName, ChatFormatting.RED,
+                        ChatFormatting.RESET, e.getMessage()));
             }
 
             if (event instanceof CancellableEvent)

@@ -1,12 +1,15 @@
 package keystrokesmod.utility.render;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import keystrokesmod.Client;
 import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.font.FontManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.opengl.Display;
 
 import java.awt.*;
 import java.util.List;
@@ -14,7 +17,7 @@ import java.util.List;
 import static keystrokesmod.Client.mc;
 
 public class BackgroundUtils {
-    public static final ResourceLocation RES_LOGO = new ResourceLocation("keystrokesmod:textures/backgrounds/ravenxd.png");
+    private static final int LOGO_COLOR = new Color(255, 255, 255, 200).getRGB();
     private static final List<ResourceLocation> BACKGROUNDS = new ObjectArrayList<>();
     private static final int WIDTH = 1920;
     private static final int HEIGHT = 1080;
@@ -88,9 +91,5 @@ public class BackgroundUtils {
         } else if (shadowTarget < shadow) {
             shadow = (int) Math.max(shadow - 4.0 * 300 / Minecraft.getDebugFPS(), shadowTarget);
         }
-    }
-
-    public static ResourceLocation getLogoPng() {
-        return RES_LOGO;
     }
 }

@@ -2,6 +2,7 @@ package keystrokesmod.utility.interact.moveable;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import keystrokesmod.Client;
+import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.render.Animation;
 import keystrokesmod.utility.render.Easing;
 import net.minecraft.client.gui.GuiChat;
@@ -22,6 +23,7 @@ public final class MoveableManager {
     private static int lastY;
     private static boolean isDragging = false;
     private static @Nullable MoveableRender draggingObj = null;
+    private static final CoolDown coolDown = new CoolDown(0);
 
     public static void init() {
         Client.EVENT_BUS.register(MoveableManager.class);
@@ -40,6 +42,7 @@ public final class MoveableManager {
         if (!(mc.currentScreen instanceof GuiChat)) {
             draggingObj = null;
             isDragging = false;
+            coolDown.start();
             return;
         }
 
@@ -48,7 +51,14 @@ public final class MoveableManager {
         final int y = mc.currentScreen.height - Mouse.getEventY()
                 * mc.currentScreen.height / mc.currentScreen.mc.displayHeight - 1;
 
-        if (Mouse.isButtonDown(0)) {
+        boolean disabled = false;
+        if (!coolDown.finished(100)) {
+            lastX = x;
+            lastY = y;
+            disabled = true;
+        }
+
+        if (Mouse.isButtonDown(0) && !disabled) {
             if (!isDragging) {
                 // 开始拖拽
                 for (MoveableRender obj : moveObjs) {
@@ -85,32 +95,36 @@ public final class MoveableManager {
 
     private static final class MoveableRender {
         public final Moveable moveable;
-        private final Animation animationX = new Animation(Easing.EASE_OUT_CIRC, 200);
-        private final Animation animationY = new Animation(Easing.EASE_OUT_CIRC, 200);
+        private final Animation animationX = new Animation(Easing.EASE_OUT_CIRC, 100);
+        private final Animation animationY = new Animation(Easing.EASE_OUT_CIRC, 100);
 
         private int targetX;
         private int targetY;
         private int lastX;
         private int lastY;
 
-        public MoveableRender(Moveable moveable) {
+        public MoveableRender(@NotNull Moveable moveable) {
             this.moveable = moveable;
-            this.lastX = moveable.getMinX();
-            this.lastY = moveable.getMinY();
+            targetX = lastX = moveable.getMinX();
+            targetY = lastY = moveable.getMinY();
         }
 
         public void update() {
-            animationX.run(targetX);
-            double curX = animationX.getValue();
-            int motionX = (int) Math.round(curX - lastX);
-            lastX += motionX;
-            moveable.moveX(motionX);
+            if (targetX != lastX) {
+                animationX.run(targetX);
+                double curX = animationX.getValue();
+                int motionX = (int) Math.round(curX - lastX);
+                lastX += motionX;
+                moveable.moveX(motionX);
+            }
 
-            animationY.run(targetY);
-            double curY = animationY.getValue();
-            int motionY = (int) Math.round(curY - lastY);
-            lastY += motionY;
-            moveable.moveY(motionY);
+            if (targetY != lastY) {
+                animationY.run(targetY);
+                double curY = animationY.getValue();
+                int motionY = (int) Math.round(curY - lastY);
+                lastY += motionY;
+                moveable.moveY(motionY);
+            }
 
             moveable.render();
         }

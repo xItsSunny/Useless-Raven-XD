@@ -11,6 +11,7 @@ import java.lang.management.ManagementFactory;
 import java.util.Optional;
 
 @Getter
+@NativeObfuscation
 public final class AntiCrack {
     @Renamer(obfuscated = false)
     public static final String CLIENT_NAME = "Raven XD";

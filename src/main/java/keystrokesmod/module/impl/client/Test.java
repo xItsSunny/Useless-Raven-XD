@@ -106,7 +106,7 @@ public class Test extends Module {
         result.append(ChatFormatting.RESET);
         result.append("\n");
 
-        result.append("    Self(Native)    ");
+        result.append("    Self2    ");
         try {
             Object fieldName = ReflectionUtils.getDeclared(AntiCrack.class, "CLIENT_NAME");
             String name = AntiCrack.CLIENT_NAME;
@@ -138,13 +138,6 @@ public class Test extends Module {
         result.append("Benchmarking:\n");
         result.append(ChatFormatting.RESET);
 
-        // make jit ready
-        for (int i = 0; i < 20; i++) {
-            benchmark();
-            benchmarkNative();
-        }
-        Thread.sleep(1000);  // waiting for jit compile
-
         result.append("    Normal:    ");
         result.append(ChatFormatting.GREEN);
         result.append(String.format("%.4f", timeIt(Test::benchmark)));
@@ -161,11 +154,11 @@ public class Test extends Module {
 
     private static double timeIt(Runnable runnable) {
         long startTime = System.nanoTime();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 2; i++) {
             runnable.run();
         }
         long stopTime = System.nanoTime();
-        return (double) (stopTime - startTime) / 10 / 1.0000E+9;
+        return (double) (stopTime - startTime) / 5 / 1.0000E+9;
     }
 
     @NativeObfuscation(obfuscated = false)
@@ -176,19 +169,19 @@ public class Test extends Module {
 
         // 1. Runtime evaluation
         for (int i = 0; i < result; i++) {
-            if (i < 10000 || result > System.currentTimeMillis()) {
+            if (i < 1000 || result > System.currentTimeMillis()) {
                 result += i;
             }
         }
 
         // 2. System call
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1000; i++) {
             result = Math.max(System.nanoTime(), result);
         }
 
         // 3. Reflection
         result = Math.min(result, 0);
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 100; i++) {
             try {
                 Field fieldTimer = mc.getClass().getDeclaredField("field_71428_T");
                 fieldTimer.setAccessible(true);
@@ -199,7 +192,7 @@ public class Test extends Module {
         }
 
         // 4. Matrix multiplication
-        int size = 100; // Matrix size
+        int size = 50; // Matrix size
         Random random = new Random();
         double[][] matrix1 = new double[size][size];
         for (int i2 = 0; i2 < size; i2++) {
@@ -227,7 +220,7 @@ public class Test extends Module {
         result += (long) result1[0][0];
 
         // 5. Diffusion (recursive computation)
-        int depth = 25; // Depth of recursion
+        int depth = 20; // Depth of recursion
         result += diffusion(depth);
 
         // Prevent result from being optimized away

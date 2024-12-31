@@ -146,16 +146,26 @@ public final class Utils {
     }
 
     public static int randomizeInt(double min, double max) {
-        final int iMin = (int) min;
-        final int iMax = (int) Math.round(max);
+        int iMin = (int) min;
+        int iMax = (int) Math.round(max);
         if (iMin == iMax)
             return iMin;
+        if (iMax < iMin) {
+            int tmp = iMin;
+            iMin = iMax;
+            iMax = tmp;
+        }
         return ThreadLocalRandom.current().nextInt(iMin, iMax);
     }
 
     public static double randomizeDouble(double min, double max) {
         if (min == max)
             return min;
+        if (max < min) {
+            double tmp = min;
+            min = max;
+            max = tmp;
+        }
         return ThreadLocalRandom.current().nextDouble(min, max);
     }
 
@@ -1222,7 +1232,7 @@ public final class Utils {
 
     public static void handleException(@NotNull Throwable e, String action, String exceptionWhere) {
         try {
-            Utils.sendMessageAnyWay(String.format("%sUnexpected '%s%s%s' while '%s%s%s' in '%s%s%s': %s%s.",
+            Utils.sendMessage(String.format("%sUnexpected '%s%s%s' while '%s%s%s' in '%s%s%s': %s%s%s.",
                     ChatFormatting.RED,
                     ChatFormatting.AQUA, e.getClass().getSimpleName(), ChatFormatting.RED,
                     ChatFormatting.RESET, action, ChatFormatting.RED,

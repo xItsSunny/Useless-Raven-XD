@@ -19,6 +19,8 @@ import java.util.List;
 import static keystrokesmod.Client.mc;
 
 public final class MainMenu {
+    private static boolean initialized = false;
+
     private static final String COPYRIGHT_MSG = String.format("Copyright Mojang Studios & %s Group.", Client.NAME);
     private static final String CLIENT_MSG = String.format("%s %s", Client.NAME, Client.VERSION);
     private static final FontRenderer LOGO_FONT = FontManager.getFont(FontManager.Fonts.MAPLESTORY, 80);
@@ -47,13 +49,19 @@ public final class MainMenu {
 
     private final GuiMainMenu screen;
     private final Animation backgroundAlphaAnimation = new Animation(Easing.EASE_IN_SINE, 3000);
-    private final Animation generalAlphaAnimation = new Animation(Easing.EASE_IN_SINE, 5000);
+    private final Animation generalAlphaAnimation = new Animation(Easing.EASE_IN_SINE, 1000);
     private final Animation clientMsgAnimation = new Animation(Easing.EASE_OUT_SINE, 300);
 
     public MainMenu(@NotNull GuiMainMenu screen) {
         this.screen = screen;
-        backgroundAlphaAnimation.setValue(0);
-        generalAlphaAnimation.setValue(0);
+        if (!initialized) {
+            backgroundAlphaAnimation.setValue(0);
+            generalAlphaAnimation.setValue(0);
+            initialized = true;
+        } else {
+            backgroundAlphaAnimation.setValue(255);
+            generalAlphaAnimation.setValue(255);
+        }
     }
 
     public void init() {

@@ -9,7 +9,7 @@ import java.util.List;
 @Unmodifiable
 public final class Const {
     public static final String NAME = "Raven XD";
-    public static final String VERSION = "Developing build";
+    public static final String VERSION = "3.0";
     public static final List<String> CHANGELOG = Collections.unmodifiableList(Arrays.asList(
             // Add
             "[+] **Add** Optimize.",

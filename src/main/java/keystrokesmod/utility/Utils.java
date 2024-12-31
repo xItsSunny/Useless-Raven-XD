@@ -1232,13 +1232,23 @@ public final class Utils {
 
     public static void handleException(@NotNull Throwable e, String action, String exceptionWhere) {
         try {
-            Utils.sendMessage(String.format("%sUnexpected '%s%s%s' while '%s%s%s' in '%s%s%s': %s%s%s.",
-                    ChatFormatting.RED,
-                    ChatFormatting.AQUA, e.getClass().getSimpleName(), ChatFormatting.RED,
-                    ChatFormatting.RESET, action, ChatFormatting.RED,
-                    ChatFormatting.RESET, exceptionWhere, ChatFormatting.RED,
-                    ChatFormatting.RESET, e.getMessage(), ChatFormatting.RED
-            ));
+            if (e instanceof NullPointerException) {
+                Utils.sendMessage(String.format("%sUnexpected '%s%s%s' while '%s%s%s' in '%s%s%s': %s%s%s.",
+                        ChatFormatting.RED,
+                        ChatFormatting.AQUA, e.getClass().getSimpleName(), ChatFormatting.RED,
+                        ChatFormatting.RESET, action, ChatFormatting.RED,
+                        ChatFormatting.RESET, exceptionWhere, ChatFormatting.RED,
+                        ChatFormatting.RESET, e.getMessage(), ChatFormatting.RED
+                ));
+            } else {
+                Utils.sendMessageAnyWay(String.format("%sUnexpected '%s%s%s' while '%s%s%s' in '%s%s%s': %s%s%s.",
+                        ChatFormatting.RED,
+                        ChatFormatting.AQUA, e.getClass().getSimpleName(), ChatFormatting.RED,
+                        ChatFormatting.RESET, action, ChatFormatting.RED,
+                        ChatFormatting.RESET, exceptionWhere, ChatFormatting.RED,
+                        ChatFormatting.RESET, e.getMessage(), ChatFormatting.RED
+                ));
+            }
         } catch (Throwable ignored) {
         }
     }

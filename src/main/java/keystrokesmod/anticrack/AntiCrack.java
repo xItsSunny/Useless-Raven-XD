@@ -7,9 +7,6 @@ import tech.skidonion.obfuscator.annotations.NativeObfuscation;
 import tech.skidonion.obfuscator.annotations.Renamer;
 import tech.skidonion.obfuscator.inline.Inline;
 
-import java.lang.management.ManagementFactory;
-import java.util.Optional;
-
 @Getter
 @NativeObfuscation
 public final class AntiCrack {
@@ -42,13 +39,13 @@ public final class AntiCrack {
 
     @NativeObfuscation(manualTryCatch = true)
     public static void check() {
-        Optional<Boolean> noverify = ManagementFactory.getRuntimeMXBean().getInputArguments()
-                .parallelStream()
-                .map(string -> string.endsWith("noverify"))
-                .findAny();
-        if (noverify.orElse(false)) {
-            UNREACHABLE();
-        }
+//        Optional<Boolean> noverify = ManagementFactory.getRuntimeMXBean().getInputArguments()
+//                .parallelStream()
+//                .map(string -> string.endsWith("noverify"))
+//                .findAny();
+//        if (noverify.orElse(false)) {
+//            UNREACHABLE();
+//        }
 
         if (CLIENT_NAME.hashCode() - "Raven XD".hashCode() != 0) {
             UNREACHABLE();

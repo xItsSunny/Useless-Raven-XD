@@ -84,12 +84,13 @@ public abstract class MixinGuiButton extends Gui {
             rectColor = raven_XD$interpolateColorC(rectColor, ColorUtils.brighter(rectColor, 0.4f));
             RenderUtils.drawBloomShadow(xPosition - 3, yPosition - 3, width + 6, height + 6, 12, new Color(0, 0, 0, 50), false);
             RRectUtils.drawRoundOutline(xPosition, yPosition, width, height, 4, 0.0015f, rectColor, new Color(255, 255, 255, 20));
-            if (blur)
-                GaussianBlur.startBlur();
-            RRectUtils.drawRoundOutline(xPosition, yPosition, width, height, 4, 0.0015f, new Color(0, 0, 0, 5), new Color(0, 0, 0, 5));
-            RRectUtils.drawRoundOutline(xPosition, yPosition, width, height, 4, 0.0015f, new Color(0, 0, 0, 50), new Color(200, 200, 200, 60));
-            if (blur)
-                GaussianBlur.endBlur(10, 1);
+            if (blur) {
+                if (GaussianBlur.startBlur()) {
+                    RRectUtils.drawRoundOutline(xPosition, yPosition, width, height, 4, 0.0015f, new Color(0, 0, 0, 5), new Color(0, 0, 0, 5));
+                    RRectUtils.drawRoundOutline(xPosition, yPosition, width, height, 4, 0.0015f, new Color(0, 0, 0, 50), new Color(200, 200, 200, 60));
+                    GaussianBlur.endBlur(10, 1);
+                }
+            }
 
             this.mouseDragged(minecraft, x, y);
 

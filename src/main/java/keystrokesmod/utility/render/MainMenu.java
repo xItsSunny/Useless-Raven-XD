@@ -123,13 +123,14 @@ public final class MainMenu {
 
         LOGO_FONT.drawCenteredString(Client.NAME, screen.width / 2.0, screen.height * 0.2 + 20, LOGO_COLOR);
 
-        GaussianBlur.startBlur();
-        RenderUtils.drawBloomShadow(
-                buttonStartX - BOX_SPILT + 1, buttonStartY - BOX_SPILT + 1,
-                BUTTON_WIDTH + BOX_SPILT * 2 - 2, BUTTON_HEIGHT * 4 + BUTTON_SPILT * 3 + BOX_SPILT * 2 - 2,
-                0, BUTTON_SPILT, BUTTON_BOX_COLOR.getRGB(), false
-        );
-        GaussianBlur.endBlur(10, 1);
+        if (GaussianBlur.startBlur()) {
+            RenderUtils.drawBloomShadow(
+                    buttonStartX - BOX_SPILT + 1, buttonStartY - BOX_SPILT + 1,
+                    BUTTON_WIDTH + BOX_SPILT * 2 - 2, BUTTON_HEIGHT * 4 + BUTTON_SPILT * 3 + BOX_SPILT * 2 - 2,
+                    0, BUTTON_SPILT, BUTTON_BOX_COLOR.getRGB(), false
+            );
+            GaussianBlur.endBlur(10, 1);
+        }
         RRectUtils.drawRoundOutline(
                 buttonStartX - BOX_SPILT, buttonStartY - BOX_SPILT,
                 BUTTON_WIDTH + BOX_SPILT * 2, BUTTON_HEIGHT * 4 + BUTTON_SPILT * 3 + BOX_SPILT * 2,

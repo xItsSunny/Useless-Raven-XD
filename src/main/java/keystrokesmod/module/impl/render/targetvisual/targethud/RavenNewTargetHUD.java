@@ -90,12 +90,13 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
         }
 
         if (blur.isToggled()) {
-            GaussianBlur.startBlur();
-            RenderUtils.drawBloomShadow(
-                    minX, minY,
-                    maxX - minX, maxY - minY,
-                    4, 10, -1, false);
-            GaussianBlur.endBlur(4, 1);
+            if (GaussianBlur.startBlur()) {
+                RenderUtils.drawBloomShadow(
+                        minX, minY,
+                        maxX - minX, maxY - minY,
+                        4, 10, -1, false);
+                GaussianBlur.endBlur(4, 1);
+            }
         }
 
         int healthTextColor = Utils.getColorForHealth(health);

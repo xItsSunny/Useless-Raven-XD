@@ -39,7 +39,7 @@ public final class MainMenu {
             .map(CHANGELOG_FONT::getStringWidth)
             .max(Double::compareTo)
             .orElse(0.0) + BOX_SPILT * 2;
-    private static final double CHANGELOG_BOX_HEIGHT = CHANGELOG_FONT_HEIGHT * Const.CHANGELOG.size()
+    private static final double CHANGELOG_BOX_HEIGHT = (CHANGELOG_FONT_HEIGHT + BUTTON_SPILT) * Const.CHANGELOG.size()
             + BOX_SPILT * 2;
 
     private int buttonStartX;

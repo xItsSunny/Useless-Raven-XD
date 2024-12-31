@@ -51,8 +51,8 @@ public class NormalHypixelFireballLongJump extends SubMode<HypixelFireballLongJu
                 && ((C08PacketPlayerBlockPlacement) event.getPacket()).getStack() != null
                 && ((C08PacketPlayerBlockPlacement) event.getPacket()).getStack().getItem() instanceof ItemFireball) {
             thrown = true;
-            if (mc.thePlayer.onGround && !Utils.jumpDown()) {
-                mc.thePlayer.jump();
+            if (mc.thePlayer.onGround) {
+                MoveUtil.jump();
             }
         }
     }

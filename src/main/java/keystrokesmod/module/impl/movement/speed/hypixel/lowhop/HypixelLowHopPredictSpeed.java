@@ -17,10 +17,8 @@ public class HypixelLowHopPredictSpeed extends SubMode<HypixelLowHopSpeed> {
     public void onPreUpdate(PreUpdateEvent event) {
         if (!MoveUtil.isMoving() || parent.parent.parent.noAction()) return;
         if (parent.parent.parent.offGroundTicks == 0) {
-            if (!Utils.jumpDown()) {
-                MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100f);
-                mc.thePlayer.jump();
-            }
+            MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100f);
+            MoveUtil.jump();
         } else if (parent.parent.parent.offGroundTicks == 5 && !parent.noLowHop()) {
             mc.thePlayer.motionY = MoveUtil.predictedMotion(mc.thePlayer.motionY, 2);
         }

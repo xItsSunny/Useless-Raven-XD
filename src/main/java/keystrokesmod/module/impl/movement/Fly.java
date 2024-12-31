@@ -24,7 +24,6 @@ public class Fly extends Module {
                 .add(new MatrixFly("Matrix", this))
                 .add(new MatrixBowFly("MatrixBow", this))
                 .add(new MatrixTNTFly("MatrixTNT", this))
-                .add(new HypixelTestFly("Test", this))
                 .add(new CustomFly("Custom", this))
                 .add(new GrimACFly("GrimAC", this))
         );

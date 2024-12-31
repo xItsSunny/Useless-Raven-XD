@@ -1,6 +1,11 @@
 package keystrokesmod.module.setting.utils;
 
+import it.unimi.dsi.fastutil.doubles.DoubleOpenHashSet;
+import it.unimi.dsi.fastutil.doubles.DoubleSet;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.module.setting.impl.ModeValue;
+import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.module.setting.interfaces.InputSetting;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -12,16 +17,29 @@ import java.util.stream.IntStream;
 
 public class ModeOnly implements Supplier<Boolean> {
     private final InputSetting mode;
-    private final Set<Double> activeMode;
+    private final DoubleSet activeMode;
 
     public ModeOnly(@NotNull InputSetting mode, double @NotNull ... activeMode) {
         this.mode = mode;
-        this.activeMode = Arrays.stream(activeMode).boxed().collect(Collectors.toSet());
+        this.activeMode = DoubleOpenHashSet.toSet(Arrays.stream(activeMode));
     }
 
     public ModeOnly(@NotNull InputSetting mode, @NotNull Collection<Double> activeMode) {
         this.mode = mode;
-        this.activeMode = new HashSet<>(activeMode);
+        this.activeMode = new DoubleOpenHashSet(activeMode);
+    }
+
+    public ModeOnly(@NotNull ModeValue mode, String @NotNull ... activeMode) {
+        this.mode = mode;
+        this.activeMode = new DoubleOpenHashSet(activeMode.length);
+
+        Set<String> modeNames = new ObjectOpenHashSet<>(activeMode);
+        List<SubMode<?>> modes = mode.getSubModeValues();
+        for (int i = 0; i < modes.size(); i++) {
+            if (modeNames.contains(modes.get(i).getName())) {
+                this.activeMode.add(i);
+            }
+        }
     }
 
     @Override
@@ -32,7 +50,7 @@ public class ModeOnly implements Supplier<Boolean> {
     public ModeOnly reserve() {
         int max = (int) mode.getMax();
         List<Double> options = IntStream.rangeClosed(0, max)
-                .filter(i -> !activeMode.contains((double) i))
+                .filter(i -> !activeMode.contains(i))
                 .mapToObj(i -> (double) i)
                 .collect(Collectors.toList());
         return new ModeOnly(mode, options);
@@ -55,6 +73,7 @@ public class ModeOnly implements Supplier<Boolean> {
         return () -> this.get() && Arrays.stream(settings).allMatch(ButtonSetting::isToggled);
     }
 
+    @SuppressWarnings("unused")
     @Contract("_ -> new")
     public final @NotNull ModeOnly extend(double @NotNull ... activeMode) {
         Set<Double> modes = Arrays.stream(activeMode).boxed().collect(Collectors.toSet());

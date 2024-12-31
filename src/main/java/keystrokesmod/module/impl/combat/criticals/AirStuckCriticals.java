@@ -9,6 +9,7 @@ import keystrokesmod.module.impl.combat.KillAura;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
+import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import net.minecraft.util.MovingObjectPosition;
 import keystrokesmod.eventbus.annotations.EventListener;
@@ -49,8 +50,8 @@ public class AirStuckCriticals extends SubMode<Criticals> {
     @EventListener(priority = 2)
     public void onPreMotion(PreMotionEvent event) {
         if (mc.thePlayer.onGround) {
-            if (!Utils.jumpDown() && autoJump.isToggled() && canActive(true))
-                mc.thePlayer.jump();
+            if (autoJump.isToggled() && canActive(true))
+                MoveUtil.jump();
         }
 
         lastActive = active;

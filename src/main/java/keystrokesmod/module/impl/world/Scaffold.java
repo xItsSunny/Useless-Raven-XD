@@ -150,6 +150,7 @@ public class Scaffold extends IAutoClicker {
                 .add(new StrictRotation("Strict", this))
                 .add(new PreciseRotation("Precise", this))
                 .add(new ConstantRotation("Constant", this))
+                .add(new HypixelRotation("Hypixel", this))
                 .setDefaultValue("Backwards")
         );
         ModeOnly doRotation = new ModeOnly(rotation, 0).reserve();
@@ -345,10 +346,11 @@ public class Scaffold extends IAutoClicker {
                 double movingYaw = Math.round(direction / 45) * 45;
                 boolean isMovingStraight = movingYaw % 90 == 0f;
 
-                if (isMovingStraight)
+                if (isMovingStraight) {
                     pitch = (float) straightPitch.getInput();
-                else
+                } else {
                     pitch = (float) diagonalPitch.getInput();
+                }
             }
         }
 
@@ -427,8 +429,8 @@ public class Scaffold extends IAutoClicker {
 
         switch (hoverState) {
             case JUMP:
-                if (mc.thePlayer.onGround && !Utils.jumpDown()) {
-                    mc.thePlayer.jump();
+                if (mc.thePlayer.onGround) {
+                    MoveUtil.jump();
                 }
                 hoverState = HoverState.FALL;
                 break;
@@ -438,8 +440,8 @@ public class Scaffold extends IAutoClicker {
                 break;
         }
 
-        if ((rotation.getInput() != 5 && autoJump.isToggled()) && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
-            mc.thePlayer.jump();
+        if ((rotation.getInput() != 5 && autoJump.isToggled()) && mc.thePlayer.onGround && MoveUtil.isMoving()) {
+            MoveUtil.jump();
         }
 
         if (delayTicks > 0) {
@@ -907,7 +909,7 @@ public class Scaffold extends IAutoClicker {
             if (jump$bridged >= jumpEveryBlocks.getInput()) {
                 jump$bridged = 0;
                 if (mc.thePlayer.onGround)
-                    mc.thePlayer.jump();
+                    MoveUtil.jump();
             }
         }
 

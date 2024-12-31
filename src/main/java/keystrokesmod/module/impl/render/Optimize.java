@@ -32,8 +32,8 @@ public class Optimize extends Module {
     }
 
     private static boolean canOptimize() {
-        if (ModuleManager.optimize == null) return true;
-        if (!ModuleManager.optimize.isEnabled()) return true;
-        return false;
+        if (ModuleManager.optimize == null) return false;
+        if (!ModuleManager.optimize.isEnabled()) return false;
+        return true;
     }
 }

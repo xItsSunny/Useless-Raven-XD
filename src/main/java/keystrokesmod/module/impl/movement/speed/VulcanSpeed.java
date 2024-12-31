@@ -25,7 +25,7 @@ public class VulcanSpeed extends SubMode<Speed> {
         if (!MoveUtil.isMoving()) return;
         switch (parent.offGroundTicks) {
             case 0:
-                mc.thePlayer.jump();
+                MoveUtil.jump();
 
                 if (mc.thePlayer.isPotionActive(Potion.moveSpeed)) {
                     MoveUtil.strafe(0.6);

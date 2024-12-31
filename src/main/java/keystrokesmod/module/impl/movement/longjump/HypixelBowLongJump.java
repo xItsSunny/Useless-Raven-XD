@@ -87,10 +87,10 @@ public class HypixelBowLongJump extends SubMode<LongJump> {
                 break;
             case JUMP:
                 tick++;
-                if (!Utils.jumpDown() && mc.thePlayer.onGround) {
+                if (mc.thePlayer.onGround) {
                     MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() *
                             (mc.thePlayer.isPotionActive(Potion.moveSpeed) ? 0.75 : 0.7) - Math.random() / 10000f);
-                    mc.thePlayer.jump();
+                    MoveUtil.jump();
                 }
 
                 if (tick == 8) {

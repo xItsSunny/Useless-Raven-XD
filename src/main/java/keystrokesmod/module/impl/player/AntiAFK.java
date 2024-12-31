@@ -4,6 +4,7 @@ import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
+import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Reflection;
 import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.Utils;
@@ -97,7 +98,7 @@ public class AntiAFK extends Module {
             }
         }
         if (jump.isToggled() && mc.thePlayer.onGround && (!jumpWhenCollided.isToggled() || mc.thePlayer.isCollidedHorizontally)) {
-            mc.thePlayer.jump();
+            MoveUtil.jump();
         }
         if (this.ticks == 0) {
             if (swapItem.isToggled()) {

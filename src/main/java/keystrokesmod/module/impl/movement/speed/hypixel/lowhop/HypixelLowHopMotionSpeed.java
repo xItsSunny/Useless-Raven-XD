@@ -4,7 +4,6 @@ import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.speed.hypixel.HypixelLowHopSpeed;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
-import keystrokesmod.utility.Utils;
 import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
@@ -52,9 +51,9 @@ public class HypixelLowHopMotionSpeed extends SubMode<HypixelLowHopSpeed> {
             if (offGroundTicks == 0) {
                 if (toDisable) {
                     disable();
-                } else if (!Utils.jumpDown()) {
+                } else {
                     MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100f);
-                    mc.thePlayer.jump();
+                    MoveUtil.jump();
                 }
             } else if (parent.noLowHop() || MoveUtil.getJumpEffect() != 0) {
                 return;
@@ -63,7 +62,6 @@ public class HypixelLowHopMotionSpeed extends SubMode<HypixelLowHopSpeed> {
             switch (offGroundTicks) {
                 case 1:
                     mc.thePlayer.motionY = 0.39;
-                    MoveUtil.strafe();
                     break;
                 case 3:
                     mc.thePlayer.motionY -= 0.13;

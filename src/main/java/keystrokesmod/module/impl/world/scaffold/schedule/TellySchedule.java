@@ -20,13 +20,12 @@ public class TellySchedule extends IScaffoldSchedule {
 
     private boolean noPlace = false;
     private boolean lastDiagonal = false;
-    private boolean jumped = false;
 
     public TellySchedule(String name, @NotNull Scaffold parent) {
         super(name, parent);
-        this.registerSetting(straightTicks = new SliderSetting("Straight ticks", 6, 0, 8, 1));
-        this.registerSetting(diagonalTicks = new SliderSetting("Diagonal ticks", 4, 0, 8, 1));
-        this.registerSetting(jumpDownTicks = new SliderSetting("Jump down ticks", 1, 0, 8, 1));
+        this.registerSetting(straightTicks = new SliderSetting("Straight ticks", 6, 1, 8, 1));
+        this.registerSetting(diagonalTicks = new SliderSetting("Diagonal ticks", 4, 1, 8, 1));
+        this.registerSetting(jumpDownTicks = new SliderSetting("Jump down ticks", 1, 1, 8, 1));
     }
 
     @Override
@@ -46,12 +45,10 @@ public class TellySchedule extends IScaffoldSchedule {
             RotationHandler.setRotationPitch(mc.thePlayer.rotationPitch);
             noPlace = true;
             lastDiagonal = false;
-            if (parent.onGroundTicks >= 1 && !jumped && MoveUtil.isMoving() && !Utils.jumpDown()) {
-                mc.thePlayer.jump();
-                jumped = true;
+            if (parent.onGroundTicks >= 1 && MoveUtil.isMoving() && !Utils.jumpDown()) {
+                MoveUtil.jump();
             }
         } else {
-            jumped = false;
             if (BlockUtils.insideBlock(mc.thePlayer.getEntityBoundingBox().offset(
                     mc.thePlayer.motionX, mc.thePlayer.motionY + 0.1, mc.thePlayer.motionZ))) {
                 noPlace = true;

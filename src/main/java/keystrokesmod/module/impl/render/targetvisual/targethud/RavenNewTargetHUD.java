@@ -86,7 +86,7 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
             RenderUtils.drawBloomShadow(
                     (float) (minX - RECT_SHADOW_DIST), (float) (minY - RECT_SHADOW_DIST),
                     (float) (maxX - minX + RECT_SHADOW_DIST * 2.0), (float) (maxY - minY + RECT_SHADOW_DIST * 2.0),
-                    6, 8, BACKGROUND_COLOR, false);
+                    4, 10, BACKGROUND_COLOR, false);
         }
 
         if (blur.isToggled()) {
@@ -94,7 +94,7 @@ public class RavenNewTargetHUD extends SubMode<TargetHUD> implements ITargetVisu
             RenderUtils.drawBloomShadow(
                     minX, minY,
                     maxX - minX, maxY - minY,
-                    6, 8, -1, false);
+                    4, 10, -1, false);
             GaussianBlur.endBlur(4, 1);
         }
 

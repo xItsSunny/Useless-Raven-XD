@@ -8,6 +8,7 @@ import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.module.setting.utils.ModeOnly;
+import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import net.minecraft.potion.Potion;
 import keystrokesmod.eventbus.annotations.EventListener;
@@ -54,16 +55,16 @@ public class LegitVelocity extends SubMode<Velocity> {
             case 0:
                 long delay = (long) (Math.random() * (maxDelay.getInput() - minDelay.getInput()) + minDelay.getInput());
                 if (delay == 0 || maxDelay.getInput() == 0) {
-                    if (canJump()) mc.thePlayer.jump();
+                    if (canJump()) MoveUtil.jump();
                 } else {
                     Client.getExecutor().schedule(() -> {
-                        if (canJump()) mc.thePlayer.jump();
+                        if (canJump()) MoveUtil.jump();
                     }, delay, TimeUnit.MILLISECONDS);
                 }
                 break;
             case 1:
                 if (chance.getInput() == 100 || Math.random() * 100 <= chance.getInput()) {
-                    if (canJump()) mc.thePlayer.jump();
+                    if (canJump()) MoveUtil.jump();
                 }
                 break;
         }

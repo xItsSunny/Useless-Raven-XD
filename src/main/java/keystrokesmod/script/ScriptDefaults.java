@@ -44,14 +44,17 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static keystrokesmod.Client.mc;
+
+@SuppressWarnings("unused")
 public class ScriptDefaults {
-    private static Minecraft mc = Minecraft.getMinecraft();
-    private static World world = new World();
+    private static final World world = new World();
     public final Bridge bridge = new Bridge();
     private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
 
     public static class client {
         public static final String colorSymbol = "§";
+
         public static boolean allowFlying() {
             return mc.thePlayer.capabilities.allowFlying;
         }
@@ -192,7 +195,7 @@ public class ScriptDefaults {
                 Thread.sleep(ms);
             }
             catch (Exception e) {
-                e.printStackTrace();
+                Utils.handleException(e);
             }
         }
 
@@ -213,7 +216,7 @@ public class ScriptDefaults {
         }
 
         public static void sendPacket(CPacket packet) {
-            Packet packet1 = PacketHandler.convertCPacket(packet);
+            Packet<?> packet1 = PacketHandler.convertCPacket(packet);
             if (packet1 == null) {
                 return;
             }
@@ -221,7 +224,7 @@ public class ScriptDefaults {
         }
 
         public static void sendPacketNoEvent(CPacket packet) {
-            Packet packet1 = PacketHandler.convertCPacket(packet);
+            Packet<?> packet1 = PacketHandler.convertCPacket(packet);
             if (packet1 == null) {
                 return;
             }
@@ -296,6 +299,7 @@ public class ScriptDefaults {
                 mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, slot, button, mode, mc.thePlayer);
             }
 
+            @SuppressWarnings("unchecked")
             public static List<String> getBookContents() {
                 if (mc.currentScreen instanceof GuiScreenBook) {
                     try {
@@ -311,12 +315,13 @@ public class ScriptDefaults {
                         }
                     }
                     catch (Exception e) {
-                        e.printStackTrace();
+                        Utils.handleException(e);
                     }
                 }
                 return null;
             }
 
+            @SuppressWarnings("ConstantValue")
             public static String getChest() {
                 if (mc.thePlayer.openContainer instanceof ContainerChest) {
                     ContainerChest chest = (ContainerChest) mc.thePlayer.openContainer;
@@ -339,6 +344,7 @@ public class ScriptDefaults {
                     try {
                         return ((IInventory) Reflection.containerInventoryPlayer.get(mc.currentScreen.getClass()).get(mc.currentScreen)).getDisplayName().getUnformattedText();
                     } catch (Exception e) {
+                        Utils.handleException(e);
                     }
                 }
                 return "";
@@ -348,6 +354,7 @@ public class ScriptDefaults {
                 return mc.thePlayer.inventory.getSizeInventory();
             }
 
+            @SuppressWarnings("ConstantValue")
             public static int getChestSize() {
                 if (mc.thePlayer.openContainer instanceof ContainerChest) {
                     ContainerChest chest = (ContainerChest) mc.thePlayer.openContainer;
@@ -505,7 +512,7 @@ public class ScriptDefaults {
     }
 
     public static class modules {
-        private String superName;
+        private final String superName;
 
         public modules(String superName) {
             this.superName = superName;
@@ -585,6 +592,7 @@ public class ScriptDefaults {
             return new Entity(KillAura.target);
         }
 
+        @SuppressWarnings("ConstantValue")
         public Vec3 getBedAuraPosition() {
             BlockPos blockPos = ModuleManager.bedAura.currentBlock;
             if (ModuleManager.bedAura == null || !ModuleManager.bedAura.isEnabled() || ModuleManager.bedAura.currentBlock == null) {

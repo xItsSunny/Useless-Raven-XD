@@ -29,6 +29,8 @@ public class GrimACNoSlow extends INoSlow {
     public void onSendPacket(@NotNull SendPacketEvent event) {
         if (canFoodNoSlow()) {
             if (event.getPacket() instanceof C08PacketPlayerBlockPlacement) {
+                if (((C08PacketPlayerBlockPlacement) event.getPacket()).getPlacedBlockDirection() != 255)
+                    return;
                 event.cancel();
                 PacketUtils.sendPacketNoEvent(new C08PacketPlayerBlockPlacement(SlotHandler.getHeldItem()));
                 PacketUtils.sendPacketNoEvent(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.DROP_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));

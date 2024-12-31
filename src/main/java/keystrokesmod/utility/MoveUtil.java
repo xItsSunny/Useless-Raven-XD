@@ -1,5 +1,9 @@
 package keystrokesmod.utility;
 
+import keystrokesmod.Client;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.mixins.impl.entity.EntityAccessor;
 import keystrokesmod.module.impl.movement.TargetStrafe;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerMove;
@@ -335,5 +339,30 @@ public class MoveUtil {
             );
         }
         return result;
+    }
+
+    static {
+        Client.EVENT_BUS.register(MoveUtil.class);
+    }
+
+    private static boolean noJump = false;
+    private static final Object[] lock = new Object[0];
+
+    public static void jump() {
+        synchronized (lock) {
+            if (!noJump)
+                mc.thePlayer.jump();
+            noJump = true;
+        }
+    }
+
+    @EventListener(priority = 3)
+    public static void onMoveInput(MoveInputEvent event) {
+        synchronized (lock) {
+            if (noJump) {
+                event.setJump(false);
+            }
+            noJump = false;
+        }
     }
 }

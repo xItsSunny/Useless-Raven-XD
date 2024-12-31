@@ -1,6 +1,5 @@
 package keystrokesmod.eventbus;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -14,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.security.InvalidParameterException;
 import java.util.*;
@@ -86,15 +84,14 @@ public final class EventBus {
             try {
                 // 0 reflect method
                 eventConsumer = ReflectionUtils.getFastMethod(objClass, object, method, type);
-            } catch (Throwable e) {
+            } catch (Throwable ignored) {
                 // revert to method invoke
                 method.setAccessible(true);
                 eventConsumer = event -> {
                     try {
                         method.invoke(object, event);
-                    } catch (IllegalAccessException | InvocationTargetException ex) {
-                        Utils.sendMessage(String.format("Fail to post event '%s' to '%s'",
-                                event.getClass().getName(), objClass.getName()));
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        Utils.handleEventException(null, e);
                     }
                 };
             }
@@ -141,8 +138,11 @@ public final class EventBus {
                 prioryList = eventHandlers.get(type);
             }
 
+            Comparator<EventHandler<? extends Event>> comparator =
+                    Comparator.comparingInt(EventHandler::getPriory);
             int addToIndex = Collections.binarySearch(prioryList, eventHandler,
-                    Comparator.comparingInt(EventHandler::getPriory));
+                    comparator.reversed());
+
             if (addToIndex < 0) {
                 addToIndex = -addToIndex - 1;
             }
@@ -200,24 +200,7 @@ public final class EventBus {
             try {
                 ((EventHandler<T>) eventHandler).invoke(event);
             } catch (Throwable e) {
-                Method method = eventHandler.getMethod();
-                String targetName;
-                if (method != null) {
-                    targetName = String.format("%s->%s", method.getDeclaringClass().getSimpleName(), method.getName());
-                    if (Modifier.isNative(method.getModifiers()))
-                        targetName += " <native method>";
-                } else {
-                    targetName = "Unknown Source";
-                }
-                if (ReflectionUtils.isFastMethod(eventHandler.getEventConsumer())) {
-                    targetName += " <fast method>";
-                }
-                Utils.sendMessage(String.format("%sException '%s%s%s' while post event '%s%s%s' to '%s%s%s': %s%s",
-                        ChatFormatting.RED,
-                        ChatFormatting.AQUA, e.getClass().getSimpleName(), ChatFormatting.RED,
-                        ChatFormatting.RESET, event.getClass().getSimpleName(), ChatFormatting.RED,
-                        ChatFormatting.RESET, targetName, ChatFormatting.RED,
-                        ChatFormatting.RESET, e.getMessage()));
+                Utils.handleEventException(eventHandler, e);
             }
 
             if (event instanceof CancellableEvent)

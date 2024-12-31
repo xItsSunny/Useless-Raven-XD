@@ -128,7 +128,7 @@ public class VulcanPhase extends SubMode<Phase> {
 
         if (mc.thePlayer.onGround && enable && teleport) {
 
-            mc.thePlayer.jump();
+            MoveUtil.jump();
             teleport = false;
             enable = false;
 

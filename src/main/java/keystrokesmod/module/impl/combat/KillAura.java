@@ -308,11 +308,11 @@ public class KillAura extends IAutoClicker {
     public void onRender3D(Render3DEvent event) {
         Vec3 hitPos = aimSimulator.getHitPos();
         if (target != null) {
-            if (rotations != null && dot.isToggled() && hitPos != null) {
+            if (rotations != null && dot.isToggled()) {
                 if (animationX == null || animationY == null || animationZ == null) {
-                    animationX = new Animation(Easing.EASE_OUT_CIRC, 50);
-                    animationY = new Animation(Easing.EASE_OUT_CIRC, 50);
-                    animationZ = new Animation(Easing.EASE_OUT_CIRC, 50);
+                    animationX = new Animation(Easing.EASE_OUT_CIRC, 100);
+                    animationY = new Animation(Easing.EASE_OUT_CIRC, 100);
+                    animationZ = new Animation(Easing.EASE_OUT_CIRC, 100);
 
                     animationX.setValue(hitPos.x);
                     animationY.setValue(hitPos.y);
@@ -439,7 +439,7 @@ public class KillAura extends IAutoClicker {
                         lag = false;
                     } else {
                         // attack while blinked
-                        if (!attack(target)) {
+                        if (!attackAndInteract(target, true, Utils.getEyePos(target))) {
                             break;  // perfect hit support
                         }
                         releasePackets(); // release

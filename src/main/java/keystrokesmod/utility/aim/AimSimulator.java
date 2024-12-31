@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.AxisAlignedBB;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
@@ -152,15 +153,18 @@ public class AimSimulator {
         return (float) ((Math.random() - 0.5) * 2 * multiple);
     }
 
+    @Contract(pure = true)
     private static double normal(double max, double min, double current) {
         if (current >= max) return max;
         return Math.max(current, min);
     }
 
+    @Contract(pure = true)
     public static float rotMove(double target, double current, @Range(from = 0, to = 180) double diff) {
         return rotMove(target, current, diff, getGCD(), 180);
     }
-    
+
+    @Contract(pure = true)
     public static float rotMove(double target, double current, @Range(from = 0, to = 180) double diff,
                                 Double gcd, @Range(from = 0, to = 180) double acc) {
         double yawDiff = Math.abs(RotationUtils.normalize((float) target) - RotationUtils.normalize((float) current));

@@ -2,6 +2,7 @@ package keystrokesmod.mixins.impl.world;
 
 import keystrokesmod.module.impl.render.Optimize;
 import keystrokesmod.performance.FastLightUpdater;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
@@ -24,6 +25,7 @@ public abstract class MixinWorld implements IBlockAccess {
 
     @Inject(method = "checkLightFor", at = @At("HEAD"), cancellable = true)
     public void onUpdateLight(EnumSkyBlock skyBlock, BlockPos blockPos, CallbackInfoReturnable<Boolean> cir) {
+        if (!((World) (Object) this instanceof WorldClient)) return;
         if (!Optimize.isFastLight()) return;
 
         if (!this.isAreaLoaded(blockPos, 17, false)) {

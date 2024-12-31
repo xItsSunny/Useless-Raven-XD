@@ -3,11 +3,11 @@ package keystrokesmod.utility;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.mojang.realmsclient.gui.ChatFormatting;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import keystrokesmod.Client;
 import keystrokesmod.event.client.ClickEvent;
 import keystrokesmod.event.client.MouseEvent;
-import keystrokesmod.mixins.impl.client.GuiScreenAccessor;
+import keystrokesmod.eventbus.EventHandler;
+import keystrokesmod.mixins.impl.gui.GuiScreenAccessor;
 import keystrokesmod.module.impl.other.NameHider;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.render.AntiShuffle;
@@ -53,10 +53,13 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.*;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -134,16 +137,26 @@ public final class Utils {
         return num == Math.floor(num);
     }
 
+    public static double random() {
+        return randomizeDouble(0, 1);
+    }
+
     public static boolean randomizeBoolean() {
-        return Math.random() >= 0.5;
+        return ThreadLocalRandom.current().nextBoolean();
     }
 
     public static int randomizeInt(double min, double max) {
-        return (int) Math.round(randomizeDouble(min, max));
+        final int iMin = (int) min;
+        final int iMax = (int) Math.round(max);
+        if (iMin == iMax)
+            return iMin;
+        return ThreadLocalRandom.current().nextInt(iMin, iMax);
     }
 
     public static double randomizeDouble(double min, double max) {
-        return Math.random() * (max - min) + min;
+        if (min == max)
+            return min;
+        return ThreadLocalRandom.current().nextDouble(min, max);
     }
 
     public static boolean inFov(float fov, @NotNull BlockPos blockPos) {
@@ -458,19 +471,16 @@ public final class Utils {
         if (n > 255) {
             return 255;
         }
-        if (n < 4) {
-            return 4;
-        }
-        return n;
+        return Math.max(n, 4);
     }
 
     public static boolean isTeamMate(Entity entity) {
         try {
-            Entity teamMate = entity;
-            if (mc.thePlayer.isOnSameTeam((EntityLivingBase) entity) || mc.thePlayer.getDisplayName().getUnformattedText().startsWith(teamMate.getDisplayName().getUnformattedText().substring(0, 2))) {
+            if (mc.thePlayer.isOnSameTeam((EntityLivingBase) entity) || mc.thePlayer.getDisplayName().getUnformattedText().startsWith(entity.getDisplayName().getUnformattedText().substring(0, 2))) {
                 return true;
             }
         } catch (Exception e) {
+            Utils.handleException(e);
         }
         return false;
     }
@@ -1119,7 +1129,8 @@ public final class Utils {
     }
 
     public static int limit(int value, int min, int max) {
-        return Math.max(Math.min(value, max), min);
+        int a = Math.min(value, max);
+        return (a >= min) ? a : min;
     }
 
     public static long limit(long value, long min, long max) {
@@ -1172,5 +1183,65 @@ public final class Utils {
         public int size() {
             return original.size();
         }
+    }
+
+    public static void handleEventException(@Nullable EventHandler<?> eventHandler, Throwable e) {
+        String targetName = "Unknown Source";
+
+        if (eventHandler != null) {
+            Method method = eventHandler.getMethod();
+            if (method != null) {
+                targetName = String.format("%s->%s", method.getDeclaringClass().getSimpleName(), method.getName());
+                if (Modifier.isNative(method.getModifiers()))
+                    targetName += "(native method)";
+            }
+            if (ReflectionUtils.isFastMethod(eventHandler.getEventConsumer())) {
+                targetName += "(fast method)";
+            }
+        }
+
+        handleException(e,
+                String.format("post event to %s", targetName),
+                String.format("%s->%s", ReflectionUtils.getCallerClassName(1),
+                        ReflectionUtils.getCallerMethodName(1)));  // because the caller is EventBus#post
+    }
+
+    public static void handleException(@NotNull Throwable e) {
+        try {
+            handleException(e, ReflectionUtils.getCallerMethodName(), ReflectionUtils.getCallerClassName());
+        } catch (Throwable ignored) {
+        }
+    }
+
+    public static void handleException(@NotNull Throwable e, String action) {
+        try {
+            handleException(e, action, ReflectionUtils.getCallerClassName());
+        } catch (Throwable ignored) {
+        }
+    }
+
+    public static void handleException(@NotNull Throwable e, String action, String exceptionWhere) {
+        try {
+            Utils.sendMessageAnyWay(String.format("%sUnexpected '%s%s%s' while '%s%s%s' in '%s%s%s': %s%s.",
+                    ChatFormatting.RED,
+                    ChatFormatting.AQUA, e.getClass().getSimpleName(), ChatFormatting.RED,
+                    ChatFormatting.RESET, action, ChatFormatting.RED,
+                    ChatFormatting.RESET, exceptionWhere, ChatFormatting.RED,
+                    ChatFormatting.RESET, e.getMessage(), ChatFormatting.RED
+            ));
+        } catch (Throwable ignored) {
+        }
+    }
+
+    @SafeVarargs
+    @Contract(pure = true)
+    public static <T extends Comparable<T>> T max(T firstObj, T @NotNull ... objects) {
+        T maxObj = firstObj;
+        for (T object : objects) {
+            if (object.compareTo(maxObj) > 0) {
+                maxObj = object;
+            }
+        }
+        return maxObj;
     }
 }

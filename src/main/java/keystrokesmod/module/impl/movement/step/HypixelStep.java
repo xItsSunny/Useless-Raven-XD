@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.movement.step;
 
 import it.unimi.dsi.fastutil.doubles.DoubleList;
-import keystrokesmod.event.client.PreTickEvent;
 import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.event.player.StepEvent;
 import keystrokesmod.module.impl.movement.Step;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -62,7 +62,7 @@ public class HypixelStep extends SubMode<Step> {
     }
 
     @EventListener
-    public void onPreTick(PreTickEvent event) {
+    public void onPreUpdate(PreUpdateEvent event) {
         if (stepped) {
             Utils.resetTimer();
             stepped = false;

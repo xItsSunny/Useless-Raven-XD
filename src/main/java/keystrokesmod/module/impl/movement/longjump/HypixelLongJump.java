@@ -52,9 +52,9 @@ public class HypixelLongJump extends SubMode<LongJump> {
             return;
         }
 
-        if (!Utils.jumpDown() && Utils.isMoving() && mc.currentScreen == null && mc.thePlayer.onGround) {
+        if (Utils.isMoving() && mc.currentScreen == null && mc.thePlayer.onGround) {
             MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100f);
-            mc.thePlayer.jump();
+            MoveUtil.jump();
         }
 
         BlockPos ground = new BlockPos(mc.thePlayer.posX, startY - 1, mc.thePlayer.posZ);

@@ -12,12 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientTheme extends Module {
-    public final ButtonSetting button;
-    public final ButtonSetting smoothFont;
     public final ButtonSetting buttonBlur;
     public final ButtonSetting buttonLowerCase;
-    public final ButtonSetting background;
-    public final ButtonSetting mainMenu;
     public final ButtonSetting clickGui;
     public final ButtonSetting test;
     public final ModeSetting colorType;
@@ -34,12 +30,8 @@ public class ClientTheme extends Module {
     public ClientTheme() {
         super("ClientTheme", category.render);
         this.registerSetting(new DescriptionSetting("Rendering"));
-        this.registerSetting(button = new ButtonSetting("Button", true));
-        this.registerSetting(smoothFont = new ButtonSetting("Smooth font", true, button::isToggled));
-        this.registerSetting(buttonBlur = new ButtonSetting("Blur", false, button::isToggled));
-        this.registerSetting(buttonLowerCase = new ButtonSetting("Button lower case", false, button::isToggled));
-        this.registerSetting(background = new ButtonSetting("Background", true));
-        this.registerSetting(mainMenu = new ButtonSetting("Main menu", true));
+        this.registerSetting(buttonBlur = new ButtonSetting("Button blur", false));
+        this.registerSetting(buttonLowerCase = new ButtonSetting("Button lower case", false));
         this.registerSetting(clickGui = new ButtonSetting("ClickGui", true));
         this.registerSetting(test = new ButtonSetting("Test", false, clickGui::isToggled));
         this.registerSetting(new DescriptionSetting("Custom Theme"));

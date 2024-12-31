@@ -69,7 +69,7 @@ public class SliderComponent extends Component {
     public void onDrawScreen(int x, int y) {
         this.y = this.parent.categoryComponent.getY() + this.o;
         this.x = this.parent.categoryComponent.getX();
-        double d = Math.min(this.parent.categoryComponent.gw() - 8, Math.max(0, x - this.x));
+        double d = Math.min(this.parent.categoryComponent.gw() - 8, (0 >= x - this.x) ? 0 : x - this.x);
         this.w = (double) (this.parent.categoryComponent.gw() - 8) * (this.sliderSetting.getInput() - this.sliderSetting.getMin()) / (this.sliderSetting.getMax() - this.sliderSetting.getMin());
         if (this.d) {
             if (d == 0.0D) {

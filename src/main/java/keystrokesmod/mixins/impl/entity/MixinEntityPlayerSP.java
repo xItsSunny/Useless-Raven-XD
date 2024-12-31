@@ -5,7 +5,6 @@ import keystrokesmod.event.player.*;
 import keystrokesmod.event.world.PushOutOfBlockEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.NoSlow;
-import keystrokesmod.module.impl.movement.Sprint;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.movement.Direction;
@@ -425,7 +424,8 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             BlockPos blockpos = new BlockPos(p_pushOutOfBlocks_1_, p_pushOutOfBlocks_3_, p_pushOutOfBlocks_5_);
             double d0 = p_pushOutOfBlocks_1_ - (double) blockpos.getX();
             double d1 = p_pushOutOfBlocks_5_ - (double) blockpos.getZ();
-            int entHeight = Math.max((int) Math.ceil(this.height), 1);
+            int a = (int) Math.ceil(this.height);
+            int entHeight = (a >= 1) ? a : 1;
             if (!this.raven_bS$isHeadspaceFree(blockpos, entHeight)) {
                 Direction direction = null;
                 double d2 = 9999.0;

@@ -361,7 +361,7 @@ public class Animations extends Module {
             if (mc.thePlayer.swingProgressInt == 1) {
                 swing = 9;
             } else {
-                swing = Math.max(0, swing - 1);
+                swing = (0 >= swing - 1) ? 0 : swing - 1;
             }
         } catch (Exception ignore) {
         }

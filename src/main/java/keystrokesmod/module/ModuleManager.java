@@ -10,7 +10,6 @@ import keystrokesmod.module.impl.other.*;
 import keystrokesmod.module.impl.player.*;
 import keystrokesmod.module.impl.render.*;
 import keystrokesmod.module.impl.world.*;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -127,6 +126,7 @@ public class ModuleManager {
     public static InvMove invMove;
     public static MotionCamera motionCamera;
     public static Optimize optimize;
+    public static SelfDamage selfDamage;
 
     static List<Module> modules = new ArrayList<>();
 
@@ -246,6 +246,7 @@ public class ModuleManager {
         this.addModule(autoWeb = new AutoWeb());
         this.addModule(chestAura = new ChestAura());
         this.addModule(autoChest = new AutoChest());
+        this.addModule(selfDamage = new SelfDamage());
 
         // render
         this.addModule(ambience = new Ambience());

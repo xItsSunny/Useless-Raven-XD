@@ -167,10 +167,11 @@ public class HUD extends Module implements Moveable {
             final double width = moduleRender.getWidth();
             if (alignRight.isToggled()) {
                 minX = Math.min(minX, (int) Math.round(posX - width));
-                maxX = Math.max(maxX, posX);
+                maxX = (maxX >= posX) ? maxX : posX;
             } else {
                 minX = Math.min(minX, posX);
-                maxX = Math.max(maxX, (int) Math.round(posX + width));
+                int b = (int) Math.round(posX + width);
+                maxX = (maxX >= b) ? maxX : b;
             }
 
             int targetX = (int) Math.round(alignRight.isToggled() ? posX - width : posX);

@@ -42,7 +42,7 @@ public class SnapAntiAim extends SubMode<AntiAim> {
         if (fastJump.isToggled()) {
             if (lastAim)
                 event.cancel();
-            disableTicks = Math.max(2, disableTicks);
+            disableTicks = (2 >= disableTicks) ? 2 : disableTicks;
         }
     }
 

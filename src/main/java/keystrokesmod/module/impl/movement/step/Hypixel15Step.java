@@ -56,7 +56,7 @@ public class Hypixel15Step extends SubMode<Step> {
                 case 0:
                     MoveUtil.stop();
                     MoveUtil.strafe();
-                    mc.thePlayer.jump();
+                    MoveUtil.jump();
                     break;
                 case 1:
                 case 2:
@@ -78,7 +78,7 @@ public class Hypixel15Step extends SubMode<Step> {
                     MoveUtil.stop();
                     break;
                 case 16:
-                    mc.thePlayer.jump();
+                    mc.thePlayer.motionY = .42;
                     stepping = false;
                     break;
             }

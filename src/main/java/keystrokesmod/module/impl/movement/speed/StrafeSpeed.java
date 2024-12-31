@@ -28,8 +28,8 @@ public class StrafeSpeed extends SubMode<Speed> {
         } else {
             MoveUtil.strafe();
         }
-        if (mc.thePlayer.onGround && autoJump.isToggled() && !Utils.jumpDown()) {
-            mc.thePlayer.jump();
+        if (mc.thePlayer.onGround && autoJump.isToggled()) {
+            MoveUtil.jump();
         }
     }
 

@@ -43,4 +43,9 @@ public class MinecraftFontRenderer implements IFont {
                 break;
         }
     }
+
+    @Override
+    public boolean isTextSupported(String text) {
+        return true;
+    }
 }

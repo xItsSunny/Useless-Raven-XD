@@ -1,15 +1,12 @@
 package keystrokesmod.utility.render;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import keystrokesmod.Client;
 import keystrokesmod.utility.Utils;
-import keystrokesmod.utility.font.FontManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.opengl.Display;
 
 import java.awt.*;
 import java.util.List;
@@ -17,7 +14,6 @@ import java.util.List;
 import static keystrokesmod.Client.mc;
 
 public class BackgroundUtils {
-    private static final int LOGO_COLOR = new Color(255, 255, 255, 200).getRGB();
     private static final List<ResourceLocation> BACKGROUNDS = new ObjectArrayList<>();
     private static final int WIDTH = 1920;
     private static final int HEIGHT = 1080;
@@ -29,7 +25,7 @@ public class BackgroundUtils {
     private static int shadow = 0;
 
     static {
-        for (int i = 1; i <= 7; i++) {
+        for (int i = 1; i <= 5; i++) {
             BACKGROUNDS.add(new ResourceLocation(String.format("keystrokesmod:textures/backgrounds/%d.png", i)));
         }
         MAX_INDEX = BACKGROUNDS.size() - 1;
@@ -47,7 +43,7 @@ public class BackgroundUtils {
         renderBackground(slot.width, slot.height);
     }
 
-    private static void renderBackground(final int width, final int height) {
+    protected static void renderBackground(final int width, final int height) {
         if (Utils.nullCheck()) return;
 
         final long time = System.currentTimeMillis();
@@ -85,7 +81,7 @@ public class BackgroundUtils {
         }
     }
 
-    private static void updateShadow(final int shadowTarget) {
+    protected static void updateShadow(final int shadowTarget) {
         if (shadowTarget > shadow) {
             shadow = (int) Math.min(shadow + 4.0 * 300 / Minecraft.getDebugFPS(), shadowTarget);
         } else if (shadowTarget < shadow) {

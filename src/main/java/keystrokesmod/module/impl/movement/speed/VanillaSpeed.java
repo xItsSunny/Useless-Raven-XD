@@ -41,9 +41,9 @@ public class VanillaSpeed extends SubMode<Speed> {
 
         if (MoveUtil.isMoving()) {
             if (autoJump.isToggled() && mc.thePlayer.onGround) {
-                mc.thePlayer.jump();
-                mc.thePlayer.motionY = verticalSpeed.getInput() * MoveUtil.jumpMotion();
                 MoveUtil.strafe();
+                MoveUtil.jump();
+                mc.thePlayer.motionY = verticalSpeed.getInput() * MoveUtil.jumpMotion();
             } else {
                 MoveUtil.strafe(horizonSpeed.getInput() * MoveUtil.getAllowedHorizontalDistance());
             }

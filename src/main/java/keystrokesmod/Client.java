@@ -36,8 +36,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
         acceptedMinecraftVersions = "[1.8.9]"
 )
 public final class Client {
-    public static final String NAME = "Raven XD";
-    public static final String VERSION = "Developing build";
+    public static final String NAME = Const.NAME;
+    public static final String VERSION = Const.VERSION;
 
     public static boolean debugger = false;
     public static Minecraft mc = Minecraft.getMinecraft();
@@ -94,14 +94,16 @@ public final class Client {
     }
 
     @EventListener
-    public void onTick(PreTickEvent e) {
-        try {
-            if (Utils.nullCheck()) {
-                if (Reflection.sendMessage) {
-                    Utils.sendMessage("&cThere was an error, relaunch the game.");
-                    Reflection.sendMessage = false;
-                }
+    public void onTick(PreTickEvent event) {
+        if (Utils.nullCheck()) {
+            if (Reflection.sendMessage) {
+                Utils.sendMessageAnyWay("&cThere was an error, relaunch the game.");
+                Reflection.sendMessage = false;
+            }
+            Module lastModule = null;
+            try {
                 for (Module module : getModuleManager().getModules()) {
+                    lastModule = module;
                     if (mc.currentScreen instanceof ClickGui) {
                         module.guiUpdate();
                     }
@@ -110,13 +112,18 @@ public final class Client {
                         module.onUpdate();
                     }
                 }
+            } catch (Throwable e) {
+                if (lastModule != null) {
+                    Utils.handleException(e, String.format("update module '%s'", lastModule.getName()), "client global");
+                } else {
+                    Utils.handleException(e);
+                }
             }
+        }
 
-            if (isKeyStrokeConfigGuiToggled) {
-                isKeyStrokeConfigGuiToggled = false;
-                mc.displayGuiScreen(new KeyStrokeConfigGui());
-            }
-        } catch (Throwable ignored) {
+        if (isKeyStrokeConfigGuiToggled) {
+            isKeyStrokeConfigGuiToggled = false;
+            mc.displayGuiScreen(new KeyStrokeConfigGui());
         }
     }
 

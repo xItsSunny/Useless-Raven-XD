@@ -28,6 +28,25 @@ public final class ReflectionUtils {
         }
     }
 
+    /**
+     * 调用方法，并指定类型
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T call(@NotNull Object object, @NotNull String method,
+                             Object @NotNull [] params, Class<?> @NotNull [] paramTypes) {
+        if (params.length != paramTypes.length) {
+            throw new RuntimeException("Param length not match with paramTypes length");
+        }
+
+        final MethodData data = new MethodData(object.getClass(), method, paramTypes);
+
+        try {
+            return (T) getMethod(data).invoke(object, params);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Data
     @AllArgsConstructor
     private static final class MethodData {
@@ -192,5 +211,51 @@ public final class ReflectionUtils {
 
     public static boolean isFastMethod(Consumer<?> consumer) {
         return fastMethodMap.containsValue(consumer);
+    }
+
+    public static @NotNull String getCallerClassName() {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        // 0: getStackTrace
+        // 1: this method
+        // 2: caller
+        // 3: the method called caller
+        if (stackTrace.length < 3)
+            return "Unknown Source";
+        String[] splits = stackTrace[3].getClassName().split("\\.");
+        return splits[splits.length - 1];
+    }
+
+    public static @NotNull String getCallerClassName(final int extraDepth) {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        // 0: getStackTrace
+        // 1: this method
+        // 2: caller
+        // 3: the method called caller
+        if (stackTrace.length < 3 + extraDepth)
+            return "Unknown Source";
+        String[] splits = stackTrace[3 + extraDepth].getClassName().split("\\.");
+        return splits[splits.length - 1];
+    }
+
+    public static @NotNull String getCallerMethodName() {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        // 0: getStackTrace
+        // 1: this method
+        // 2: caller
+        // 3: the method called caller
+        if (stackTrace.length < 3)
+            return "Unknown Source";
+        return stackTrace[3].getMethodName();
+    }
+
+    public static @NotNull String getCallerMethodName(final int extraDepth) {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        // 0: getStackTrace
+        // 1: this method
+        // 2: caller
+        // 3: the method called caller
+        if (stackTrace.length < 3 + extraDepth)
+            return "Unknown Source";
+        return stackTrace[3 + extraDepth].getMethodName();
     }
 }

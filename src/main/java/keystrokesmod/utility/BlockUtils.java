@@ -6,7 +6,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -159,8 +158,14 @@ public class BlockUtils {
 
         BlockPos min = new BlockPos(Math.min(from.getX(), to.getX()),
                 Math.min(from.getY(), to.getY()), Math.min(from.getZ(), to.getZ()));
-        BlockPos max = new BlockPos(Math.max(from.getX(), to.getX()),
-                Math.max(from.getY(), to.getY()), Math.max(from.getZ(), to.getZ()));
+        int a = from.getZ();
+        int b = to.getZ();
+        int a1 = from.getY();
+        int b1 = to.getY();
+        int a2 = from.getX();
+        int b2 = to.getX();
+        BlockPos max = new BlockPos((a2 >= b2) ? a2 : b2,
+                (a1 >= b1) ? a1 : b1, (a >= b) ? a : b);
 
         for (int x = min.getX(); x <= max.getX(); x++)
             for (int y = min.getY(); y <= max.getY(); y++)

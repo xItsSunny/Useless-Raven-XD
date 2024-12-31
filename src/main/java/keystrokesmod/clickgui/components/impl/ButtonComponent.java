@@ -5,6 +5,7 @@ import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.profile.ProfileModule;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
@@ -100,7 +101,8 @@ public class ButtonComponent extends Component {
             this.buttonSetting.toggle();
             try {
                 this.mod.guiButtonToggled(this.buttonSetting);
-            } catch (Exception ignored) {
+            } catch (Throwable e) {
+                Utils.handleException(e);
             }
             if (Client.currentProfile != null) {
                 ((ProfileModule) Client.currentProfile.getModule()).saved = false;

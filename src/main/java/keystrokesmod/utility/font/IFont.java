@@ -22,4 +22,5 @@ public interface IFont {
 
     void drawString(String text, double x, double y, CenterMode centerMode, boolean dropShadow, int color);
 
+    boolean isTextSupported(String text);
 }

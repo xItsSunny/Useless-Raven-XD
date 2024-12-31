@@ -6,8 +6,8 @@ import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.player.blink.NormalBlink;
 import keystrokesmod.utility.ContainerUtils;
+import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.PacketUtils;
-import keystrokesmod.utility.Utils;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
@@ -43,11 +43,13 @@ public class HypixelNoSlow extends INoSlow {
         final @Nullable ItemStack item = SlotHandler.getHeldItem();
         if (offGroundTicks == 4 && send) {
             send = false;
-            PacketUtils.sendPacketNoEvent(new C08PacketPlayerBlockPlacement(
-                    new BlockPos(-1, -1, -1),
-                    255, item,
-                    0, 0, 0
-            ));
+            if (mc.thePlayer.isUsingItem()) {
+                PacketUtils.sendPacketNoEvent(new C08PacketPlayerBlockPlacement(
+                        new BlockPos(-1, -1, -1),
+                        255, item,
+                        0, 0, 0
+                ));
+            }
 
         } else if (item != null && mc.thePlayer.isUsingItem() && !(item.getItem() instanceof ItemSword)) {
             event.setPosY(event.getPosY() + 1E-14);
@@ -85,8 +87,8 @@ public class HypixelNoSlow extends INoSlow {
             C08PacketPlayerBlockPlacement blockPlacement = (C08PacketPlayerBlockPlacement) event.getPacket();
             if (SlotHandler.getHeldItem() != null && blockPlacement.getPlacedBlockDirection() == 255
                     && (ContainerUtils.isRest(SlotHandler.getHeldItem().getItem()) || SlotHandler.getHeldItem().getItem() instanceof ItemBow || SlotHandler.getHeldItem().getItem() instanceof ItemPotion) && offGroundTicks < 2) {
-                if (mc.thePlayer.onGround && !Utils.jumpDown()) {
-                    mc.thePlayer.jump();
+                if (mc.thePlayer.onGround) {
+                    MoveUtil.jump();
                 }
                 send = true;
                 event.cancel();

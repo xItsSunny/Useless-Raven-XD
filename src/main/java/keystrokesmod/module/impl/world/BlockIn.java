@@ -33,7 +33,10 @@ import java.util.Set;
 public class BlockIn extends Module {
     private static final String[] rotationModes = new String[]{"None", "Block", "Strict"};
     private final ModeSetting rotationMode;
-    private final SliderSetting aimSpeed;
+    private final SliderSetting minRotationSpeed;
+    private final SliderSetting maxRotationSpeed;
+    private final SliderSetting minRotationAccuracy;
+    private final SliderSetting maxRotationAccuracy;
     private final ButtonSetting lookView;
     private final SliderSetting placeDelay;
     private final ButtonSetting silentSwing;
@@ -48,11 +51,21 @@ public class BlockIn extends Module {
         super("Block-In", category.world);
         this.registerSetting(new DescriptionSetting("make you block in."));
         this.registerSetting(rotationMode = new ModeSetting("Rotation mode", rotationModes, 2));
-        this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 5, 0, 10, 0.05, new ModeOnly(rotationMode, 1, 2)));
-        this.registerSetting(lookView = new ButtonSetting("Look view", false, new ModeOnly(rotationMode, 1, 2)));
+        ModeOnly doRotation = new ModeOnly(rotationMode, 1, 2);
+        this.registerSetting(minRotationSpeed = new SliderSetting("Min rotation speed", 180, 0, 180, 1, doRotation));
+        this.registerSetting(maxRotationSpeed = new SliderSetting("Max rotation speed", 180, 0, 180, 1, doRotation));
+        this.registerSetting(minRotationAccuracy = new SliderSetting("Min rotation accuracy", 180, 0, 180, 1, doRotation));
+        this.registerSetting(maxRotationAccuracy = new SliderSetting("Max rotation accuracy", 180, 0, 180, 1, doRotation));
+        this.registerSetting(lookView = new ButtonSetting("Look view", false, doRotation));
         this.registerSetting(placeDelay = new SliderSetting("Place delay", 50, 0, 500, 1, "ms"));
         this.registerSetting(silentSwing = new ButtonSetting("Silent swing", false));
         this.registerSetting(autoSwitch = new ButtonSetting("Auto switch", true));
+    }
+
+    @Override
+    public void guiUpdate() throws Throwable {
+        Utils.correctValue(minRotationSpeed, maxRotationSpeed);
+        Utils.correctValue(minRotationAccuracy, maxRotationAccuracy);
     }
 
     @Override
@@ -123,9 +136,14 @@ public class BlockIn extends Module {
                 currentRot = new Vec2(RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
             }
             if (rotationMode.getInput() != 0 && !AimSimulator.equals(currentRot, rotation)) {
+                float rotationSpeed = (float) Utils.randomizeDouble(minRotationSpeed.getInput(), maxRotationSpeed.getInput());
+                double rotationAccuracy = Utils.randomizeDouble(minRotationAccuracy.getInput(), maxRotationAccuracy.getInput());
+
                 currentRot = new Vec2(
-                        AimSimulator.rotMove(rotation.x, currentRot.x, (float) aimSpeed.getInput() * 5),
-                        AimSimulator.rotMove(rotation.y, currentRot.y, (float) aimSpeed.getInput() * 5)
+                        AimSimulator.rotMove(rotation.x, currentRot.x,
+                                rotationSpeed, AimSimulator.getGCD(), rotationAccuracy),
+                        AimSimulator.rotMove(rotation.y, currentRot.y,
+                                rotationSpeed, AimSimulator.getGCD(), rotationAccuracy)
                 );
 
                 if (lookView.isToggled()) {

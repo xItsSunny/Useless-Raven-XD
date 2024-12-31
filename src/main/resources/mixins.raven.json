@@ -4,8 +4,8 @@
   "refmap": "mixins.raven.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "client.GuiConnectingAccessor",
-    "client.GuiScreenAccessor",
+    "gui.GuiConnectingAccessor",
+    "gui.GuiScreenAccessor",
     "client.KeyBindingAccessor",
     "client.MinecraftAccessor",
     "client.MixinEntityRenderer",

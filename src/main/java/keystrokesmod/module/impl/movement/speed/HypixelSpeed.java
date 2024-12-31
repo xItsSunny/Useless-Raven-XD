@@ -1,5 +1,7 @@
 package keystrokesmod.module.impl.movement.speed;
 
+import keystrokesmod.event.player.PostPlayerInputEvent;
+import keystrokesmod.event.player.PrePlayerInputEvent;
 import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.Speed;
 import keystrokesmod.module.impl.movement.TargetStrafe;
@@ -36,8 +38,33 @@ public class HypixelSpeed extends SubMode<Speed> {
         );
         this.registerSetting(strafe = new ButtonSetting("Strafe", false));
         this.registerSetting(fastStrafe = new ButtonSetting("Fast strafe", false, strafe::isToggled));
-        this.registerSetting(minAngle = new SliderSetting("Min angle", 30, 15, 90, 15, strafe::isToggled));
+        this.registerSetting(minAngle = new SliderSetting("Min angle", 30, 15, 90, 15, () -> strafe.isToggled() && !fastStrafe.isToggled()));
         this.registerSetting(fastStop = new ButtonSetting("Fast stop", false));
+    }
+
+    @EventListener
+    public void onPrePlayerInput(PrePlayerInputEvent event) {
+        if (strafe.isToggled() && MoveUtil.isMoving() && fastStrafe.isToggled()) {
+            double attemptAngle = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.direction()));
+            double movementAngle = MathHelper.wrapAngleTo180_double(Math.toDegrees(
+                    Math.atan2(mc.thePlayer.motionZ, mc.thePlayer.motionX)
+            ) - 90);
+
+            if (wrappedDifference(attemptAngle, movementAngle) > 90) {
+                MoveUtil.strafe(MoveUtil.speed(), (float) movementAngle - 180);
+            }
+        }
+    }
+
+    @EventListener
+    public void onPostPlayerInput(PostPlayerInputEvent event) {
+        if (strafe.isToggled() && MoveUtil.isMoving()
+                && fastStrafe.isToggled() && parent.offGroundTicks == 2 && !parent.noAction()) {
+            double motionX2 = mc.thePlayer.motionX;
+            double motionZ2 = mc.thePlayer.motionZ;
+            mc.thePlayer.motionZ = (mc.thePlayer.motionZ * 1 + motionZ2 * 2) / 3;
+            mc.thePlayer.motionX = (mc.thePlayer.motionX * 1 + motionX2 * 2) / 3;
+        }
     }
 
     @EventListener
@@ -46,31 +73,18 @@ public class HypixelSpeed extends SubMode<Speed> {
             double speed = Math.hypot(
                     (mc.thePlayer.motionX - (mc.thePlayer.lastTickPosX - lastLastTickPosX)),
                     (mc.thePlayer.motionZ - (mc.thePlayer.lastTickPosZ - lastLastTickPosZ)));
-            if (speed < 0.0125) {
+            if (speed < 0.0125 && MoveUtil.isMoving()) {
                 MoveUtil.strafe();
             }
         }
 
-        if (strafe.isToggled() && MoveUtil.isMoving()) {
-            if (fastStrafe.isToggled()) {
-                double attemptAngle = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.direction()));
-                double movementAngle = MathHelper.wrapAngleTo180_double(Math.toDegrees(
-                        Math.atan2(mc.thePlayer.motionZ, mc.thePlayer.motionX)
-                ) - minAngle.getInput());
-
-                if (wrappedDifference(attemptAngle, movementAngle) > minAngle.getInput()) {
-                    MoveUtil.strafe(MoveUtil.speed(), (float) movementAngle - 180);
-                }
-                return;
-            }
-
-            if (canStrafe()) {
-                if (parent.offGroundTicks == 9) {
-                    MoveUtil.strafe(Math.min(0.2, MoveUtil.speed()));
-                    mc.thePlayer.motionY += 0.1;
-                } else {
-                    MoveUtil.strafe(Math.min(0.11, MoveUtil.speed()));
-                }
+        if (strafe.isToggled() && MoveUtil.isMoving()
+                && !fastStrafe.isToggled() && canStrafe()) {
+            if (parent.offGroundTicks == 9) {
+                MoveUtil.strafe(Math.min(0.2, MoveUtil.speed()));
+                mc.thePlayer.motionY += 0.1;
+            } else {
+                MoveUtil.strafe(Math.min(0.11, MoveUtil.speed()));
             }
         }
 

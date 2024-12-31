@@ -5,6 +5,7 @@ import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
+import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
@@ -53,7 +54,7 @@ public class IntaveVelocity extends SubMode<Velocity> {
             if (Math.random() > jumpChance.getInput() / 100) return;
 
             if (mc.thePlayer.onGround && (jumpInInv.isToggled() || mc.currentScreen == null))
-                mc.thePlayer.jump();
+                MoveUtil.jump();
         }
         reduced = false;
     }

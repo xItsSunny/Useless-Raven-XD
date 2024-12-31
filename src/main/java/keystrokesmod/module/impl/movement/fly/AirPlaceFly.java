@@ -6,6 +6,7 @@ import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.BlockUtils;
+import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -23,8 +24,7 @@ public class AirPlaceFly extends SubMode<Fly> {
         SlotHandler.setCurrentSlot(Scaffold.getSlot());
 
         if (mc.thePlayer.onGround) {
-            if (!Utils.jumpDown())
-                mc.thePlayer.jump();
+            MoveUtil.jump();
         } else if (mc.thePlayer.motionY < 0) {
             if (!Utils.jumpDown() && mc.thePlayer.motionY > -0.25) {
                 return;

@@ -88,7 +88,7 @@ public class Module {
                     this.isToggled = false;
                 }
             } catch (Exception e) {
-                Utils.sendMessage("&cFailed to check keybinding. Setting to none");
+                Utils.handleException(e, String.format("checking keyBind for module '%s'", this.getName()));
                 this.keycode = 0;
             }
         }
@@ -114,7 +114,8 @@ public class Module {
             try {
                 Client.EVENT_BUS.register(this);
                 this.onEnable();
-            } catch (Throwable ignored) {
+            } catch (Throwable e) {
+                Utils.handleException(e, String.format("enable module '%s'", this.getName()));
             }
         }
     }
@@ -131,7 +132,8 @@ public class Module {
             try {
                 Client.EVENT_BUS.unregister(this);
                 this.onDisable();
-            } catch (Throwable ignored) {
+            } catch (Throwable e) {
+                Utils.handleException(e, String.format("disable module '%s'", this.getName()));
             }
         }
     }
@@ -203,6 +205,7 @@ public class Module {
         }
     }
 
+    @SuppressWarnings("unused")
     public void unregisterSetting(@NotNull Setting setting) {
         synchronized (settings) {
             this.settings.remove(setting);
@@ -241,7 +244,7 @@ public class Module {
     public void guiUpdate() throws Throwable {
     }
 
-    public void guiButtonToggled(ButtonSetting b) throws Exception {
+    public void guiButtonToggled(ButtonSetting b) {
     }
 
     public void setBind(int keybind) {

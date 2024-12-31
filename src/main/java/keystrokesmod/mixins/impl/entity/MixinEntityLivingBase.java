@@ -2,6 +2,7 @@ package keystrokesmod.mixins.impl.entity;
 
 import com.google.common.collect.Maps;
 import keystrokesmod.Client;
+import keystrokesmod.event.player.DamageEvent;
 import keystrokesmod.event.player.JumpEvent;
 import keystrokesmod.event.player.MoveEvent;
 import keystrokesmod.event.player.PreMoveEvent;
@@ -193,5 +194,15 @@ public abstract class MixinEntityLivingBase extends Entity {
     private double onAbsMotion(double motion) {
         final double absResult = Math.abs(motion);
         return ViaVersionFixHelper.is122() ? absResult + 0.002 : absResult;
+    }
+
+    @Inject(method = "performHurtAnimation", at = @At("HEAD"), cancellable = true)
+    public void onPerformHurtAnimation(CallbackInfo ci) {
+        if ((Object) this instanceof EntityPlayerSP) {
+            DamageEvent event = new DamageEvent();
+            Client.EVENT_BUS.post(event);
+            if (event.isCancelled())
+                ci.cancel();
+        }
     }
 }

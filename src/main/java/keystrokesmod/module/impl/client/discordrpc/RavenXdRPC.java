@@ -8,7 +8,7 @@ import net.arikia.dev.drpc.DiscordRichPresence;
 
 
 public class RavenXdRPC extends SubMode<DiscordRpc> {
-    private final String clientId = "1261607711653629952";
+    private static final String clientId = "1261607711653629952";
     private boolean started;
 
     public RavenXdRPC(String name, DiscordRpc parent) {
@@ -20,7 +20,7 @@ public class RavenXdRPC extends SubMode<DiscordRpc> {
         if (!started) {
             DiscordRPC.discordInitialize(clientId, new DiscordEventHandlers.Builder().setReadyEventHandler(user -> {
                 DiscordRichPresence.Builder presence = new DiscordRichPresence.Builder("");
-                presence.setDetails("Cheating using RavenXD");
+                presence.setDetails("Maybe cheating with RavenXD");
                 presence.setBigImage("logo", "https://github.com/xia-mc/Raven-XD").setStartTimestamps(System.currentTimeMillis());
                 DiscordRPC.discordUpdatePresence(presence.build());
             }).build(), true);

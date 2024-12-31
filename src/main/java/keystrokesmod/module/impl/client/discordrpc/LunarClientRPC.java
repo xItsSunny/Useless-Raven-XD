@@ -22,8 +22,8 @@ public class LunarClientRPC extends SubMode<DiscordRpc> {
     private static final String DEFAULT_SERVER_NAME = "Active in the launcher";
     private static final String DEFAULT_IMAGE = "logo-default";
     private static final String DEFAULT_SMALL_IMAGE = "logo-blue";
-    private final String clientId = "562286213059444737";
-    private final String mappingUrl = "https://servermappings.lunarclientcdn.com/servers.json";
+    private static final String clientId = "562286213059444737";
+    private static final String mappingUrl = "https://servermappings.lunarclientcdn.com/servers.json";
     private final Map<String, ServerData> serverDataMap = new HashMap<>();
     private boolean started;
     private String serverName;
@@ -53,7 +53,7 @@ public class LunarClientRPC extends SubMode<DiscordRpc> {
                 try {
                     fetchServerMappings();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Utils.handleException(e);
                 }
             }
             if (Utils.nullCheck()) {

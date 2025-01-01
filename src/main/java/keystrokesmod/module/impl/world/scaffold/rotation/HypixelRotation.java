@@ -26,13 +26,13 @@ public class HypixelRotation extends IScaffoldRotation {
 
     private float applyStrafe(float yaw) {
         if (parent.isDiagonal()) {
-            return yaw - 70;
+            return yaw - 75;
         } else {
             double offsetToMid = EnumFacing.fromAngle(yaw).getAxis() == EnumFacing.Axis.X ? Math.abs(mc.thePlayer.posZ % 1) : Math.abs(mc.thePlayer.posX % 1);
             if (offsetToMid > 0.6 || offsetToMid < 0.4 || lastOffsetToMid == -1) {
                 lastOffsetToMid = offsetToMid;
             }
-            return yaw + (float) (lastOffsetToMid >= 0.5 ? 70 : -70);
+            return yaw + (float) (lastOffsetToMid >= 0.5 ? 75 : -75);
         }
     }
 }

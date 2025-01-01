@@ -1,8 +1,6 @@
 package keystrokesmod.utility.movement;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import keystrokesmod.Client;
-import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.script.classes.Vec3;
@@ -19,26 +17,18 @@ import net.minecraft.util.MovingObjectPosition;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static keystrokesmod.Client.mc;
 
 public class TrajectoriesEngine {
     @Getter
     private final List<Vec3> predictPoses = new ObjectArrayList<>(64);
-    private final List<Vec3> cachePoses = new ObjectArrayList<>(64);
     @Getter
     private MovingObjectPosition target = null;
     private double posX, posY, posZ, motionX, motionY, motionZ;
     private boolean isArrow;
 
-    private boolean working = false;
-    private final Lock lock = new ReentrantLock();
-
     public void requestUpdate() {
-        if (working) return;
-
         ItemStack heldItem = SlotHandler.getHeldItem();
         if (heldItem == null) return;
         isArrow = heldItem.getItem() instanceof ItemBow;
@@ -74,15 +64,13 @@ public class TrajectoriesEngine {
         motionY *= (double) (isArrow ? f10 * 2.0f : 1.0f) * 1.5;
         motionZ *= (double) (isArrow ? f10 * 2.0f : 1.0f) * 1.5;
 
-        working = true;
-        Client.getExecutor().execute(this::predict);
+        predict();
     }
 
     private void predict() {
         boolean ground = false;
 
-        cachePoses.clear();
-        MovingObjectPosition newTarget = null;
+        predictPoses.clear();
         for (int k = 0; k <= 100 && !ground; ++k) {
             var start = new net.minecraft.util.Vec3(posX, posY, posZ);
             var predicted = new net.minecraft.util.Vec3(
@@ -92,11 +80,11 @@ public class TrajectoriesEngine {
                     false, true, false);
             if (rayTraced != null) {
                 ground = true;
-                newTarget = rayTraced;
+                target = rayTraced;
             } else {
                 MovingObjectPosition entityHit = getEntityHit(start, predicted);
                 if (entityHit != null) {
-                    newTarget = entityHit;
+                    target = entityHit;
                     ground = true;
                 }
             }
@@ -105,16 +93,8 @@ public class TrajectoriesEngine {
             double x = (posX += (motionX *= f14)) - mc.getRenderManager().viewerPosX;
             double y = (posY += (motionY -= isArrow ? 0.05 : 0.03)) - mc.getRenderManager().viewerPosY;
             double z = (posZ += (motionZ *= f14)) - mc.getRenderManager().viewerPosZ;
-            cachePoses.add(new Vec3(x, y, z));
+            predictPoses.add(new Vec3(x, y, z));
         }
-
-        lock.lock();
-        target = newTarget;
-        predictPoses.clear();
-        predictPoses.addAll(cachePoses);
-        lock.unlock();
-
-        working = false;
     }
 
     private static @Nullable MovingObjectPosition getEntityHit(
@@ -138,11 +118,4 @@ public class TrajectoriesEngine {
         return null;
     }
 
-    public void begin() {
-        lock.lock();
-    }
-
-    public void end() {
-        lock.unlock();
-    }
 }

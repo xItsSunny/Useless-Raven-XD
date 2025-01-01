@@ -365,4 +365,26 @@ public class MoveUtil {
             noJump = false;
         }
     }
+
+    public static double getMoveForward() {
+        double result = 0;
+        if (mc.gameSettings.keyBindForward.isKeyDown()) {
+            result++;
+        }
+        if (mc.gameSettings.keyBindBack.isKeyDown()) {
+            result--;
+        }
+        return result;
+    }
+
+    public static double getMoveStrafe() {
+        double result = 0;
+        if (mc.gameSettings.keyBindLeft.isKeyDown()) {
+            result++;
+        }
+        if (mc.gameSettings.keyBindRight.isKeyDown()) {
+            result--;
+        }
+        return result;
+    }
 }

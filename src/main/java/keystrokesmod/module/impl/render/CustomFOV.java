@@ -1,12 +1,12 @@
 package keystrokesmod.module.impl.render;
 
 
+import keystrokesmod.event.render.FOVUpdateEvent;
 import keystrokesmod.event.world.WorldChangeEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.eventbus.annotations.EventListener;
-import net.minecraftforge.client.event.FOVUpdateEvent;
 
 
 public class CustomFOV extends Module {
@@ -49,12 +49,5 @@ public class CustomFOV extends Module {
     public static float getDesiredFOV() {
         return (float) setFOV.getInput();
     }
-
-
-
-
-
-
-
 
 }

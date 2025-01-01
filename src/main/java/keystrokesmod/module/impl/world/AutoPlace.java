@@ -2,6 +2,7 @@ package keystrokesmod.module.impl.world;
 
 import keystrokesmod.event.player.PostUpdateEvent;
 import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.render.DrawBlockHighlightEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -19,7 +20,6 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
-import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import keystrokesmod.eventbus.annotations.EventListener;
 import org.lwjgl.input.Mouse;
 

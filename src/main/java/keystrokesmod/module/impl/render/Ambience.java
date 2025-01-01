@@ -3,13 +3,11 @@ package keystrokesmod.module.impl.render;
 import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
-import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.server.S03PacketTimeUpdate;
 import net.minecraft.network.play.server.S2BPacketChangeGameState;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
 import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
@@ -18,10 +16,6 @@ public class Ambience extends Module {
     private final SliderSetting time;
     private final SliderSetting speed;
     private final ModeSetting weather;
-    private final ButtonSetting fogColor;
-    private final SliderSetting fogColorRed;
-    private final SliderSetting fogColorGreen;
-    private final SliderSetting fogColorBlue;
 
     public Ambience() {
         super("Ambience", category.render);
@@ -30,11 +24,6 @@ public class Ambience extends Module {
 
         String[] MODES = new String[]{"Unchanged", "Clear", "Rain"};
         this.registerSetting(weather = new ModeSetting("Weather", MODES, 0));
-
-        this.registerSetting(fogColor = new ButtonSetting("Fog color", false));
-        this.registerSetting(fogColorRed = new SliderSetting("Fog color red", 100, 0, 255, 1, fogColor::isToggled));
-        this.registerSetting(fogColorGreen = new SliderSetting("Fog color green", 100, 0, 255, 1, fogColor::isToggled));
-        this.registerSetting(fogColorBlue = new SliderSetting("Fog color blue", 100, 0, 255, 1, fogColor::isToggled));
     }
 
     @Override
@@ -90,14 +79,5 @@ public class Ambience extends Module {
     public void onRenderTick(Render2DEvent event) {
         if (!Utils.nullCheck()) return;
         mc.theWorld.setWorldTime((long) (time.getInput() + (System.currentTimeMillis() * speed.getInput())));
-    }
-
-    @EventListener
-    public void onFogColors(EntityViewRenderEvent.@NotNull FogColors event) {
-        if (!fogColor.isToggled()) return;
-
-        event.red = (float) fogColorRed.getInput();
-        event.green = (float) fogColorGreen.getInput();
-        event.blue = (float) fogColorBlue.getInput();
     }
 }

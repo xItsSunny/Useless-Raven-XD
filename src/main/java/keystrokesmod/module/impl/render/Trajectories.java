@@ -4,22 +4,16 @@ import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.event.render.Render3DEvent;
 import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
-import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.movement.TrajectoriesEngine;
 import keystrokesmod.utility.render.RenderUtils;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
-import java.util.List;
 
 public class Trajectories extends Module {
     private static final int HIGHLIGHT_COLOR = new Color(234, 38, 38).getRGB();
@@ -85,14 +79,12 @@ public class Trajectories extends Module {
             GL11.glEnable(3042);
         }
 
-        engine.begin();
         MovingObjectPosition target = engine.getTarget();
         Vec3 vec3 = Utils.getEyePos();
         for (Vec3 predictPose : engine.getPredictPoses()) {
             vec3 = predictPose;
             GL11.glVertex3d(vec3.x, vec3.y, vec3.z);
         }
-        engine.end();
 
         // 落点
         double posX = vec3.x;

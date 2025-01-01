@@ -10,7 +10,6 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.event.GuiOpenEvent;
 import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
@@ -36,6 +35,8 @@ public class SafeWalk extends Module {
 
     public static boolean canSafeWalk() {
         if (ModuleManager.safeWalk != null && ModuleManager.safeWalk.isEnabled()) {
+            if (mc.currentScreen != null)
+                return false;
             if (disableOnForward.isToggled() && Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode())) {
                 return false;
             }
@@ -90,13 +91,6 @@ public class SafeWalk extends Module {
         }
         if (this.isSneaking && mc.thePlayer.capabilities.isFlying) {
             this.setSneakState(false);
-        }
-    }
-
-    @EventListener
-    public void onGuiOpen(final GuiOpenEvent guiOpenEvent) {
-        if (shift.isToggled() && guiOpenEvent.gui == null) {
-            this.isSneaking = mc.thePlayer.isSneaking();
         }
     }
 

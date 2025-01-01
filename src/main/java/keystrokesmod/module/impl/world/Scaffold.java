@@ -833,8 +833,9 @@ public class Scaffold extends IAutoClicker {
 
     public float getYaw() {
         float yaw = 180.0f;
-        double moveForward = mc.thePlayer.moveForward;
-        double moveStrafe = mc.thePlayer.moveStrafing;
+        double moveForward = MoveUtil.getMoveForward();
+        double moveStrafe = MoveUtil.getMoveStrafe();
+
         if (rotateWithMovement.isToggled()) {
             if (moveForward > 0.0) {
                 if (moveStrafe > 0.0) {

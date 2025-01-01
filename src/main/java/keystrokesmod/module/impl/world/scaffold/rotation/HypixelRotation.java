@@ -60,10 +60,12 @@ public class HypixelRotation extends IScaffoldRotation {
     private static float moveToNearest(float value, float deltaLeft, float deltaRight, float left, float right) {
         if (deltaLeft < deltaRight) {
             // move to left
-            return AimSimulator.rotMove(left, value, 180, AimSimulator.getGCD(), 180);
+            return left;
+//            return AimSimulator.rotMove(left, value, 180, AimSimulator.getGCD(), 180);
         } else {
             // move to right
-            return AimSimulator.rotMove(right, value, 180, AimSimulator.getGCD(), 180);
+            return right;
+//            return AimSimulator.rotMove(right, value, 180, AimSimulator.getGCD(), 180);
         }
     }
 }

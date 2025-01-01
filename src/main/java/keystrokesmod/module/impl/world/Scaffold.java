@@ -383,7 +383,7 @@ public class Scaffold extends IAutoClicker {
                 if (offsetToMid > 0.6 || offsetToMid < 0.4 || lastOffsetToMid == -1) {
                     lastOffsetToMid = offsetToMid;
                 }
-                yaw += (float) (lastOffsetToMid >= 0.5 ? strafe.getInput() : -strafe.getInput());
+                yaw += lastOffsetToMid >= 0.5 ? strafeVal : -strafeVal;
             }
         }
         return yaw;

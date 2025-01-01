@@ -413,11 +413,7 @@ public class ContainerUtils {
     }
 
     public static int getProtection(final @NotNull ItemStack itemStack) {
-        return ((ItemArmor)itemStack.getItem()).damageReduceAmount + EnchantmentHelper.getEnchantmentModifierDamage(new ItemStack[] { itemStack }, DamageSource.generic);
-    }
-
-    public static void click(int slot) {
-        mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, slot, 0, 1, mc.thePlayer);
+        return ((ItemArmor) itemStack.getItem()).damageReduceAmount + EnchantmentHelper.getEnchantmentModifierDamage(new ItemStack[]{itemStack}, DamageSource.generic);
     }
 
     public static boolean sort(int bestSlot, int desiredSlot) {

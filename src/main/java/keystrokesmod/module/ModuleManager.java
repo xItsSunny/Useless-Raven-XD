@@ -115,7 +115,6 @@ public class ModuleManager {
     public static ChestAura chestAura;
     public static AutoRod autoRod;
     public static ClientTheme clientTheme;
-    public static AutoChest autoChest;
     public static Teleport teleport;
     public static AntiFalseFlag antiFalseFlag;
     public static ViaVersionFix viaVersionFix;
@@ -245,7 +244,6 @@ public class ModuleManager {
         this.addModule(fakePotion = new FakePotion());
         this.addModule(autoWeb = new AutoWeb());
         this.addModule(chestAura = new ChestAura());
-        this.addModule(autoChest = new AutoChest());
         this.addModule(selfDamage = new SelfDamage());
 
         // render

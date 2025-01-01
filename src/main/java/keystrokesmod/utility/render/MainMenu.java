@@ -127,14 +127,14 @@ public final class MainMenu {
             RenderUtils.drawBloomShadow(
                     buttonStartX - BOX_SPILT + 1, buttonStartY - BOX_SPILT + 1,
                     BUTTON_WIDTH + BOX_SPILT * 2 - 2, BUTTON_HEIGHT * 4 + BUTTON_SPILT * 3 + BOX_SPILT * 2 - 2,
-                    0, BUTTON_SPILT, BUTTON_BOX_COLOR.getRGB(), false
+                    0, BOX_SPILT, BUTTON_BOX_COLOR.getRGB(), false
             );
             GaussianBlur.endBlur(10, 1);
         }
         RRectUtils.drawRoundOutline(
                 buttonStartX - BOX_SPILT, buttonStartY - BOX_SPILT,
                 BUTTON_WIDTH + BOX_SPILT * 2, BUTTON_HEIGHT * 4 + BUTTON_SPILT * 3 + BOX_SPILT * 2,
-                BUTTON_SPILT, 0.002f, BUTTON_BOX_COLOR, BUTTON_BOX_OUTLINE_COLOR
+                BOX_SPILT, 0.002f, BUTTON_BOX_COLOR, BUTTON_BOX_OUTLINE_COLOR
         );
 
         final String moduleMsg = Client.moduleCounter + " modules and " + Client.settingCounter + " settings loaded!";
@@ -157,13 +157,13 @@ public final class MainMenu {
         RenderUtils.drawBloomShadow(
                 4F, (float) (clientMsgY + GENERAL_FONT_HEIGHT + 4),
                 (float) CHANGELOG_BOX_WIDTH, (float) CHANGELOG_BOX_HEIGHT,
-                0, BUTTON_SPILT, changeLogBoxColor.getRGB(),
+                0, BOX_SPILT, changeLogBoxColor.getRGB(),
                 false
         );
         RRectUtils.drawRoundOutline(
                 4F, (float) (clientMsgY + GENERAL_FONT_HEIGHT + 4),
                 (float) CHANGELOG_BOX_WIDTH, (float) CHANGELOG_BOX_HEIGHT,
-                BUTTON_SPILT, 0.002f,
+                BOX_SPILT, 0.002f,
                 changeLogBoxColor, changeLogBoxOutlineColor
         );
 

@@ -145,7 +145,7 @@ public class ChestStealer extends Module {
             if (stole.contains(i)) continue;
             ItemStack stack = chest.getStackInSlot(i);
             if (stack == null || stack.getItem() instanceof ItemEmptyMap) continue;
-            if (ignoreTrash.isToggled() && ContainerUtils.canDrop(stack, -1, mc.thePlayer.inventory)) continue;
+            if (ignoreTrash.isToggled() && !ContainerUtils.useful(stack)) continue;
             items.add(i);
         }
 

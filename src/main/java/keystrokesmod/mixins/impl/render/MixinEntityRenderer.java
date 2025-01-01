@@ -1,7 +1,6 @@
 package keystrokesmod.mixins.impl.render;
 
 import keystrokesmod.Client;
-import keystrokesmod.event.render.PreOrientCameraEvent;
 import keystrokesmod.event.render.Render2DEvent;
 import keystrokesmod.event.render.Render3DEvent;
 import keystrokesmod.module.ModuleManager;
@@ -22,7 +21,6 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -66,13 +64,6 @@ public abstract class MixinEntityRenderer {
             GlStateManager.rotate(-f * (ModuleManager.noHurtCam.isEnabled() ? (float) ModuleManager.noHurtCam.multiplier.getInput() : 14.0F), 0.0F, 0.0F, 1.0F);
             GlStateManager.rotate(f2, 0.0F, 1.0F, 0.0F);
         }
-    }
-
-    @ModifyVariable(method = "orientCamera", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    public float modifySmooth(float smooth) {
-        PreOrientCameraEvent event = new PreOrientCameraEvent(smooth);
-        Client.EVENT_BUS.post(event);
-        return event.getSmooth();
     }
 
     @Inject(method = "orientCamera", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Vec3;distanceTo(Lnet/minecraft/util/Vec3;)D"), cancellable = true)

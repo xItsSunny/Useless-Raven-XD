@@ -30,7 +30,7 @@ Raven B4, but not only for Hypixel.
 ### Steps:
 
 1. **Download the latest .jar file from the releases**:
-   - Download from [https://github.com/xia-mc/Raven-XD/releases](https://github.com/xia-mc/Raven-XD/releases)
+   - Download from [https://github.com/xItsSunny/Useless-Raven-XD/releases](https://github.com/xia-mc/Raven-XD/releases)
    - This client requires Forge 1.8.9.
 
 2. **Put in mods folder of your .minecraft directory**:
@@ -62,7 +62,7 @@ Raven B4, but not only for Hypixel.
 4. **Clone the Repository**:
    - Run the following commands in the terminal or command prompt:
      ```bash
-     git clone --recursive https://github.com/xia-mc/Raven-XD.git
+     git clone --recursive https://github.com/xItsSunny/Useless-Raven-XD.git
      cd Raven-XD
      ```
 
@@ -82,8 +82,6 @@ Raven B4, but not only for Hypixel.
 Feel free to raise an issue or submit a pull request.
 
 If you want to co-develop this project with me, please contact me.
-
-You can also support us on [Patreon](https://www.patreon.com/xia__mc)!
 
 <div align="center">
 

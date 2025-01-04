@@ -18,7 +18,7 @@ Raven B4, but for those who can't afford it.
 
 Raven B4, but not only for Hypixel.
 
-<a href="https://dsc.gg/ravenxd"><img src="https://invidget.switchblade.xyz/zSgDKArSH4" alt="https://dsc.gg/ravenxd"/></a><br>
+<a href="https://dsc.gg/useless-ravenxd"><img src="https://invidget.switchblade.xyz/zSgDKArSH4" alt="https://dsc.gg/ravenxd"/></a><br>
 [QQ Group (645021103)](https://qm.qq.com/q/vv0xPdfc6A)
 
 ![2024-08-13_10 14 36](https://github.com/user-attachments/assets/36e8920e-336e-4b62-ae3f-6b9962920812)

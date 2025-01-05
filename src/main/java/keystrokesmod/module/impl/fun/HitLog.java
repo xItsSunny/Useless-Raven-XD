@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.fun;
 
-import keystrokesmod.Raven;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -14,7 +14,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
@@ -36,7 +36,7 @@ public class HitLog extends Module {
         if (System.currentTimeMillis() - lastAttack < coolDown.getInput()) return;
         lastAttack = System.currentTimeMillis();
 
-        Raven.getExecutor().schedule(() -> {
+        Client.getExecutor().schedule(() -> {
             HitPos hitPos = HitPos.fromY(predHitPos.y(), target);
 
             if (target.hurtTime == 0) {
@@ -72,7 +72,7 @@ public class HitLog extends Module {
         }, predTicks * 50L, TimeUnit.MILLISECONDS);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
             lastS08 = System.currentTimeMillis();

@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.movement;
 
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.speed.*;
@@ -11,8 +11,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class Speed extends Module {
@@ -53,7 +52,7 @@ public class Speed extends Module {
         mode.enable();
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onPreUpdate(PreUpdateEvent event) {
         if (mc.thePlayer.onGround) {
             offGroundTicks = 0;
@@ -65,7 +64,7 @@ public class Speed extends Module {
             disableTicks--;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
             disableTicks += (int) (tempDisableOnFlag.getInput() * 20);

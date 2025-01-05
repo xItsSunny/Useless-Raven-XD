@@ -1,9 +1,10 @@
 package keystrokesmod.module.impl.movement.phase;
 
-import keystrokesmod.event.BlockAABBEvent;
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.ReceivePacketEvent;
-import keystrokesmod.event.WorldChangeEvent;
+import keystrokesmod.event.world.BlockAABBEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
+import keystrokesmod.event.world.WorldChangeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.impl.movement.Phase;
 import keystrokesmod.module.impl.player.blink.NormalBlink;
 import keystrokesmod.module.setting.impl.SubMode;
@@ -12,7 +13,6 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.block.BlockGlass;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S02PacketChat;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class WatchdogAutoPhase extends SubMode<Phase> {
@@ -24,23 +24,23 @@ public class WatchdogAutoPhase extends SubMode<Phase> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (phase && !stopWatch.hasFinished())
             blink.enable();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onBlockAABBEvent(BlockAABBEvent event) {
         if (phase && event.getBlock() instanceof BlockGlass) event.setBoundingBox(null);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onWorldChange(WorldChangeEvent event) {
         onDisable();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPacketReceiveEvent(@NotNull ReceivePacketEvent event) {
         Packet<?> packet = event.getPacket();
 

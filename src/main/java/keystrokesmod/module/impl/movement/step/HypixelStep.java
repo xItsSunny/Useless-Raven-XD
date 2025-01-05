@@ -1,8 +1,9 @@
 package keystrokesmod.module.impl.movement.step;
 
 import it.unimi.dsi.fastutil.doubles.DoubleList;
-import keystrokesmod.event.PreTickEvent;
-import keystrokesmod.event.StepEvent;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.StepEvent;
 import keystrokesmod.module.impl.movement.Step;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
@@ -14,7 +15,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class HypixelStep extends SubMode<Step> {
@@ -38,9 +39,9 @@ public class HypixelStep extends SubMode<Step> {
         Utils.resetTimer();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onStep(@NotNull StepEvent event) {
-        if (event.getHeight() == 1 && mc.thePlayer.onGround && !Utils.inLiquid()) {
+        if (event.getHeight() > 0.6 && mc.thePlayer.onGround && !Utils.inLiquid()) {
             Block block = BlockUtils.getBlock(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
             if (block instanceof BlockStairs || block instanceof BlockSlab) return;
 
@@ -60,13 +61,22 @@ public class HypixelStep extends SubMode<Step> {
         }
     }
 
-    @SubscribeEvent
-    public void onPreTick(PreTickEvent event) {
+    @EventListener
+    public void onPreUpdate(PreUpdateEvent event) {
         if (stepped) {
             Utils.resetTimer();
             stepped = false;
         }
-        if (System.currentTimeMillis() - lastStep > delay.getInput())
+        if (System.currentTimeMillis() - lastStep > delay.getInput() && mc.thePlayer.onGround)
             mc.thePlayer.stepHeight = 1;
+        else
+            mc.thePlayer.stepHeight = 0.6f;
+    }
+
+    @EventListener
+    public void onMoveInput(MoveInputEvent event) {
+        if (stepped || System.currentTimeMillis() - lastStep < 200) {
+            event.setJump(false);
+        }
     }
 }

@@ -1,16 +1,17 @@
 package keystrokesmod.module.impl.combat.velocity;
 
-import keystrokesmod.Raven;
-import keystrokesmod.event.PostVelocityEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.player.PostVelocityEvent;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.module.setting.utils.ModeOnly;
+import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import net.minecraft.potion.Potion;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 import java.util.concurrent.TimeUnit;
 
@@ -41,7 +42,7 @@ public class LegitVelocity extends SubMode<Velocity> {
         Utils.correctValue(minDelay, maxDelay);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPostVelocity(PostVelocityEvent event) {
         if (Utils.nullCheck() || mc.thePlayer.maxHurtTime <= 0)
             return;
@@ -54,16 +55,16 @@ public class LegitVelocity extends SubMode<Velocity> {
             case 0:
                 long delay = (long) (Math.random() * (maxDelay.getInput() - minDelay.getInput()) + minDelay.getInput());
                 if (delay == 0 || maxDelay.getInput() == 0) {
-                    if (canJump()) mc.thePlayer.jump();
+                    if (canJump()) MoveUtil.jump();
                 } else {
-                    Raven.getExecutor().schedule(() -> {
-                        if (canJump()) mc.thePlayer.jump();
+                    Client.getExecutor().schedule(() -> {
+                        if (canJump()) MoveUtil.jump();
                     }, delay, TimeUnit.MILLISECONDS);
                 }
                 break;
             case 1:
                 if (chance.getInput() == 100 || Math.random() * 100 <= chance.getInput()) {
-                    if (canJump()) mc.thePlayer.jump();
+                    if (canJump()) MoveUtil.jump();
                 }
                 break;
         }

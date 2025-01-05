@@ -1,13 +1,13 @@
 package keystrokesmod.module.impl.other;
 
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.play.server.S02PacketChat;
 import net.minecraft.util.ChatComponentText;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -33,7 +33,7 @@ public class ScreenshotHelper extends Module {
         this.registerSetting(delay = new SliderSetting("Delay", 0.25, 0.1, 3, 0.05, "s"));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceive(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S02PacketChat) {
             S02PacketChat packet = (S02PacketChat) event.getPacket();

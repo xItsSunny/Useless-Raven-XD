@@ -1,12 +1,12 @@
 package keystrokesmod.module.impl.movement.noweb;
 
-import keystrokesmod.event.BlockAABBEvent;
+import keystrokesmod.event.world.BlockAABBEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.impl.movement.NoWeb;
 import keystrokesmod.module.setting.impl.SubMode;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class VulcanNoWeb extends SubMode<NoWeb> {
@@ -14,7 +14,7 @@ public class VulcanNoWeb extends SubMode<NoWeb> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onAABB(@NotNull BlockAABBEvent event) {
         if (event.getBlock() == Blocks.web) {
             BlockPos pos = event.getBlockPos();

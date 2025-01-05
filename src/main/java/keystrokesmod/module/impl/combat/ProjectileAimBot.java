@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.LowCPSAutoClicker;
@@ -12,7 +12,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 public class ProjectileAimBot extends IAutoClicker {
     private final ModeValue clickMode;
@@ -44,7 +44,7 @@ public class ProjectileAimBot extends IAutoClicker {
         clickMode.disable();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         Vec3 eyePos = Utils.getEyePos();
         if (KillAura.target != null && !ModuleManager.killAura.isAttack()

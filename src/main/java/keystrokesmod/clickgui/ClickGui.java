@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.clickgui.components.IComponent;
 import keystrokesmod.clickgui.components.impl.BindComponent;
@@ -85,7 +85,7 @@ public class ClickGui extends GuiScreen {
 
     public void initMain() {
         (this.aT = this.aE = this.aR = new Timer(500.0F)).start();
-        this.sf = Raven.getExecutor().schedule(() -> (this.aL = new Timer(650.0F)).start(), 650L, TimeUnit.MILLISECONDS);
+        this.sf = Client.getExecutor().schedule(() -> (this.aL = new Timer(650.0F)).start(), 650L, TimeUnit.MILLISECONDS);
     }
 
     public void initGui() {

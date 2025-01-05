@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.movement.noslow;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.movement.NoSlow;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.utility.ContainerUtils;
@@ -13,7 +13,7 @@ import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class IntaveNoSlow extends INoSlow {
@@ -23,7 +23,7 @@ public class IntaveNoSlow extends INoSlow {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (!mc.thePlayer.isUsingItem() || SlotHandler.getHeldItem() == null) {
             lastUsingItem = false;

@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.other.anticheats.checks.combat;
 
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.impl.other.Anticheat;
 import keystrokesmod.module.impl.other.anticheats.Check;
 import keystrokesmod.module.impl.other.anticheats.TRPlayer;
@@ -9,10 +9,10 @@ import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.server.S0BPacketAnimation;
 import net.minecraft.network.play.server.S14PacketEntity;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
 public class AutoBlockA extends Check {
     private boolean needToCheck = false;
@@ -21,7 +21,7 @@ public class AutoBlockA extends Check {
         super("AutoBlockA", player);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S0BPacketAnimation) {
             if (((S0BPacketAnimation) event.getPacket()).getEntityID() == player.fabricPlayer.getEntityId()) {
@@ -49,6 +49,6 @@ public class AutoBlockA extends Check {
 
     @Override
     public boolean isDisabled() {
-        return !Anticheat.getCombatCheck().isToggled() || !Anticheat.getCombatCheckAutoBlockA().isToggled();
+        return !Anticheat.getCombatCheck().isToggled();
     }
 }

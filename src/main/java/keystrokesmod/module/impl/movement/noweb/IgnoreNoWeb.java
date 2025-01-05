@@ -1,9 +1,9 @@
 package keystrokesmod.module.impl.movement.noweb;
 
-import keystrokesmod.event.BlockWebEvent;
+import keystrokesmod.event.world.BlockWebEvent;
 import keystrokesmod.module.impl.movement.NoWeb;
 import keystrokesmod.module.setting.impl.SubMode;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class IgnoreNoWeb extends SubMode<NoWeb> {
@@ -11,8 +11,8 @@ public class IgnoreNoWeb extends SubMode<NoWeb> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onBlockWeb(@NotNull BlockWebEvent event) {
-        event.setCanceled(true);
+        event.cancel();
     }
 }

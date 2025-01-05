@@ -1,8 +1,10 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.event.PreTickEvent;
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.client.PreTickEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.mixins.impl.network.S14PacketEntityAccessor;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -17,9 +19,7 @@ import keystrokesmod.utility.render.Easing;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.*;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.network.AttackEntityEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -86,7 +86,7 @@ public class Backtrack extends Module {
         releaseAll();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent e) {
         try {
             final double distance = vec3.distanceTo(mc.thePlayer);
@@ -100,7 +100,7 @@ public class Backtrack extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreTick(PreTickEvent e) {
         while (!packetQueue.isEmpty()) {
             try {
@@ -120,8 +120,8 @@ public class Backtrack extends Module {
         }
     }
 
-    @SubscribeEvent
-    public void onRender(RenderWorldLastEvent e) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (target == null || vec3 == null || target.isDead)
             return;
 
@@ -145,14 +145,14 @@ public class Backtrack extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onAttack(@NotNull AttackEntityEvent e) {
-        final Vec3 targetPos = new Vec3(e.target);
-        if (e.target instanceof EntityPlayer) {
-            if (target == null || e.target != target) {
+        final Vec3 targetPos = new Vec3(e.getTarget());
+        if (e.getTarget() instanceof EntityPlayer) {
+            if (target == null || e.getTarget() != target) {
                 vec3 = targetPos;
                 if (animationX != null && animationY != null && animationZ != null) {
-                    long duration = target == null ? 0 : Math.min(500, Math.max(100, (long) new Vec3(e.target).distanceTo(target) * 50));
+                    long duration = target == null ? 0 : Math.min(500, Math.max(100, (long) new Vec3(e.getTarget()).distanceTo(target) * 50));
                     animationX.setDuration(duration);
                     animationY.setDuration(duration);
                     animationZ.setDuration(duration);
@@ -162,7 +162,7 @@ public class Backtrack extends Module {
                 animationY.setDuration(100);
                 animationZ.setDuration(100);
             }
-            target = (EntityPlayer) e.target;
+            target = (EntityPlayer) e.getTarget();
 
             try {
                 final double distance = targetPos.distanceTo(mc.thePlayer);
@@ -176,7 +176,7 @@ public class Backtrack extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent e) {
         if (!Utils.nullCheck()) return;
         Packet<?> p = e.getPacket();
@@ -205,7 +205,7 @@ public class Backtrack extends Module {
                 return;
             }
 
-            if (e.isCanceled())
+            if (e.isCancelled())
                 return;
 
             if (p instanceof S19PacketEntityStatus
@@ -245,7 +245,7 @@ public class Backtrack extends Module {
             }
 
             packetQueue.add(new TimedPacket(p));
-            e.setCanceled(true);
+            e.cancel();
         } catch (NullPointerException ignored) {
 
         }

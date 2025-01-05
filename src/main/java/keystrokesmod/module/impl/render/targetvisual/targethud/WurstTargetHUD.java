@@ -36,8 +36,8 @@ public class WurstTargetHUD extends SubMode<TargetHUD> implements ITargetVisual 
     public void render(@NotNull EntityLivingBase target) {
         String name = target.getDisplayName().getFormattedText();
 
-        double x = TargetHUD.current$minX;
-        double y = TargetHUD.current$minY;
+        double x = TargetHUD.minX;
+        double y = TargetHUD.minY;
 
         RenderUtils.drawRect(x, y, x + 185, y + 34, new Color(255, 255, 255, 100).getRGB());
         getFont().drawString("Name: " + name, x + 4, y + 4, Color.BLACK.getRGB());

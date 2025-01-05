@@ -1,8 +1,7 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.event.ClickEvent;
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.mixins.impl.client.MinecraftAccessor;
+import keystrokesmod.event.client.ClickEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.mixins.impl.client.PlayerControllerMPAccessor;
 import keystrokesmod.module.impl.combat.autoclicker.DragClickAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
@@ -16,7 +15,7 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 public class AutoClicker extends IAutoClicker {
     private final ModeValue mode;
@@ -54,7 +53,7 @@ public class AutoClicker extends IAutoClicker {
         mode.disable();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onClick(ClickEvent event) {
         coolDown.start();
 
@@ -97,7 +96,7 @@ public class AutoClicker extends IAutoClicker {
         return false;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (mc.currentScreen instanceof GuiContainer) {
             if (inventoryClick) {

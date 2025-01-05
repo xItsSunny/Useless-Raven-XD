@@ -1,7 +1,8 @@
 package keystrokesmod.module.impl.other;
 
-import keystrokesmod.event.ReceivePacketEvent;
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.client.PreTickEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.utility.Utils;
@@ -10,8 +11,7 @@ import net.minecraft.event.HoverEvent;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.*;
 import net.minecraft.util.*;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 public class ViewPackets extends Module {
     private final ButtonSetting includeCancelled;
@@ -22,7 +22,7 @@ public class ViewPackets extends Module {
     private final ButtonSetting compactC03;
     private final ButtonSetting ignoreC0F;
     private final ButtonSetting received;
-    private Packet packet;
+    private Packet<?> packet;
     private long tick;
 
     public ViewPackets() {
@@ -63,7 +63,7 @@ public class ViewPackets extends Module {
         mc.thePlayer.addChatMessage(chatComponentText);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(SendPacketEvent e) {
         if (!sent.isToggled()) {
             return;
@@ -71,7 +71,7 @@ public class ViewPackets extends Module {
         if (singlePlayer.isToggled() && mc.isSingleplayer() && e.getPacket().getClass().getSimpleName().charAt(0) == 'S') {
             return;
         }
-        if (e.isCanceled() && !includeCancelled.isToggled()) {
+        if (e.isCancelled() && !includeCancelled.isToggled()) {
             return;
         }
         if (ignoreC00.isToggled() && e.getPacket() instanceof C00PacketKeepAlive) {
@@ -86,7 +86,7 @@ public class ViewPackets extends Module {
         sendMessage(packet = e.getPacket(), false);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(ReceivePacketEvent e) {
         if (!received.isToggled()) {
             return;
@@ -148,10 +148,8 @@ public class ViewPackets extends Module {
         return s + "\n&7Client tick: &e" + tick;
     }
 
-    @SubscribeEvent
-    public void onTick(TickEvent.ClientTickEvent e) {
-        if (e.phase == TickEvent.Phase.START) {
-            ++tick;
-        }
+    @EventListener
+    public void onTick(PreTickEvent e) {
+        ++tick;
     }
 }

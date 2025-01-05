@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.movement.noslow;
 
-import keystrokesmod.event.*;
+import keystrokesmod.event.network.SendPacketEvent;
+import keystrokesmod.event.player.*;
 import keystrokesmod.module.impl.movement.NoSlow;
-import keystrokesmod.module.impl.movement.Sprint;
 import keystrokesmod.module.impl.movement.noslow.customnoslow.SimpleCustomNoSlow;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -13,8 +13,7 @@ import keystrokesmod.utility.ContainerUtils;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import net.minecraft.item.ItemBow;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +44,7 @@ public class CustomNoSlow extends INoSlow {
         this.registerSetting(rest = new ModeValue("Rest", this, () -> false).add(new SimpleCustomNoSlow("Rest", this)));
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onPreUpdate(PreUpdateEvent event) {
         if (noAction()) return;
         SimpleCustomNoSlow noSlow = getNoSlow();
@@ -53,7 +52,7 @@ public class CustomNoSlow extends INoSlow {
             noSlow.onPreUpdate(event);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onPostUpdate(PostUpdateEvent event) {
         if (noAction()) return;
         SimpleCustomNoSlow noSlow = getNoSlow();
@@ -61,20 +60,14 @@ public class CustomNoSlow extends INoSlow {
             noSlow.onPostUpdate(event);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onPreMotion(PreMotionEvent event) {
         if (mc.thePlayer.isUsingItem()) {
             usingTicks++;
 
             if (mode.getInput() == 1 || mode.getInput() == 3)
                 event.setSprinting(false);
-            if (mode.getInput() == 2 || mode.getInput() == 3)
-                Sprint.omni = true;
         } else {
-            if (usingTicks > 0) {
-                Sprint.omni = false;
-            }
-
             usingTicks = 0;
         }
 
@@ -84,7 +77,13 @@ public class CustomNoSlow extends INoSlow {
             noSlow.onPreMotion(event);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
+    public void onSprint(SprintEvent event) {
+        if (mode.getInput() == 2 || mode.getInput() == 3)
+            event.setSprint(true);
+    }
+
+    @EventListener(priority = -2)
     public void onPostMotion(PostMotionEvent event) {
         if (noAction()) return;
         SimpleCustomNoSlow noSlow = getNoSlow();
@@ -92,7 +91,7 @@ public class CustomNoSlow extends INoSlow {
             noSlow.onPostMotion(event);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onSendPacket(SendPacketEvent event) {
         if (noAction()) return;
         SimpleCustomNoSlow noSlow = getNoSlow();
@@ -116,10 +115,6 @@ public class CustomNoSlow extends INoSlow {
         sword.disable();
         bow.disable();
         rest.disable();
-
-        if (usingTicks > 0) {
-            Sprint.omni = false;
-        }
     }
 
     private @Nullable SimpleCustomNoSlow getNoSlow() {

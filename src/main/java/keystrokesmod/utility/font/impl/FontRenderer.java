@@ -1,12 +1,12 @@
 package keystrokesmod.utility.font.impl;
 
+import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.font.CenterMode;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.render.ColorUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
@@ -20,13 +20,8 @@ import java.util.List;
  * @since 28/07/2024
  */
 public class FontRenderer extends CharRenderer implements IFont {
-
-    final CharData[] boldChars = new CharData[256];
-    final CharData[] italicChars = new CharData[256];
-    final CharData[] boldItalicChars = new CharData[256];
-    final int[] colorCode = new int[32];
-    final String colorcodeIdentifiers = "0123456789abcdefklmnor";
-    DynamicTexture texBold, texItalic, texItalicBold;
+    private final int[] colorCode = new int[32];
+    private static final String colorcodeIdentifiers = "0123456789abcdefklmnor";
 
     public FontRenderer(Font font) {
         super(font, true, true);
@@ -63,6 +58,11 @@ public class FontRenderer extends CharRenderer implements IFont {
         }
     }
 
+    @Override
+    public boolean isTextSupported(@NotNull String text) {
+        return text.chars().noneMatch(c -> c >= 256);
+    }
+
     public void drawString(String text, double x, double y, int color, boolean shadow) {
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
 
@@ -76,7 +76,6 @@ public class FontRenderer extends CharRenderer implements IFont {
 
 //        FontManager.init();
 
-        CharData[] currentData = this.charData;
         double alpha = (color >> 24 & 255) / 255f;
         x = (x - 1) * sr.getScaleFactor();
         y = (y - 3) * sr.getScaleFactor() - 0.2;
@@ -87,9 +86,6 @@ public class FontRenderer extends CharRenderer implements IFont {
         ColorUtils.setColor(color);
         GlStateManager.enableTexture2D();
         GlStateManager.bindTexture(this.tex.getGlTextureId());
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.tex.getGlTextureId());
-
-        GlStateManager.enableBlend();
 
         for (int index = 0; index < text.length(); index++) {
             char character = text.charAt(index);
@@ -100,13 +96,10 @@ public class FontRenderer extends CharRenderer implements IFont {
                 try {
                     colorIndex = colorcodeIdentifiers.indexOf(text.charAt(index + 1));
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Utils.handleException(e);
                 }
 
                 if (colorIndex < 16) {
-                    GlStateManager.bindTexture(this.tex.getGlTextureId());
-                    currentData = this.charData;
-
                     if (colorIndex < 0) {
                         colorIndex = 15;
                     }
@@ -118,15 +111,14 @@ public class FontRenderer extends CharRenderer implements IFont {
                     ColorUtils.setColor(this.colorCode[colorIndex], alpha);
                 } else {
                     ColorUtils.setColor(color);
-                    GlStateManager.bindTexture(this.tex.getGlTextureId());
-                    currentData = this.charData;
                 }
 
                 ++index;
-            } else if (character < currentData.length) {
-                drawLetter(x, y, currentData, character);
-
-                x += currentData[character].width - 8.3 + this.charOffset;
+            } else if (character < charData.length) {
+                GL11.glBegin(4);
+                this.drawChar(charData, character, x, y);
+                x += charData[character].width - 8.3 + 0;
+                GL11.glEnd();
             }
         }
         GlStateManager.disableBlend();
@@ -155,12 +147,6 @@ public class FontRenderer extends CharRenderer implements IFont {
         return getHeight();
     }
 
-    private void drawLetter(double x, double y, CharData[] currentData, char character) {
-        GL11.glBegin(4);
-        this.drawChar(currentData, character, x, y);
-        GL11.glEnd();
-    }
-
     public double getStringWidth(String text) {
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
 
@@ -169,15 +155,14 @@ public class FontRenderer extends CharRenderer implements IFont {
         }
 
         double width = 0;
-        CharData[] currentData = charData;
 
         for (int index = 0; index < text.length(); index++) {
             char character = text.charAt(index);
 
             if (character == '§') {
                 index++;
-            } else if (character < currentData.length) {
-                width += currentData[character].width - 8.3f + charOffset;
+            } else if (character < charData.length) {
+                width += charData[character].width - 8.3f + 0;
             }
         }
 
@@ -209,12 +194,10 @@ public class FontRenderer extends CharRenderer implements IFont {
     }
 
     private void setupBoldItalicIDs() {
-        this.texBold = this.setupTexture(this.font.deriveFont(Font.BOLD), this.antiAlias, this.fractionalMetrics, this.boldChars);
-        this.texItalic = this.setupTexture(this.font.deriveFont(Font.ITALIC), this.antiAlias, this.fractionalMetrics, this.italicChars);
-        this.texItalicBold = this.setupTexture(this.font.deriveFont(Font.BOLD | Font.ITALIC), this.antiAlias, this.fractionalMetrics, this.boldItalicChars);
     }
 
-    public void wrapText(String text, double x, double y, CenterMode centerMode, boolean shadow, int color, double width) {
+    @SuppressWarnings("unused")
+    public void wrapText(@NotNull String text, double x, double y, CenterMode centerMode, boolean shadow, int color, double width) {
         List<String> lines = new ArrayList<>();
         String[] words = text.trim().split(" ");
         StringBuilder line = new StringBuilder();

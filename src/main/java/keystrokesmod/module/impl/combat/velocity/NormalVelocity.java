@@ -1,11 +1,11 @@
 package keystrokesmod.module.impl.combat.velocity;
 
-import keystrokesmod.event.PreVelocityEvent;
+import keystrokesmod.event.player.PreVelocityEvent;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class NormalVelocity extends SubMode<Velocity> {
@@ -26,7 +26,7 @@ public class NormalVelocity extends SubMode<Velocity> {
         this.registerSetting(resetTime = new SliderSetting("Reset time", 5000, 500, 10000, 500, "ms", onlyFirstHit::isToggled));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreVelocity(PreVelocityEvent event) {
         final long time = System.currentTimeMillis();
 

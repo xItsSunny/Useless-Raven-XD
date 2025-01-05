@@ -6,8 +6,8 @@ import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class TimerCriticals extends SubMode<Criticals> {
@@ -34,8 +34,8 @@ public class TimerCriticals extends SubMode<Criticals> {
         startTimer = -1;
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onRender(Render2DEvent event) {
         if (mc.thePlayer == null) return;
 
         if (startTimer != -1) {

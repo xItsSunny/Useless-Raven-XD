@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.event.MoveInputEvent;
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.SprintEvent;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.SprintEvent;
 import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.impl.combat.morekb.IMoreKB;
 import keystrokesmod.module.impl.combat.morekb.SimpleSprintReset;
@@ -11,7 +11,7 @@ import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.lwjgl.input.Keyboard;
 
 public class MoreKB extends IMoreKB {
@@ -42,7 +42,7 @@ public class MoreKB extends IMoreKB {
         mode.disable();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMoveInput(MoveInputEvent event) {
         if (noSprint() && MoveUtil.isMoving()) {
             switch ((int) mode.getInput()) {
@@ -56,14 +56,14 @@ public class MoreKB extends IMoreKB {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSprint(SprintEvent event) {
         if (noSprint() && MoveUtil.isMoving() && (int) mode.getInput() == 2) {
             event.setSprint(false);
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (noSprint() && MoveUtil.isMoving()) {
             if ((int) mode.getInput() == 4) {

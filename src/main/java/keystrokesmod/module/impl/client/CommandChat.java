@@ -1,13 +1,12 @@
 package keystrokesmod.module.impl.client;
 
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.network.SendPacketEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.utility.Commands;
 import net.minecraft.network.play.client.C01PacketChatMessage;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.Client;
 import org.jetbrains.annotations.NotNull;
 
 public class CommandChat extends Module {
@@ -18,20 +17,20 @@ public class CommandChat extends Module {
         super("Command chat", category.client);
         this.registerSetting(identifier);
         this.canBeEnabled = false;
-        MinecraftForge.EVENT_BUS.register(this);
+        Client.EVENT_BUS.register(this);
     }
 
     public static String getIdentifier() {
         return IDENTIFIERS[(int) identifier.getInput()];
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onSendPacket(@NotNull SendPacketEvent event) {
         if (event.getPacket() instanceof C01PacketChatMessage) {
             final String message = ((C01PacketChatMessage) event.getPacket()).getMessage();
 
             if (message.startsWith(getIdentifier())) {
-                event.setCanceled(true);
+                event.cancel();
 
                 Commands.rCMD(message.substring(1));
             }

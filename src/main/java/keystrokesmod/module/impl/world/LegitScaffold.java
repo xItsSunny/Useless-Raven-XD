@@ -12,8 +12,8 @@ import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.lwjgl.input.Keyboard;
 
 public class LegitScaffold extends Module {
@@ -43,8 +43,8 @@ public class LegitScaffold extends Module {
         setSneak(Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()));
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onRender(Render2DEvent event) {
         if (!Utils.nullCheck() || mc.currentScreen != null) return;
 
         if ((onlySPressed.isToggled() && !mc.gameSettings.keyBindBack.isKeyDown())

@@ -6,8 +6,8 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class BalanceTimer extends SubMode<Timer> {
@@ -32,8 +32,8 @@ public class BalanceTimer extends SubMode<Timer> {
         this.registerSetting(autoDisable = new ButtonSetting("Auto disable", true));
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onRender(Render2DEvent event) {
         final long curTime = System.currentTimeMillis();
 
         if (!parent.canTimer()) {

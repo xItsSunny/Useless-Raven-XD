@@ -1,7 +1,6 @@
 package keystrokesmod.utility.render;
 
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.mixins.impl.render.RenderManagerAccessor;
 import keystrokesmod.module.impl.render.Freecam;
@@ -28,9 +27,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Timer;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
@@ -39,7 +36,7 @@ import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 import static org.lwjgl.opengl.GL11.*;
 
 public class RenderUtils {
@@ -176,8 +173,8 @@ public class RenderUtils {
         GL11.glPopMatrix();
     }
 
-    public static void renderBPS(final boolean isRender, TickEvent.RenderTickEvent e) {
-        if (!isRender || e.phase != TickEvent.Phase.END || !Utils.nullCheck()) {
+    public static void renderBPS(final boolean isRender) {
+        if (!isRender ||!Utils.nullCheck()) {
             return;
         }
         if (mc.currentScreen != null || mc.gameSettings.showDebugInfo) {

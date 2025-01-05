@@ -1,5 +1,6 @@
 package keystrokesmod.utility.font.impl;
 
+import keystrokesmod.utility.Utils;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
@@ -9,9 +10,9 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 public class CharRenderer {
-    final float imgSize = 1024;
-    final CharData[] charData = new CharData[256];
-    final int charOffset = 0;
+    private static final int IMG_SIZE = 1024;
+
+    protected final CharData[] charData = new CharData[256];
     Font font;
     boolean antiAlias, fractionalMetrics;
     int fontHeight = -1;
@@ -30,7 +31,7 @@ public class CharRenderer {
     }
 
     protected BufferedImage generateFontImage(Font font, boolean antiAlias, boolean fractionalMetrics, CharData @NotNull [] chars) {
-        int imgSize = (int) this.imgSize;
+        int imgSize = IMG_SIZE;
         BufferedImage bufferedImage = new BufferedImage(imgSize, imgSize, 2);
         Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
         graphics.setFont(font);
@@ -84,15 +85,15 @@ public class CharRenderer {
         try {
             this.drawQuad(x, y, chars[c].width, chars[c].height, chars[c].storedX, chars[c].storedY, chars[c].width, chars[c].height);
         } catch (Exception e) {
-            e.printStackTrace();
+            Utils.handleException(e);
         }
     }
 
     protected void drawQuad(double x2, double y2, double width, double height, double srcX, double srcY, double srcWidth, double srcHeight) {
-        float renderSRCX = (float) (srcX / this.imgSize);
-        float renderSRCY = (float) (srcY / this.imgSize);
-        float renderSRCWidth = (float) (srcWidth / this.imgSize);
-        float renderSRCHeight = (float) (srcHeight / this.imgSize);
+        float renderSRCX = (float) (srcX / IMG_SIZE);
+        float renderSRCY = (float) (srcY / IMG_SIZE);
+        float renderSRCWidth = (float) (srcWidth / IMG_SIZE);
+        float renderSRCHeight = (float) (srcHeight / IMG_SIZE);
 
         GL11.glTexCoord2f(renderSRCX + renderSRCWidth, renderSRCY);
         GL11.glVertex2d(x2 + width, y2);

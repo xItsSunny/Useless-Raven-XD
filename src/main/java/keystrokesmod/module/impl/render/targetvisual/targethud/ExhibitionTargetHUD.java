@@ -93,8 +93,8 @@ public class ExhibitionTargetHUD extends SubMode<TargetHUD> implements ITargetVi
     @Override
     public void render(@NotNull EntityLivingBase target) {
         String name = target.getDisplayName().getFormattedText();
-        double x = TargetHUD.current$minX;
-        double y = TargetHUD.current$minY;
+        double x = TargetHUD.minX;
+        double y = TargetHUD.minY;
 
         ///////////////////////////////////////////////////
 

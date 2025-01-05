@@ -1,7 +1,7 @@
 package keystrokesmod.mixins.impl.render;
 
 
-import keystrokesmod.event.RenderItemEvent;
+import keystrokesmod.event.render.RenderItemEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.utility.Utils;
@@ -17,7 +17,7 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.common.MinecraftForge;
+import keystrokesmod.Client;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
@@ -98,7 +98,7 @@ public abstract class MixinItemRenderer {
                 boolean useItem = itemInUseCount > 0;
 
                 final RenderItemEvent event = new RenderItemEvent(enumaction, useItem, animationProgression, partialTicks, swingProgress, itemToRender);
-                MinecraftForge.EVENT_BUS.post(event);
+                Client.EVENT_BUS.post(event);
                 enumaction = event.getEnumAction();
                 useItem = event.isUseItem();
                 animationProgression = event.getAnimationProgression();
@@ -107,7 +107,7 @@ public abstract class MixinItemRenderer {
                 if (itemToRender.getItem() instanceof ItemMap) {
                     this.renderItemMap(thePlayer, f2, animationProgression, swingProgress);
                 } else if (useItem) {
-                    if (!event.isCanceled()) {
+                    if (!event.isCancelled()) {
                         switch (enumaction) {
                             case NONE:
                                 this.transformFirstPersonItem(animationProgression, 0.0F);
@@ -129,7 +129,7 @@ public abstract class MixinItemRenderer {
                                 this.func_178098_a(partialTicks, thePlayer);
                         }
                     }
-                } else if (!event.isCanceled()) {
+                } else if (!event.isCancelled()) {
                     this.func_178105_d(swingProgress);
                     this.transformFirstPersonItem(animationProgression, swingProgress);
                 }

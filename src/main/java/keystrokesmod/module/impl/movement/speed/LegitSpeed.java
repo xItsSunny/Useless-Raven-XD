@@ -1,14 +1,14 @@
 package keystrokesmod.module.impl.movement.speed;
 
-import keystrokesmod.event.MoveInputEvent;
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.Speed;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class LegitSpeed extends SubMode<Speed> {
@@ -21,7 +21,7 @@ public class LegitSpeed extends SubMode<Speed> {
         this.registerSetting(cpuSpeedUpExploit = new ButtonSetting("CPU SpeedUp Exploit", false));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(@NotNull PreUpdateEvent event) {
         if (parent.noAction()) return;
 
@@ -34,7 +34,7 @@ public class LegitSpeed extends SubMode<Speed> {
             Utils.getTimer().timerSpeed = 1.004f;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMove(MoveInputEvent event) {
         if (MoveUtil.isMoving())
             event.setJump(true);

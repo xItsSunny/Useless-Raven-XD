@@ -1,10 +1,11 @@
 package keystrokesmod.module.impl.world;
 
-import keystrokesmod.Raven;
-import keystrokesmod.event.*;
+import keystrokesmod.Client;
+import keystrokesmod.event.player.*;
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.ModuleManager;
-import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.combat.autoclicker.IAutoClicker;
 import keystrokesmod.module.impl.combat.autoclicker.NormalAutoClicker;
 import keystrokesmod.module.impl.other.RotationHandler;
@@ -33,19 +34,13 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C0APacketAnimation;
-import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.util.*;
-import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.event.client.MouseEvent;
+import keystrokesmod.event.render.Render2DEvent;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -61,7 +56,10 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting autoJump;
     private final ModeValue clickMode;
     private final ButtonSetting alwaysPlaceIfPossible;
-    private final SliderSetting aimSpeed;
+    private final SliderSetting minRotationSpeed;
+    private final SliderSetting maxRotationSpeed;
+    private final SliderSetting minRotationAccuracy;
+    private final SliderSetting maxRotationAccuracy;
     public final ModeValue schedule;
     private final ModeValue rotation;
     private final ButtonSetting moveFix;
@@ -70,7 +68,7 @@ public class Scaffold extends IAutoClicker {
     private final ButtonSetting notWhileTower;
     private final ModeValue sprint;
     private final ButtonSetting cancelSprint;
-    private final ButtonSetting legit;
+    private final ButtonSetting rayCast;
     private final ButtonSetting recycleRotation;
     private final ButtonSetting hover;
     private final ButtonSetting sneak;
@@ -88,19 +86,15 @@ public class Scaffold extends IAutoClicker {
     private final ModeSetting precision;
     private final ButtonSetting autoSwap;
     private final ButtonSetting useBiggestStack;
-    private final ButtonSetting fastOnRMB;
-    private final ButtonSetting multiPlace;
     private final ButtonSetting showBlockCount;
     private final ButtonSetting delayOnJump;
+    private final SliderSetting delayOnJumpAmount;
     private final ButtonSetting stopAtStart;
     private final ButtonSetting silentSwing;
     private final ButtonSetting noSwing;
     private final ButtonSetting expand;
     private final SliderSetting expandDistance;
-    private final ButtonSetting polar;
-    private final ButtonSetting postPlace;
     private final ButtonSetting lookView;
-    private final ButtonSetting stopSprintAtStart;
     private final ButtonSetting esp;
     private final ModeSetting theme;
     private final ButtonSetting raytrace;
@@ -116,7 +110,7 @@ public class Scaffold extends IAutoClicker {
     public int at;
     public int index;
     public boolean rmbDown;
-    public boolean delay;
+    public int delayTicks = 0;
     public boolean place;
     public int offGroundTicks = 0;
     public int onGroundTicks = 0;
@@ -129,8 +123,8 @@ public class Scaffold extends IAutoClicker {
     private int sneak$bridged = 0;
     private int jump$bridged = 0;
     private boolean placedUp;
-    private Float lastYaw = null, lastPitch = null;
-    private boolean polar$waitingForExpand = false;
+    public float lastYaw = 0;
+    public float lastPitch = 85;
     private HoverState hoverState = HoverState.DONE;
     private boolean stopMoving = false;
     private double lastOffsetToMid = -1;
@@ -156,10 +150,15 @@ public class Scaffold extends IAutoClicker {
                 .add(new StrictRotation("Strict", this))
                 .add(new PreciseRotation("Precise", this))
                 .add(new ConstantRotation("Constant", this))
+                .add(new HypixelRotation("Hypixel", this))
                 .setDefaultValue("Backwards")
         );
-        this.registerSetting(aimSpeed = new SliderSetting("Aim speed", 20, 5, 20, 0.1, new ModeOnly(rotation, 0).reserve()));
-        this.registerSetting(moveFix = new ButtonSetting("MoveFix", false, new ModeOnly(rotation, 0).reserve()));
+        ModeOnly doRotation = new ModeOnly(rotation, 0).reserve();
+        this.registerSetting(minRotationSpeed = new SliderSetting("Min rotation speed", 180, 0, 180, 1, doRotation));
+        this.registerSetting(maxRotationSpeed = new SliderSetting("Max rotation speed", 180, 0, 180, 1, doRotation));
+        this.registerSetting(minRotationAccuracy = new SliderSetting("Min rotation accuracy", 180, 0, 180, 1, doRotation));
+        this.registerSetting(maxRotationAccuracy = new SliderSetting("Max rotation accuracy", 180, 0, 180, 1, doRotation));
+        this.registerSetting(moveFix = new ButtonSetting("MoveFix", false, doRotation));
         this.registerSetting(motion = new SliderSetting("Motion", 1.0, 0.5, 1.2, 0.01, () -> !moveFix.isToggled()));
         this.registerSetting(strafe = new SliderSetting("Strafe", 0, 0, 90, 5));
         this.registerSetting(notWhileDiagonal = new ButtonSetting("Not while diagonal", true, () -> strafe.getInput() != 0));
@@ -173,7 +172,6 @@ public class Scaffold extends IAutoClicker {
                 .add(new JumpSprint("JumpC", this))
                 .add(new HypixelJumpSprint("HypixelJump", this))
                 .add(new HypixelJump2Sprint("HypixelJump2", this))
-                .add(new HypixelJump3Sprint("HypixelJump3", this))
                 .add(new HypixelSprint("Hypixel", this))
                 .add(new LegitSprint("Legit", this))
                 .add(new SneakSprint("Sneak", this))
@@ -181,7 +179,7 @@ public class Scaffold extends IAutoClicker {
         );
         this.registerSetting(precision = new ModeSetting("Precision", precisionModes, 4));
         this.registerSetting(cancelSprint = new ButtonSetting("Cancel sprint", false, new ModeOnly(sprint, 0).reserve()));
-        this.registerSetting(legit = new ButtonSetting("Legit", false));
+        this.registerSetting(rayCast = new ButtonSetting("Ray cast", false));
         this.registerSetting(hover = new ButtonSetting("Hover", false));
         this.registerSetting(recycleRotation = new ButtonSetting("Recycle rotation", false));
         this.registerSetting(sneak = new ButtonSetting("Sneak", false));
@@ -198,14 +196,12 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(diagonalPitch = new SliderSetting("Diagonal pitch", 75.6, 45, 90, 0.1, staticPitch::isToggled));
         this.registerSetting(autoSwap = new ButtonSetting("AutoSwap", true));
         this.registerSetting(useBiggestStack = new ButtonSetting("Use biggest stack", true, autoSwap::isToggled));
-        this.registerSetting(delayOnJump = new ButtonSetting("Delay on jump", true));
-        this.registerSetting(fastOnRMB = new ButtonSetting("Fast on RMB", false));
-        this.registerSetting(multiPlace = new ButtonSetting("Multi-place", false));
+        this.registerSetting(delayOnJump = new ButtonSetting("Delay on jump", false));
+        this.registerSetting(delayOnJumpAmount = new SliderSetting("Delay on jump amount", 0, 0, 4, 1, delayOnJump::isToggled));
         this.registerSetting(safeWalk = new ButtonSetting("Safewalk", true));
         this.registerSetting(safeWalkOnNoBlocks = new ButtonSetting("Safewalk on no blocks", true));
         this.registerSetting(showBlockCount = new ButtonSetting("Show block count", true));
         this.registerSetting(stopAtStart = new ButtonSetting("Stop at start", false));
-        this.registerSetting(stopSprintAtStart = new ButtonSetting("Stop sprint at start", false));
         this.registerSetting(silentSwing = new ButtonSetting("Silent swing", false));
         this.registerSetting(noSwing = new ButtonSetting("No swing", false, silentSwing::isToggled));
         this.registerSetting(tower = new ButtonSetting("Tower", false));
@@ -213,8 +209,6 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(autoJump = new ButtonSetting("Auto jump", false));
         this.registerSetting(expand = new ButtonSetting("Expand", false));
         this.registerSetting(expandDistance = new SliderSetting("Expand distance", 4.5, 0, 10, 0.1, expand::isToggled));
-        this.registerSetting(polar = new ButtonSetting("Polar", false, expand::isToggled));
-        this.registerSetting(postPlace = new ButtonSetting("Post place", false, "Place on PostUpdate."));
         this.registerSetting(lookView = new ButtonSetting("Look view", false));
         this.registerSetting(new DescriptionSetting("Rendering"));
         this.registerSetting(esp = new ButtonSetting("ESP", false));
@@ -225,16 +219,21 @@ public class Scaffold extends IAutoClicker {
         this.registerSetting(shade = new ButtonSetting("Shade", false, esp::isToggled));
     }
 
+    @Override
+    public void guiUpdate() throws Throwable {
+        Utils.correctValue(minRotationSpeed, maxRotationSpeed);
+        Utils.correctValue(minRotationAccuracy, maxRotationAccuracy);
+    }
+
     public static boolean sprint() {
         if (ModuleManager.scaffold.isEnabled()
-                && ModuleManager.scaffold.sprint.getInput() > 0
-                && (!ModuleManager.scaffold.fastOnRMB.isToggled() || Mouse.isButtonDown(1))) {
+                && ModuleManager.scaffold.sprint.getInput() != 0) {
             return ((IScaffoldSprint) ModuleManager.scaffold.sprint.getSelected()).isSprint();
         }
         return false;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSprint(SprintEvent event) {
         if (!sprint()) {
             event.setSprint(false);
@@ -267,7 +266,7 @@ public class Scaffold extends IAutoClicker {
             SlotHandler.setCurrentSlot(lastSlot);
             lastSlot = -1;
         }
-        delay = false;
+        delayTicks = 0;
         highlight.clear();
         at = index = 0;
         add = 0;
@@ -278,8 +277,6 @@ public class Scaffold extends IAutoClicker {
         placedUp = false;
         offGroundTicks = 0;
         telly$noBlockPlace = false;
-        lastYaw = lastPitch = null;
-        polar$waitingForExpand = false;
         lastOffsetToMid = -1;
         lastESPRaytrace = null;
         Utils.resetTimer();
@@ -295,6 +292,8 @@ public class Scaffold extends IAutoClicker {
         startPos = mc.thePlayer.posY;
         sneak$bridged = 0;
         jump$bridged = 0;
+        lastYaw = RotationHandler.getRotationYaw();
+        lastPitch = RotationHandler.getRotationPitch();
 
         if (hover.isToggled() && mc.thePlayer.onGround) {
             hoverState = HoverState.JUMP;
@@ -306,83 +305,73 @@ public class Scaffold extends IAutoClicker {
             stopMoving = true;
         }
 
-        if (stopSprintAtStart.isToggled()) {
-            mc.thePlayer.setSprinting(false);
-        }
-
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRotation(RotationEvent event) {
         if (!Utils.nullCheck()) {
             return;
         }
-        if (expand.isToggled() && polar.isToggled() && !polar$waitingForExpand)
-            return;
 
         final RotationData data = ((IScaffoldRotation) rotation.getSelected()).onRotation(placeYaw, placePitch, forceStrict, event);
         float yaw;
         float pitch;
-        if (!((IScaffoldSchedule) schedule.getSelected()).noRotation()) {
-            yaw = data.getYaw();
-            pitch = data.getPitch();
-        } else {
+        if (((IScaffoldSchedule) schedule.getSelected()).noRotation()) {
             yaw = event.getYaw();
             pitch = event.getPitch();
+        } else {
+            yaw = data.getYaw();
+            pitch = data.getPitch();
+
+            if (strafe.getInput() != 0)
+                yaw = applyStrafe(yaw, (float) strafe.getInput());
+
+            if (staticYaw.isToggled()) {
+                float delta = yaw % 45;
+                if (delta > 22.5 && delta <= 45)
+                    yaw += 45 - delta;
+                else if (delta < -22.5 && delta >= -45)
+                    yaw -= 45 + delta;
+                else if (delta <= 22.5 && delta > 0)
+                    yaw -= delta;
+                else if (delta >= -22.5 && delta < 0)
+                    yaw -= delta;
+            }
+
+            if (reserveYaw.isToggled())
+                yaw += 180;
+
+            if (staticPitch.isToggled() && (staticPitchOnJump.isToggled() || mc.thePlayer.onGround)) {
+                double direction = MoveUtil.direction();
+                double movingYaw = Math.round(direction / 45) * 45;
+                boolean isMovingStraight = movingYaw % 90 == 0f;
+
+                if (isMovingStraight) {
+                    pitch = (float) straightPitch.getInput();
+                } else {
+                    pitch = (float) diagonalPitch.getInput();
+                }
+            }
         }
 
-        if (strafe.getInput() != 0)
-            yaw = applyStrafe(yaw, (float) strafe.getInput());
+        final RotationData result = ((IScaffoldSprint) sprint.getSelected()).onFinalRotation(new RotationData(yaw, pitch));
 
-        boolean instant = aimSpeed.getInput() == aimSpeed.getMax();
+        float rotationSpeed = (float) Utils.randomizeDouble(minRotationSpeed.getInput(), maxRotationSpeed.getInput());
+        double rotationAccuracy = Utils.randomizeDouble(minRotationAccuracy.getInput(), maxRotationAccuracy.getInput());
 
-        if (lastYaw == null || lastPitch == null) {
-            lastYaw = event.getYaw();
-            lastPitch = event.getPitch();
-        }
+        lastYaw = AimSimulator.rotMove(result.getYaw(), lastYaw,
+                rotationSpeed, AimSimulator.getGCD(), rotationAccuracy);
+        lastPitch = AimSimulator.rotMove(result.getPitch(), lastPitch,
+                rotationSpeed, AimSimulator.getGCD(), rotationAccuracy);
 
-        if (staticYaw.isToggled()) {
-            float delta = yaw % 45;
-            if (delta > 22.5 && delta <= 45)
-                yaw += 45 - delta;
-            else if (delta < -22.5 && delta >= -45)
-                yaw -= 45 + delta;
-            else if (delta <= 22.5 && delta > 0)
-                yaw -= delta;
-            else if (delta >= -22.5 && delta < 0)
-                yaw -= delta;
-        }
-
-        if (reserveYaw.isToggled())
-            yaw += 180;
-
-        if (staticPitch.isToggled() && (staticPitchOnJump.isToggled() || mc.thePlayer.onGround)) {
-            double direction = MoveUtil.direction();
-            double movingYaw = Math.round(direction / 45) * 45;
-            boolean isMovingStraight = movingYaw % 90 == 0f;
-
-            if (isMovingStraight)
-                pitch = (float) straightPitch.getInput();
-            else
-                pitch = (float) diagonalPitch.getInput();
-        }
-
-        final float finalYaw = instant ? yaw : AimSimulator.rotMove(yaw, lastYaw, (float) aimSpeed.getInput());
-        final float finalPitch = instant ? pitch : AimSimulator.rotMove(pitch, lastPitch, (float) aimSpeed.getInput());
-
-        final RotationData result = ((IScaffoldSprint) sprint.getSelected()).onFinalRotation(new RotationData(finalYaw, finalPitch));
-
-        event.setYaw(lastYaw = result.getYaw());
-        event.setPitch(lastPitch = result.getPitch());
+        event.setYaw(lastYaw);
+        event.setPitch(lastPitch);
         event.setMoveFix(moveFix.isToggled() ? RotationHandler.MoveFix.Silent : RotationHandler.MoveFix.None);
 
         if (lookView.isToggled()) {
             mc.thePlayer.rotationYaw = event.getYaw();
             mc.thePlayer.rotationPitch = event.getPitch();
         }
-
-        if (clickMode.getInput() == 0)
-            place = true;
     }
 
     public float applyStrafe(float yaw, float strafeVal) {
@@ -394,7 +383,7 @@ public class Scaffold extends IAutoClicker {
                 if (offsetToMid > 0.6 || offsetToMid < 0.4 || lastOffsetToMid == -1) {
                     lastOffsetToMid = offsetToMid;
                 }
-                yaw += (float) (lastOffsetToMid >= 0.5 ? strafe.getInput() : -strafe.getInput());
+                yaw += lastOffsetToMid >= 0.5 ? strafeVal : -strafeVal;
             }
         }
         return yaw;
@@ -406,77 +395,30 @@ public class Scaffold extends IAutoClicker {
         return true;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (cancelSprint.isToggled()) {
             event.setSprinting(false);
         }
-
-        if (expand.isToggled() && polar.isToggled()) {
-            if (!mc.thePlayer.onGround) {
-                polar$waitingForExpand = false;
-                return;
-            }
-
-            if (!polar$waitingForExpand && BlockUtils.replaceable(RotationUtils.getExtendedPos(new BlockPos(mc.thePlayer).down(), mc.thePlayer.rotationYaw, 1))) {
-                final double pos = EnumFacing.fromAngle(getYaw()).getAxis() == EnumFacing.Axis.X ? Math.abs(mc.thePlayer.posX % 1) : Math.abs(mc.thePlayer.posZ % 1);
-                polar$waitingForExpand = pos > 0.75 && pos < 0.95 || pos > 0.05 && pos < 0.25;
-            }
-        }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onJump(JumpEvent e) {
         if (delayOnJump.isToggled())
-            delay = true;
+            delayTicks = (int) delayOnJumpAmount.getInput();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMoveInput(@NotNull MoveInputEvent event) {
-        if (expand.isToggled() && polar.isToggled()) {
-            if (polar$waitingForExpand) {
-                event.setSneak(true);
-                event.setForward(0);
-                event.setStrafe(0);
-            } else {
-                event.setSneak(false);
-            }
-        }
-
         if (stopMoving) {
-            event.setCanceled(true);
+            event.cancel();
             stopMoving = false;
         }
     }
 
-    @SubscribeEvent
-    public void onReceivePacket(ReceivePacketEvent event) {
-        if (expand.isToggled() && polar.isToggled()) {
-            if (event.getPacket() instanceof S23PacketBlockChange && polar$waitingForExpand) {
-                S23PacketBlockChange packet = (S23PacketBlockChange) event.getPacket();
-                double distance = expandDistance.getInput();
-                if (packet.getBlockState().getBlock() instanceof BlockAir
-                        && mc.thePlayer.getDistanceSqToCenter(packet.getBlockPosition()) <= distance * distance) {
-                    polar$waitingForExpand = false;
-                    Notifications.sendNotification(Notifications.NotificationTypes.WARN, "Polar cancel a place!");
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
-        if (!postPlace.isToggled())
-            action();
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onPostUpdate(PostUpdateEvent event) {
-        if (postPlace.isToggled())
-            action();
-    }
-
-    private void action() { // place here
+        // place here
         if (mc.thePlayer.onGround) {
             offGroundTicks = 0;
             onGroundTicks++;
@@ -487,8 +429,8 @@ public class Scaffold extends IAutoClicker {
 
         switch (hoverState) {
             case JUMP:
-                if (mc.thePlayer.onGround && !Utils.jumpDown()) {
-                    mc.thePlayer.jump();
+                if (mc.thePlayer.onGround) {
+                    MoveUtil.jump();
                 }
                 hoverState = HoverState.FALL;
                 break;
@@ -498,12 +440,12 @@ public class Scaffold extends IAutoClicker {
                 break;
         }
 
-        if ((rotation.getInput() != 5 && autoJump.isToggled()) && mc.thePlayer.onGround && MoveUtil.isMoving() && !Utils.jumpDown()) {
-            mc.thePlayer.jump();
+        if ((rotation.getInput() != 5 && autoJump.isToggled()) && mc.thePlayer.onGround && MoveUtil.isMoving()) {
+            MoveUtil.jump();
         }
 
-        if (delay) {
-            delay = false;
+        if (delayTicks > 0) {
+            delayTicks--;
             return;
         }
 
@@ -535,9 +477,6 @@ public class Scaffold extends IAutoClicker {
         }
         if (keepYPosition() && (sprint.getInput() == 3 || sprint.getInput() == 4 || sprint.getInput() == 5 || sprint.getInput() == 6 || sprint.getInput() == 12)) {
             if (mc.thePlayer.onGround) {
-                if (!Utils.jumpDown()) {
-                    mc.thePlayer.jump();
-                }
                 add = 0;
                 if (Math.floor(mc.thePlayer.posY) == Math.floor(startPos) && sprint.getInput() == 5) {
                     placedUp = false;
@@ -602,7 +541,7 @@ public class Scaffold extends IAutoClicker {
                 searchYaw = 180;
                 searchPitch = new float[]{65, 25};
             } else if (i == 1) {
-                if (expand.isToggled() && !(tower.isToggled() && Utils.jumpDown()) && (!polar.isToggled() || polar$waitingForExpand)) {
+                if (expand.isToggled() && !(tower.isToggled() && Utils.jumpDown())) {
                     final keystrokesmod.script.classes.Vec3 eyePos = Utils.getEyePos();
                     final BlockPos groundPos = new BlockPos(mc.thePlayer).down();
                     long expDist = Math.round(expandDistance.getInput());
@@ -628,9 +567,6 @@ public class Scaffold extends IAutoClicker {
                         placePitch = PlayerRotation.getPitch(placeSide.getRight());
                         break;
                     }
-                    if (polar.isToggled() && rayCasted == null) {
-                        polar$waitingForExpand = false;
-                    }
                 }
                 break;
             }
@@ -649,7 +585,8 @@ public class Scaffold extends IAutoClicker {
                             if (raycast.getBlockPos().equals(targetPos) && raycast.sideHit == enumFacing.getEnumFacing()) {
                                 if (rayCasted == null || !BlockUtils.isSamePos(raycast.getBlockPos(), rayCasted.getBlockPos())) {
                                     if (heldItem.getItem() instanceof ItemBlock && ((ItemBlock) heldItem.getItem()).canPlaceBlockOnSide(mc.theWorld, raycast.getBlockPos(), raycast.sideHit, mc.thePlayer, heldItem)) {
-                                        if (rayCasted == null) {
+                                        if (rayCasted == null
+                                                && raycast.getBlockPos().getY() <= mc.thePlayer.posY) {  // to fix the insane block search bug
                                             forceStrict = (forceStrict(checkYaw)) && i == 1;
                                             if (recycleRotation.isToggled()) {
                                                 Optional<Triple<BlockPos, EnumFacing, keystrokesmod.script.classes.Vec3>> placeSide = RotationUtils.getPlaceSide(raycast.getBlockPos().offset(raycast.sideHit));
@@ -680,20 +617,26 @@ public class Scaffold extends IAutoClicker {
         if (((IScaffoldSchedule) schedule.getSelected()).noPlace())
             return;
 
-        if (place) {
+        if (clickMode.getInput() == 0 || place) {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
 
+            MovingObjectPosition hitResult = RotationUtils.rayCast(4.5, lastYaw, lastPitch);
             if (rayCasted == null && alwaysPlaceIfPossible.isToggled()) {
-                MovingObjectPosition hitResult = RotationUtils.rayCast(4.5, RotationHandler.getRotationYaw(), RotationHandler.getRotationPitch());
                 if (hitResult == null) return;
                 placeBlock = hitResult;
             } else {
                 if (rayCasted == null) return;
                 placeBlock = rayCasted;
             }
-            if (multiPlace.isToggled()) {
-                place(placeBlock, true);
+            if (rayCast.isToggled()) {
+                if (hitResult == null
+                        || !hitResult.getBlockPos().equals(placeBlock.getBlockPos())
+                        || hitResult.sideHit != placeBlock.sideHit
+                ) {
+                    return;
+                }
             }
+
             place(placeBlock, false);
             place = false;
             if (placeBlock.sideHit == EnumFacing.UP && keepYPosition()) {
@@ -702,29 +645,27 @@ public class Scaffold extends IAutoClicker {
         }
     }
 
-    @SubscribeEvent
-    public void onRenderTick(TickEvent.RenderTickEvent ev) {
+    @EventListener
+    public void onRenderTick(Render2DEvent ev) {
         if (!Utils.nullCheck() || !showBlockCount.isToggled()) {
             return;
         }
-        if (ev.phase == TickEvent.Phase.END) {
-            if (mc.currentScreen != null) {
-                return;
-            }
-            final ScaledResolution scaledResolution = new ScaledResolution(mc);
-            int blocks = totalBlocks();
-            String color = "§";
-            if (blocks <= 5) {
-                color += "c";
-            } else if (blocks <= 15) {
-                color += "6";
-            } else if (blocks <= 25) {
-                color += "e";
-            } else {
-                color = "";
-            }
-            mc.fontRendererObj.drawStringWithShadow(color + blocks + " §rblock" + (blocks == 1 ? "" : "s"), (float) scaledResolution.getScaledWidth() / 2 + 8, (float) scaledResolution.getScaledHeight() / 2 + 4, -1);
+        if (mc.currentScreen != null) {
+            return;
         }
+        final ScaledResolution scaledResolution = new ScaledResolution(mc);
+        int blocks = totalBlocks();
+        String color = "§";
+        if (blocks <= 5) {
+            color += "c";
+        } else if (blocks <= 15) {
+            color += "6";
+        } else if (blocks <= 25) {
+            color += "e";
+        } else {
+            color = "";
+        }
+        mc.fontRendererObj.drawStringWithShadow(color + blocks + " §rblock" + (blocks == 1 ? "" : "s"), (float) scaledResolution.getScaledWidth() / 2 + 8, (float) scaledResolution.getScaledHeight() / 2 + 4, -1);
     }
 
     public Vec3 getPlacePossibility(double offsetY, double original) { // rise
@@ -779,12 +720,12 @@ public class Scaffold extends IAutoClicker {
         return sequence;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMouse(@NotNull MouseEvent mouseEvent) {
-        if (mouseEvent.button == 1) {
-            rmbDown = mouseEvent.buttonstate;
+        if (mouseEvent.getButton() == 1) {
+            rmbDown = mouseEvent.isButtonstate();
             if (placeBlock != null && rmbDown) {
-                mouseEvent.setCanceled(true);
+                mouseEvent.cancel();
             }
         }
     }
@@ -812,8 +753,8 @@ public class Scaffold extends IAutoClicker {
         return -1;
     }
 
-    @SubscribeEvent
-    public void onRenderWorld(RenderWorldLastEvent e) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (!Utils.nullCheck() || !esp.isToggled()) {
             return;
         }
@@ -862,12 +803,16 @@ public class Scaffold extends IAutoClicker {
     }
 
     private boolean forceStrict(float value) {
-        return (inBetween(-170, -105, value) || inBetween(-80, 80, value) || inBetween(98, 170, value)) && !inBetween(-10, 10, value);
+        return (inBetween(-170, -105, value)
+                || inBetween(-80, 80, value)
+                || inBetween(98, 170, value))
+                && !inBetween(-10, 10, value);
     }
 
     public boolean keepYPosition() {
         boolean sameYSca = ((IScaffoldSprint) sprint.getSelected()).isKeepY();
-        return this.isEnabled() && Utils.keysDown() && (sameYSca || sameY.isToggled()) && !Utils.jumpDown() && (!fastOnRMB.isToggled() || Mouse.isButtonDown(1)) || hoverState != HoverState.DONE;
+        return this.isEnabled() && Utils.keysDown() && (sameYSca || sameY.isToggled()) && !Utils.jumpDown()
+                || hoverState != HoverState.DONE;
     }
 
     public boolean safewalk() {
@@ -888,8 +833,9 @@ public class Scaffold extends IAutoClicker {
 
     public float getYaw() {
         float yaw = 180.0f;
-        double moveForward = mc.thePlayer.moveForward;
-        double moveStrafe = mc.thePlayer.moveStrafing;
+        double moveForward = MoveUtil.getMoveForward();
+        double moveStrafe = MoveUtil.getMoveStrafe();
+
         if (rotateWithMovement.isToggled()) {
             if (moveForward > 0.0) {
                 if (moveStrafe > 0.0) {
@@ -956,7 +902,7 @@ public class Scaffold extends IAutoClicker {
             if (sneak$bridged >= sneakEveryBlocks.getInput()) {
                 sneak$bridged = 0;
                 ((KeyBindingAccessor) mc.gameSettings.keyBindSneak).setPressed(true);
-                Raven.getExecutor().schedule(() -> ((KeyBindingAccessor) mc.gameSettings.keyBindSneak).setPressed(Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode())), (long) sneakTime.getInput(), TimeUnit.MILLISECONDS);
+                Client.getExecutor().schedule(() -> ((KeyBindingAccessor) mc.gameSettings.keyBindSneak).setPressed(Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode())), (long) sneakTime.getInput(), TimeUnit.MILLISECONDS);
             }
         }
 
@@ -964,7 +910,7 @@ public class Scaffold extends IAutoClicker {
             if (jump$bridged >= jumpEveryBlocks.getInput()) {
                 jump$bridged = 0;
                 if (mc.thePlayer.onGround)
-                    mc.thePlayer.jump();
+                    MoveUtil.jump();
             }
         }
 
@@ -973,15 +919,9 @@ public class Scaffold extends IAutoClicker {
             return false;
         }
 
-        if (legit.isToggled()) {
-            Utils.sendClick(1, true);
-            Utils.sendClick(1, false);
-            return true;
-        }
-
         ScaffoldPlaceEvent event = new ScaffoldPlaceEvent(block, extra);
-        MinecraftForge.EVENT_BUS.post(event);
-        if (event.isCanceled()) return false;
+        Client.EVENT_BUS.post(event);
+        if (event.isCancelled()) return false;
 
         block = event.getHitResult();
         extra = event.isExtra();
@@ -1025,7 +965,7 @@ public class Scaffold extends IAutoClicker {
         return schedule.getSelected().getPrettyName();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSafeWalk(@NotNull SafeWalkEvent event) {
         if (safewalk())
             event.setSafeWalk(true);

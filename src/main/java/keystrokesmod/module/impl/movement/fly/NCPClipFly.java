@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.movement.fly;
 
-import keystrokesmod.event.PrePlayerInputEvent;
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.player.PrePlayerInputEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
@@ -10,7 +10,7 @@ import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class NCPClipFly extends SubMode<Fly> {
@@ -21,7 +21,7 @@ public class NCPClipFly extends SubMode<Fly> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (mc.thePlayer.onGround) {
             offGroundTicks = 0;
@@ -30,7 +30,7 @@ public class NCPClipFly extends SubMode<Fly> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPrePlayerInput(PrePlayerInputEvent event) {
         final AxisAlignedBB bb = mc.thePlayer.getEntityBoundingBox().offset(0, 1, 0);
 
@@ -70,10 +70,10 @@ public class NCPClipFly extends SubMode<Fly> {
         Utils.getTimer().timerSpeed = 0.4f;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(ReceivePacketEvent event) {
         if (teleport) {
-            event.setCanceled(true);
+            event.cancel();
             teleport = false;
         }
     }

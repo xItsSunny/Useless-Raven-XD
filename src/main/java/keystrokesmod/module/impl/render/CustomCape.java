@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.render;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -24,7 +24,8 @@ import static com.mojang.realmsclient.gui.ChatFormatting.*;
 public final class CustomCape extends Module {
     public static final List<ResourceLocation> LOADED_CAPES = new ArrayList<>();
     public static String[] CAPES_NAME = new String[]{
-            "RavenAnime", "RavenAqua", "RavenGreen", "RavenPurple", "RavenRed", "RavenWhite", "RavenYellow", "RavenXD", "Cherry", "Die", "Astolfo"
+            "RavenAnime", "Cherry", "Die", "Astolfo", "RavenXD", "RavenAqua", "RavenGreen", "RavenPurple", "RavenRed",
+            "RavenWhite", "RavenYellow"
     };
     public static final ModeSetting cape = new ModeSetting("Cape", CAPES_NAME, 0);
     private static File directory;
@@ -46,7 +47,7 @@ public final class CustomCape extends Module {
             try {
                 Desktop.getDesktop().open(directory);
             } catch (IOException ex) {
-                Raven.profileManager.directory.mkdirs();
+                Client.profileManager.directory.mkdirs();
                 Utils.sendMessage("&cError locating folder, recreated.");
             }
         }));
@@ -64,7 +65,8 @@ public final class CustomCape extends Module {
         }
 
         final String[] builtinCapes = new String[]{
-                "RavenAnime", "RavenAqua", "RavenGreen", "RavenPurple", "RavenRed", "RavenWhite", "RavenYellow", "RavenXD", "Cherry", "Die", "Astolfo"
+                "RavenAnime", "Cherry", "Die", "Astolfo", "RavenXD", "RavenAqua", "RavenGreen", "RavenPurple", "RavenRed",
+                "RavenWhite", "RavenYellow"
         };
         CAPES_NAME = new String[files.length + builtinCapes.length];
         LOADED_CAPES.clear();
@@ -73,9 +75,9 @@ public final class CustomCape extends Module {
         for (String s : builtinCapes) {
             String name = s.toLowerCase();
             try {
-                InputStream stream = Raven.class.getResourceAsStream("/assets/keystrokesmod/textures/capes/" + name + ".png");
+                InputStream stream = Client.class.getResourceAsStream("/assets/keystrokesmod/textures/capes/" + name + ".png");
                 if (stream == null)
-                    stream = Raven.class.getResourceAsStream("/assets/keystrokesmod/textures/capes/" + s + ".png");
+                    stream = Client.class.getResourceAsStream("/assets/keystrokesmod/textures/capes/" + s + ".png");
                 if (stream == null)
                     continue;
                 BufferedImage bufferedImage = ImageIO.read(stream);

@@ -1,13 +1,13 @@
 package keystrokesmod.module.impl.combat.velocity;
 
-import keystrokesmod.event.PreVelocityEvent;
+import keystrokesmod.event.player.PreVelocityEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.Velocity;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class HypixelVelocity extends SubMode<Velocity> {
@@ -34,7 +34,7 @@ public class HypixelVelocity extends SubMode<Velocity> {
         this.registerSetting(resetTime = new SliderSetting("Reset time", 5000, 500, 10000, 500, "ms", onlyFirstHit::isToggled));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreVelocity(@NotNull PreVelocityEvent event) {
         if (ModuleManager.longJump.isEnabled()) return;
 
@@ -44,7 +44,7 @@ public class HypixelVelocity extends SubMode<Velocity> {
             return;
         lastVelocityTime = time;
 
-        event.setCanceled(true);
+        event.cancel();
 
         if (!mc.thePlayer.onGround && cancelAir.isToggled()) {
             return;

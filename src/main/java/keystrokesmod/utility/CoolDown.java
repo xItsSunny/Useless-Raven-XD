@@ -33,4 +33,9 @@ public class CoolDown {
     public long getTimeLeft(){
         return lasts - (System.currentTimeMillis() - start);
     }
+
+    public boolean finished(long time) {
+        setCooldown(time);
+        return hasFinished();
+    }
 }

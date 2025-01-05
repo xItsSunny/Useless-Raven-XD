@@ -1,7 +1,7 @@
 package keystrokesmod.module.setting;
 
 import com.google.gson.JsonObject;
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.Module;
 import keystrokesmod.utility.i18n.I18nModule;
 import keystrokesmod.utility.i18n.settings.I18nSetting;
@@ -25,7 +25,7 @@ public abstract class Setting {
         this.visibleCheck = visibleCheck;
         this.viewOnly = false;
         this.toolTip = toolTip;
-        Raven.settingCounter++;
+        Client.settingCounter++;
     }
 
     public Setting(String n, @NotNull Supplier<Boolean> visibleCheck) {

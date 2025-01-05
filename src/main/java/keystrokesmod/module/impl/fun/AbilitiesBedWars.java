@@ -1,11 +1,11 @@
 package keystrokesmod.module.impl.fun;
 
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.server.S3BPacketScoreboardObjective;
 import net.minecraft.network.play.server.S3CPacketUpdateScore;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class AbilitiesBedWars extends Module {
@@ -13,7 +13,7 @@ public class AbilitiesBedWars extends Module {
         super("AbilitiesBedWars", category.fun);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S3BPacketScoreboardObjective) {
             S3BPacketScoreboardObjective packet = (S3BPacketScoreboardObjective) event.getPacket();

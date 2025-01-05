@@ -1,10 +1,10 @@
 package keystrokesmod.module.impl.world.scaffold.sprint;
 
-import keystrokesmod.event.JumpEvent;
+import keystrokesmod.event.player.JumpEvent;
 import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.module.impl.world.scaffold.IScaffoldSprint;
 import keystrokesmod.utility.MoveUtil;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class OldIntaveSprint extends IScaffoldSprint {
@@ -12,9 +12,9 @@ public class OldIntaveSprint extends IScaffoldSprint {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onJump(@NotNull JumpEvent event) {
-        event.setCanceled(true);
+        event.cancel();
         mc.thePlayer.motionY = MoveUtil.jumpMotion();
     }
 

@@ -1,12 +1,11 @@
 package keystrokesmod.module.impl.fun.antiaim;
 
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.player.RotationEvent;
 import keystrokesmod.module.impl.fun.AntiAim;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class BackwardAntiAim extends SubMode<AntiAim> {
@@ -21,7 +20,7 @@ public class BackwardAntiAim extends SubMode<AntiAim> {
         this.registerSetting(randomValue = new SliderSetting("Random", 8, 0, 20, 1, random::isToggled));
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onRotation(@NotNull RotationEvent event) {
         if (!parent.canAntiAim()) {
             return;

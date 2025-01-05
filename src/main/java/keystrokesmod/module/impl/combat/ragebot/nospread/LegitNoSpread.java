@@ -1,11 +1,11 @@
 package keystrokesmod.module.impl.combat.ragebot.nospread;
 
-import keystrokesmod.event.PreTickEvent;
+import keystrokesmod.event.client.PreTickEvent;
 import keystrokesmod.module.impl.combat.RageBot;
 import keystrokesmod.module.impl.combat.ragebot.IRageBotFeature;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class LegitNoSpread extends IRageBotFeature {
@@ -21,7 +21,7 @@ public class LegitNoSpread extends IRageBotFeature {
         fire = true;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreTick(PreTickEvent event) {
         if (shouldSwitch) {
             int curSlot = SlotHandler.getCurrentSlot();

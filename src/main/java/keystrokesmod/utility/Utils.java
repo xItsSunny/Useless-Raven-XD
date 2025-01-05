@@ -3,9 +3,11 @@ package keystrokesmod.utility;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.mojang.realmsclient.gui.ChatFormatting;
-import keystrokesmod.Raven;
-import keystrokesmod.event.ClickEvent;
-import keystrokesmod.mixins.impl.client.GuiScreenAccessor;
+import keystrokesmod.Client;
+import keystrokesmod.event.client.ClickEvent;
+import keystrokesmod.event.client.MouseEvent;
+import keystrokesmod.eventbus.EventHandler;
+import keystrokesmod.mixins.impl.gui.GuiScreenAccessor;
 import keystrokesmod.module.impl.other.NameHider;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.module.impl.render.AntiShuffle;
@@ -13,7 +15,6 @@ import keystrokesmod.utility.i18n.I18nManager;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.Timer;
-import net.minecraftforge.client.event.MouseEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Settings;
@@ -42,9 +43,9 @@ import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.potion.Potion;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.*;
-import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -52,22 +53,26 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.*;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Utils {
+public final class Utils {
     private static final Random rand = new Random();
     public static final Minecraft mc = Minecraft.getMinecraft();
-    public static final ChatComponentText PREFIX = new ChatComponentText("&7[&dR&7]&r ");
+    public static final String PREFIX = "&7[&dR&7]&r ";
     public static HashSet<String> friends = new HashSet<>();
     public static HashSet<String> enemies = new HashSet<>();
     public static final Logger log = LogManager.getLogger();
 
-    public static boolean addEnemy(String name) {
+    public static boolean addEnemy(@NotNull String name) {
         if (enemies.add(name.toLowerCase())) {
             Utils.sendMessage("&7Added &cenemy&7: &b" + name);
             return true;
@@ -93,13 +98,13 @@ public class Utils {
     }
 
     public static List<NetworkPlayerInfo> getTablist() {
-        final ArrayList<NetworkPlayerInfo> list = new ArrayList<>(mc.getNetHandler().getPlayerInfoMap());
-        removeDuplicates(list);
-        list.remove(mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()));
-        return list;
+        return mc.getNetHandler().getPlayerInfoMap().stream()
+                .distinct()
+                .filter(info -> !info.getGameProfile().getId().equals(mc.thePlayer.getUniqueID()))
+                .collect(Collectors.toList());
     }
 
-    public static double getFallDistance(Entity entity) {
+    public static double getFallDistance(@NotNull Entity entity) {
         double fallDist = -1;
         Vec3 pos = new Vec3(entity.posX, entity.posY, entity.posZ);
         int y = (int) Math.floor(pos.yCoord);
@@ -114,21 +119,13 @@ public class Utils {
         return fallDist;
     }
 
-    public static void removeDuplicates(final ArrayList list) {
-        final HashSet set = new HashSet(list);
-        list.clear();
-        list.addAll(set);
-    }
-
-    public static boolean removeFriend(String name) {
+    public static void removeFriend(@NotNull String name) {
         if (friends.remove(name.toLowerCase())) {
             Utils.sendMessage("&7Removed &afriend&7: &b" + name);
-            return true;
         }
-        return false;
     }
 
-    public static boolean addFriend(String name) {
+    public static boolean addFriend(@NotNull String name) {
         if (friends.add(name.toLowerCase())) {
             Utils.sendMessage("&7Added &afriend&7: &b" + name);
             return true;
@@ -140,16 +137,36 @@ public class Utils {
         return num == Math.floor(num);
     }
 
+    public static double random() {
+        return randomizeDouble(0, 1);
+    }
+
     public static boolean randomizeBoolean() {
-        return Math.random() >= 0.5;
+        return ThreadLocalRandom.current().nextBoolean();
     }
 
     public static int randomizeInt(double min, double max) {
-        return (int) Math.round(randomizeDouble(min, max));
+        int iMin = (int) min;
+        int iMax = (int) Math.round(max);
+        if (iMin == iMax)
+            return iMin;
+        if (iMax < iMin) {
+            int tmp = iMin;
+            iMin = iMax;
+            iMax = tmp;
+        }
+        return ThreadLocalRandom.current().nextInt(iMin, iMax);
     }
 
     public static double randomizeDouble(double min, double max) {
-        return Math.random() * (max - min) + min;
+        if (min == max)
+            return min;
+        if (max < min) {
+            double tmp = min;
+            min = max;
+            max = tmp;
+        }
+        return ThreadLocalRandom.current().nextDouble(min, max);
     }
 
     public static boolean inFov(float fov, @NotNull BlockPos blockPos) {
@@ -192,7 +209,7 @@ public class Utils {
 
     public static void sendMessage(String txt) {
         if (nullCheck()) {
-            String m = formatColor("&7[&dR&7]&r " + replace(txt));
+            String m = formatColor(PREFIX + replace(txt));
             mc.thePlayer.addChatMessage(new ChatComponentText(m));
         }
     }
@@ -225,7 +242,7 @@ public class Utils {
     }
 
     static {
-        Raven.getExecutor().scheduleWithFixedDelay(() -> {
+        Client.getExecutor().scheduleWithFixedDelay(() -> {
             if (Utils.nullCheck() && !delayedMessage.isEmpty()) {
                 for (String s : delayedMessage) {
                     sendMessage(s);
@@ -391,9 +408,11 @@ public class Utils {
         return mc.thePlayer != null && mc.theWorld != null;
     }
 
+    private static final List<String> HYPIXEL_IPS = Collections.unmodifiableList(Arrays.asList("hypixel.net", "nyaproxy.xyz", "nyap.buzz", "hyp"));
+
     public static boolean isHypixel() {
         return !mc.isSingleplayer() && mc.getCurrentServerData() != null
-                && mc.getCurrentServerData().serverIP.contains("hypixel.net");
+                && HYPIXEL_IPS.stream().anyMatch(mc.getCurrentServerData().serverIP::contains);
     } // I'm not sure how to handle it, such as Proxy IP.
 
     public static boolean isCraftiGames() {
@@ -406,7 +425,7 @@ public class Utils {
     // bro this method is too fucking slow, so I improve it
     public static Timer getTimer() {
         if (timer == null) {
-            timer = Reflection.get(mc, "field_71428_T", Timer.class);
+            timer = ReflectionUtils.get(mc, "field_71428_T");
             return timer;
         }
         return timer;
@@ -462,19 +481,16 @@ public class Utils {
         if (n > 255) {
             return 255;
         }
-        if (n < 4) {
-            return 4;
-        }
-        return n;
+        return Math.max(n, 4);
     }
 
     public static boolean isTeamMate(Entity entity) {
         try {
-            Entity teamMate = entity;
-            if (mc.thePlayer.isOnSameTeam((EntityLivingBase) entity) || mc.thePlayer.getDisplayName().getUnformattedText().startsWith(teamMate.getDisplayName().getUnformattedText().substring(0, 2))) {
+            if (mc.thePlayer.isOnSameTeam((EntityLivingBase) entity) || mc.thePlayer.getDisplayName().getUnformattedText().startsWith(entity.getDisplayName().getUnformattedText().substring(0, 2))) {
                 return true;
             }
         } catch (Exception e) {
+            Utils.handleException(e);
         }
         return false;
     }
@@ -737,10 +753,10 @@ public class Utils {
         return str.replace("§k", "").replace("§l", "").replace("§m", "").replace("§n", "").replace("§o", "").replace("§r", "");
     }
 
-    public static boolean isLeftClicking() {
+    public static boolean isNotLeftClicking() {
         if (ModuleManager.autoClicker.isEnabled()) {
-            return Mouse.isButtonDown(0);
-        } else return CPSCalculator.f() > 1 && System.currentTimeMillis() - CPSCalculator.LL < 300L;
+            return !Mouse.isButtonDown(0);
+        } else return CPSCalculator.f() <= 1 || System.currentTimeMillis() - CPSCalculator.LL >= 300L;
     }
 
     public static boolean tryingToCombo() {
@@ -750,14 +766,14 @@ public class Utils {
     public static void setMouseButtonState(int mouseButton, boolean held) {
         MouseEvent m = new MouseEvent();
 
-        Reflection.set(m, "button", mouseButton);
-        Reflection.set(m, "buttonstate", held);
-        MinecraftForge.EVENT_BUS.post(m);
+        m.setButton(mouseButton);
+        m.setButtonstate(held);
+        Client.EVENT_BUS.post(m);
 
-        ByteBuffer buttons = Reflection.get(Mouse.class, "buttons", ByteBuffer.class);
-        buttons.put(mouseButton, (byte) (held ? 1 : 0));
-        Reflection.set(Mouse.class, "buttons", buttons);
-
+        if (!m.isCancelled()) {
+            ByteBuffer buttons = ReflectionUtils.getDeclared(Mouse.class, "buttons");
+            buttons.put(mouseButton, (byte) (held ? 1 : 0));
+        }
     }
 
     public static long getDifference(long n, long n2) {
@@ -780,30 +796,29 @@ public class Utils {
         final Vec3 vec3 = new Vec3((double) (sin * n2), (double) MathHelper.sin(-rotationPitch * 0.017453292f), (double) (cos * n2));
         final Vec3 addVector = getPositionEyes.addVector(vec3.xCoord * (double) n, vec3.yCoord * (double) n, vec3.zCoord * (double) n);
         Vec3 vec4 = null;
-        final List getEntitiesWithinAABBExcludingEntity = mc.theWorld.getEntitiesWithinAABBExcludingEntity(mc.getRenderViewEntity(), mc.getRenderViewEntity().getEntityBoundingBox().addCoord(vec3.xCoord * (double) n, vec3.yCoord * (double) n, vec3.zCoord * (double) n).expand(1.0, 1.0, 1.0));
-        double n3 = (double) n;
-        for (int i = 0; i < getEntitiesWithinAABBExcludingEntity.size(); ++i) {
-            final Entity entity2 = (Entity) getEntitiesWithinAABBExcludingEntity.get(i);
-            if (entity2.canBeCollidedWith()) {
-                final float getCollisionBorderSize = entity2.getCollisionBorderSize();
-                final AxisAlignedBB expand = entity2.getEntityBoundingBox().expand((double) getCollisionBorderSize, (double) getCollisionBorderSize, (double) getCollisionBorderSize);
+        final List<Entity> getEntitiesWithinAABBExcludingEntity = mc.theWorld.getEntitiesWithinAABBExcludingEntity(mc.getRenderViewEntity(), mc.getRenderViewEntity().getEntityBoundingBox().addCoord(vec3.xCoord * (double) n, vec3.yCoord * (double) n, vec3.zCoord * (double) n).expand(1.0, 1.0, 1.0));
+        double n3 = n;
+        for (Entity entity1 : getEntitiesWithinAABBExcludingEntity) {
+            if (entity1.canBeCollidedWith()) {
+                final float getCollisionBorderSize = entity1.getCollisionBorderSize();
+                final AxisAlignedBB expand = entity1.getEntityBoundingBox().expand((double) getCollisionBorderSize, (double) getCollisionBorderSize, (double) getCollisionBorderSize);
                 final MovingObjectPosition calculateIntercept = expand.calculateIntercept(getPositionEyes, addVector);
                 if (expand.isVecInside(getPositionEyes)) {
                     if (0.0 < n3 || n3 == 0.0) {
-                        entity = entity2;
+                        entity = entity1;
                         vec4 = ((calculateIntercept == null) ? getPositionEyes : calculateIntercept.hitVec);
                         n3 = 0.0;
                     }
                 } else if (calculateIntercept != null) {
                     final double distanceTo = getPositionEyes.distanceTo(calculateIntercept.hitVec);
                     if (distanceTo < n3 || n3 == 0.0) {
-                        if (entity2 == mc.getRenderViewEntity().ridingEntity && !entity2.canRiderInteract()) {
+                        if (entity1 == mc.getRenderViewEntity().ridingEntity && !entity1.canRiderInteract()) {
                             if (n3 == 0.0) {
-                                entity = entity2;
+                                entity = entity1;
                                 vec4 = calculateIntercept.hitVec;
                             }
                         } else {
-                            entity = entity2;
+                            entity = entity1;
                             vec4 = calculateIntercept.hitVec;
                             n3 = distanceTo;
                         }
@@ -829,19 +844,19 @@ public class Utils {
         if (d == 0) {
             return (double) Math.round(n);
         } else {
-            double p = Math.pow(10.0D, (double) d);
+            double p = Math.pow(10.0D, d);
             return (double) Math.round(n * p) / p;
         }
     }
     public static double PitchFromEntity(EntityPlayer en, float f) {
-        return (double) (mc.thePlayer.rotationPitch - pitchToEntity(en, f));
+        return mc.thePlayer.rotationPitch - pitchToEntity(en, f);
     }
     public static double fovFromEntity(EntityPlayer en) {
         return ((((double) (mc.thePlayer.rotationYaw - fovToEntity(en)) % 360.0D) + 540.0D) % 360.0D) - 180.0D;
     }
 
     public static float fovFromEntityf(EntityPlayer en) {
-        return (float) (((((float) (mc.thePlayer.rotationYaw - fovToEntity(en)) % 360.0D) + 540.0D) % 360.0D) - 180.0D);
+        return (float) (((((mc.thePlayer.rotationYaw - fovToEntity(en)) % 360.0D) + 540.0D) % 360.0D) - 180.0D);
     }
 
     public static float fovToEntity(EntityPlayer ent) {
@@ -989,8 +1004,21 @@ public class Utils {
         return stringbuilder.toString();
     }
 
+    public static float getEyeHeight() {
+        float f = mc.thePlayer.eyeHeight;
+        if (mc.thePlayer.isPlayerSleeping()) {
+            f = 0.2F;
+        }
+
+        if (mc.thePlayer.isSneaking()) {
+            f -= 0.08F;
+        }
+
+        return f;
+    }
+
     public static keystrokesmod.script.classes.Vec3 getEyePos(@NotNull Entity entity, keystrokesmod.script.classes.@NotNull Vec3 position) {
-        return position.add(new keystrokesmod.script.classes.Vec3(0, entity.getEyeHeight(), 0));
+        return position.add(new keystrokesmod.script.classes.Vec3(0, entity == mc.thePlayer ? getEyeHeight() : entity.getEyeHeight(), 0));
     }
 
     public static keystrokesmod.script.classes.Vec3 getEyePos(Entity entity) {
@@ -1085,10 +1113,14 @@ public class Utils {
      * Sends a click to Minecraft legitimately
      */
     public static void sendClick(final int button, final boolean state) {
+        MouseEvent event = new MouseEvent();
+        event.setButton(button);
+        event.setButtonstate(state);
+        Client.EVENT_BUS.post(event);
+        if (event.isCancelled()) return;
+
         final int keyBind = button == 0 ? mc.gameSettings.keyBindAttack.getKeyCode() : mc.gameSettings.keyBindUseItem.getKeyCode();
-
         KeyBinding.setKeyBindState(keyBind, state);
-
         if (state) {
             KeyBinding.onTick(keyBind);
         }
@@ -1099,15 +1131,16 @@ public class Utils {
         int y = s.height - Mouse.getY() * s.height / mc.displayHeight - 1;
 
         ClickEvent event = new ClickEvent();
-        MinecraftForge.EVENT_BUS.post(event);
-        if (event.isCanceled())
+        Client.EVENT_BUS.post(event);
+        if (event.isCancelled())
             return;
 
         ((GuiScreenAccessor) s).mouseClicked(x, y, 0);
     }
 
     public static int limit(int value, int min, int max) {
-        return Math.max(Math.min(value, max), min);
+        int a = Math.min(value, max);
+        return (a >= min) ? a : min;
     }
 
     public static long limit(long value, long min, long max) {
@@ -1120,5 +1153,115 @@ public class Utils {
 
     public static double limit(double value, double min, double max) {
         return Math.max(Math.min(value, max), min);
+    }
+
+    /**
+     * 返回一个反转视图的列表，而不修改原列表。
+     *
+     * @param list 原始列表
+     * @param <T>  列表的元素类型
+     * @return 反转视图的列表
+     */
+    public static <T> @NotNull List<T> reversed(@NotNull List<T> list) {
+        return new ReversedList<>(list);
+    }
+
+    /**
+     * 内部类：实现反转视图的列表。
+     */
+    private static class ReversedList<T> extends AbstractList<T> {
+        private final @NotNull List<T> original;
+
+        public ReversedList(@NotNull List<T> original) {
+            this.original = original;
+        }
+
+        @Override
+        public T get(int index) {
+            // 动态计算反转索引
+            int reversedIndex = size() - 1 - index;
+            return original.get(reversedIndex);
+        }
+
+        @Override
+        public T set(int index, T element) {
+            int reversedIndex = size() - 1 - index;
+            return original.set(reversedIndex, element);
+        }
+
+        @Override
+        public int size() {
+            return original.size();
+        }
+    }
+
+    public static void handleEventException(@Nullable EventHandler<?> eventHandler, Throwable e) {
+        String targetName = "Unknown Source";
+
+        if (eventHandler != null) {
+            Method method = eventHandler.getMethod();
+            if (method != null) {
+                targetName = String.format("%s->%s", method.getDeclaringClass().getSimpleName(), method.getName());
+                if (Modifier.isNative(method.getModifiers()))
+                    targetName += "(native method)";
+            }
+            if (ReflectionUtils.isFastMethod(eventHandler.getEventConsumer())) {
+                targetName += "(fast method)";
+            }
+        }
+
+        handleException(e,
+                String.format("post event to %s", targetName),
+                String.format("%s->%s", ReflectionUtils.getCallerClassName(1),
+                        ReflectionUtils.getCallerMethodName(1)));  // because the caller is EventBus#post
+    }
+
+    public static void handleException(@NotNull Throwable e) {
+        try {
+            handleException(e, ReflectionUtils.getCallerMethodName(), ReflectionUtils.getCallerClassName());
+        } catch (Throwable ignored) {
+        }
+    }
+
+    public static void handleException(@NotNull Throwable e, String action) {
+        try {
+            handleException(e, action, ReflectionUtils.getCallerClassName());
+        } catch (Throwable ignored) {
+        }
+    }
+
+    public static void handleException(@NotNull Throwable e, String action, String exceptionWhere) {
+        try {
+            if (e instanceof NullPointerException) {
+                Utils.sendMessage(String.format("%sUnexpected '%s%s%s' while '%s%s%s' in '%s%s%s': %s%s%s.",
+                        ChatFormatting.RED,
+                        ChatFormatting.AQUA, e.getClass().getSimpleName(), ChatFormatting.RED,
+                        ChatFormatting.RESET, action, ChatFormatting.RED,
+                        ChatFormatting.RESET, exceptionWhere, ChatFormatting.RED,
+                        ChatFormatting.RESET, e.getMessage(), ChatFormatting.RED
+                ));
+            } else {
+                Utils.sendMessageAnyWay(String.format("%sUnexpected '%s%s%s' while '%s%s%s' in '%s%s%s': %s%s%s.",
+                        ChatFormatting.RED,
+                        ChatFormatting.AQUA, e.getClass().getSimpleName(), ChatFormatting.RED,
+                        ChatFormatting.RESET, action, ChatFormatting.RED,
+                        ChatFormatting.RESET, exceptionWhere, ChatFormatting.RED,
+                        ChatFormatting.RESET, e.getMessage(), ChatFormatting.RED
+                ));
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
+    @SafeVarargs
+    @Contract(pure = true)
+    public static <T extends Comparable<T>> T max(T firstObj, T @NotNull ... objects) {
+        T maxObj = firstObj;
+        for (T object : objects) {
+            if (object.compareTo(maxObj) > 0) {
+                maxObj = object;
+            }
+        }
+        return maxObj;
     }
 }

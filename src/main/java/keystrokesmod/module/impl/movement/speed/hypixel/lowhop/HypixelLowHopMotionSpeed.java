@@ -1,11 +1,10 @@
 package keystrokesmod.module.impl.movement.speed.hypixel.lowhop;
 
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.speed.hypixel.HypixelLowHopSpeed;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
-import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class HypixelLowHopMotionSpeed extends SubMode<HypixelLowHopSpeed> {
@@ -27,7 +26,7 @@ public class HypixelLowHopMotionSpeed extends SubMode<HypixelLowHopSpeed> {
         toDisable = true;
     }
 
-    private class Impl extends SubMode<HypixelLowHopSpeed> {
+    public class Impl extends SubMode<HypixelLowHopSpeed> {
         private int offGroundTicks = 0;
 
         public Impl(String name, @NotNull HypixelLowHopSpeed parent) {
@@ -39,7 +38,7 @@ public class HypixelLowHopMotionSpeed extends SubMode<HypixelLowHopSpeed> {
             offGroundTicks = 999;
         }
 
-        @SubscribeEvent
+        @EventListener
         public void onPreUpdate(PreUpdateEvent event) {
             if (mc.thePlayer.onGround) {
                 offGroundTicks = 0;
@@ -52,9 +51,9 @@ public class HypixelLowHopMotionSpeed extends SubMode<HypixelLowHopSpeed> {
             if (offGroundTicks == 0) {
                 if (toDisable) {
                     disable();
-                } else if (!Utils.jumpDown()) {
+                } else {
                     MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance() - Math.random() / 100f);
-                    mc.thePlayer.jump();
+                    MoveUtil.jump();
                 }
             } else if (parent.noLowHop() || MoveUtil.getJumpEffect() != 0) {
                 return;

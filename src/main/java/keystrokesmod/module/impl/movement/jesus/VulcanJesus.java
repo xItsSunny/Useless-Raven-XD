@@ -1,11 +1,11 @@
 package keystrokesmod.module.impl.movement.jesus;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.movement.Jesus;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import net.minecraft.potion.Potion;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class VulcanJesus extends SubMode<Jesus> {
@@ -17,7 +17,7 @@ public class VulcanJesus extends SubMode<Jesus> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (!mc.gameSettings.keyBindJump.isPressed() && mc.thePlayer.isInWater() && isFirstTimeInWater && !(mc.thePlayer.posY % 1 == 0 || (mc.thePlayer.posY * 2) % 1 == 0)) {
             mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - .85, mc.thePlayer.posZ);

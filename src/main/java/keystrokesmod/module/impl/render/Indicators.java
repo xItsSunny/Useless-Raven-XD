@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.render;
 
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -16,16 +17,14 @@ import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.event.world.EntityJoinWorldEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
 public class Indicators extends Module {
     private final ButtonSetting renderArrows;
@@ -37,8 +36,7 @@ public class Indicators extends Module {
     private final ButtonSetting arrowColor;
     private final ButtonSetting renderItem;
     private final ButtonSetting threatsOnly;
-    private final HashSet<Entity> threats = new HashSet<>();
-    private final Map<String, String> lastHeldItems = new ConcurrentHashMap<>();
+    private final Set<Entity> threats = new ObjectOpenHashSet<>();
     private final int pearlColor = new Color(173, 12, 255).getRGB();
     private final int fireBallColor = new Color(255, 109, 0).getRGB();
 
@@ -57,14 +55,10 @@ public class Indicators extends Module {
 
     public void onDisable() {
         this.threats.clear();
-        this.lastHeldItems.clear();
     }
 
-    @SubscribeEvent
-    public void onRenderTick(TickEvent.RenderTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
+    @EventListener
+    public void onRenderTick(Render2DEvent event) {
         if (mc.currentScreen != null || !Utils.nullCheck()) {
             return;
         }
@@ -117,7 +111,7 @@ public class Indicators extends Module {
                 GL11.glTranslated(x + position[0], y + position[1], 0.0);
                 String distanceStr = (int) mc.thePlayer.getDistanceToEntity(e) + "m";
                 float textWidth = mc.fontRendererObj.getStringWidth(distanceStr);
-                mc.fontRendererObj.drawStringWithShadow(distanceStr, -textWidth / 2, -mc.fontRendererObj.FONT_HEIGHT / 2, -1);
+                mc.fontRendererObj.drawStringWithShadow(distanceStr, -textWidth / 2, (float) -mc.fontRendererObj.FONT_HEIGHT / 2, -1);
                 GL11.glPopMatrix();
 
                 GL11.glPushMatrix();
@@ -126,20 +120,19 @@ public class Indicators extends Module {
                 RenderUtils.drawArrow(-5f, (float) -radius.getInput() - 38, itemColors.isToggled() ? color : -1, 3, 5);
                 GL11.glPopMatrix();
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onEntityJoin(EntityJoinWorldEvent e) {
         if (!Utils.nullCheck()) {
             return;
         }
-        if (e.entity == mc.thePlayer) {
+        if (e.getEntity() == mc.thePlayer) {
             this.threats.clear();
-        } else if (canRender(e.entity) && (mc.thePlayer.getDistanceSqToEntity(e.entity) > 16.0 || !threatsOnly.isToggled())) {
-            this.threats.add(e.entity);
+        } else if (canRender(e.getEntity()) && (mc.thePlayer.getDistanceSqToEntity(e.getEntity()) > 16.0 || !threatsOnly.isToggled())) {
+            this.threats.add(e.getEntity());
         }
     }
 
@@ -156,7 +149,6 @@ public class Indicators extends Module {
             }
         } catch (IllegalAccessException e) {
             Utils.sendMessage("&cIssue checking entity.");
-            e.printStackTrace();
             return false;
         }
         return false;

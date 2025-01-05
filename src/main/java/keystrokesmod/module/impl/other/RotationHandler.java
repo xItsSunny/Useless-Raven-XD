@@ -1,9 +1,10 @@
 package keystrokesmod.module.impl.other;
 
-import keystrokesmod.event.MoveInputEvent;
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.clickgui.ClickGui;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.RotationEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.movement.TargetStrafe;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -19,9 +20,8 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.Client;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,14 +44,18 @@ public final class RotationHandler extends Module {
     private static MoveFix moveFix = MoveFix.None;
     private final ModeSetting smoothBack = new ModeSetting("Smooth back", new String[]{"None", "Default"}, 0);
     private final SliderSetting aimSpeed = new SliderSetting("Aim speed", 5, 1, 15, 0.1, new ModeOnly(smoothBack, 1));
+    private static final ButtonSetting hideRotation = new ButtonSetting("Hide rotation", false);
 
     public RotationHandler() {
         super("RotationHandler", category.other);
-        this.registerSetting(defaultMoveFix, smoothBack, aimSpeed);
+        this.registerSetting(defaultMoveFix, smoothBack, aimSpeed, hideRotation);
         this.registerSetting(new DescriptionSetting("Classic"));
         this.registerSetting(rotateBody, fullBody, randomYawFactor);
-        this.registerSetting(new DescriptionSetting("Debug"));
         this.canBeEnabled = false;
+    }
+
+    public static boolean hideRotation() {
+        return hideRotation.isToggled();
     }
 
     public static float getMovementYaw(Entity entity) {
@@ -121,11 +125,11 @@ public final class RotationHandler extends Module {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onPreUpdate(PreUpdateEvent event) {
         prevRotationYaw = getRotationYaw();
         prevRotationPitch = getRotationPitch();
-        if (isSet && mc.currentScreen == null) {
+        if (isSet && (mc.currentScreen == null || mc.currentScreen instanceof ClickGui)) {
             float viewYaw = RotationUtils.normalize(mc.thePlayer.rotationYaw);
             float viewPitch = RotationUtils.normalize(mc.thePlayer.rotationPitch);
 
@@ -148,7 +152,7 @@ public final class RotationHandler extends Module {
         if (getRotationPitch() == mc.thePlayer.rotationPitch) rotationPitch = null;
 
         RotationEvent rotationEvent = new RotationEvent(getRotationYaw(), getRotationPitch(), MoveFix.values()[(int) defaultMoveFix.getInput()]);
-        MinecraftForge.EVENT_BUS.post(rotationEvent);
+        Client.EVENT_BUS.post(rotationEvent);
         isSet = (rotationEvent.isSet() || rotationYaw != null || rotationPitch != null) && rotationEvent.isSmoothBack();
         if (isSet) {
             rotationYaw = rotationEvent.getYaw();
@@ -165,7 +169,7 @@ public final class RotationHandler extends Module {
      *
      * @param event before update living entity (move)
      */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @EventListener(priority = 2)
     public void onMoveInput(MoveInputEvent event) {
         if (isSet) {
             switch (moveFix) {
@@ -211,7 +215,7 @@ public final class RotationHandler extends Module {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onPreMotion(PreMotionEvent event) {
         if (rotationYaw != null) {
             final float yaw = rotationYaw;

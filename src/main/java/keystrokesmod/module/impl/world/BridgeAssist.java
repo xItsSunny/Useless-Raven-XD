@@ -6,8 +6,8 @@ import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 
 public class BridgeAssist extends Module {
     private static final String NORMAL = "Normal";
@@ -47,8 +47,8 @@ public class BridgeAssist extends Module {
         this.gliding = false;
     }
 
-    @SubscribeEvent
-    public void onRenderTick(TickEvent.RenderTickEvent e) {
+    @EventListener
+    public void onRenderTick(Render2DEvent e) {
         if (!Utils.nullCheck()) {
             return;
         }

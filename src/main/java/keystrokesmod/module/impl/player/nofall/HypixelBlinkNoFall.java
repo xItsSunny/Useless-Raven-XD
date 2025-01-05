@@ -1,13 +1,13 @@
 package keystrokesmod.module.impl.player.nofall;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.player.NoFall;
 import keystrokesmod.module.impl.player.blink.NormalBlink;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.BlockUtils;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import static keystrokesmod.module.ModuleManager.scaffold;
@@ -30,7 +30,7 @@ public class HypixelBlinkNoFall extends SubMode<NoFall> {
         blinked = false;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (mc.thePlayer.onGround || parent.noAction()) {
             if (blinked) {

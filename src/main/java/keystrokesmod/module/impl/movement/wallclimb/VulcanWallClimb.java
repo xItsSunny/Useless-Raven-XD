@@ -1,11 +1,11 @@
 package keystrokesmod.module.impl.movement.wallclimb;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.movement.WallClimb;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class VulcanWallClimb extends SubMode<WallClimb> {
@@ -13,7 +13,7 @@ public class VulcanWallClimb extends SubMode<WallClimb> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (mc.thePlayer.isCollidedHorizontally) {
             if (mc.thePlayer.ticksExisted % 2 == 0) {

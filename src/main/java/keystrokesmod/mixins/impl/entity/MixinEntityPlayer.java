@@ -1,6 +1,6 @@
 package keystrokesmod.mixins.impl.entity;
 
-import keystrokesmod.event.EyeHeightEvent;
+import keystrokesmod.event.render.EyeHeightEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.KeepSprint;
 import keystrokesmod.module.impl.render.Particles;
@@ -18,7 +18,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
+import keystrokesmod.Client;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
 @SuppressWarnings("DataFlowIssue")
 @Mixin(value = EntityPlayer.class)
@@ -153,7 +153,7 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
     @Inject(method = "getEyeHeight", at = @At("RETURN"), cancellable = true)
     public void onGetEyeHeight(@NotNull CallbackInfoReturnable<Float> cir) {
         EyeHeightEvent event = new EyeHeightEvent(cir.getReturnValue());
-        MinecraftForge.EVENT_BUS.post(event);
+        Client.EVENT_BUS.post(event);
         if (event.isSet()) {
             mc.thePlayer.cameraYaw = 0;
             mc.thePlayer.cameraPitch = 0;

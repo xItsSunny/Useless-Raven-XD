@@ -1,14 +1,14 @@
 package keystrokesmod.module.impl.movement.step;
 
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.Step;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 public class Hypixel15Step extends SubMode<Step> {
     private final SliderSetting delay = new SliderSetting("Delay", 1000, 0, 5000, 250, "ms");
@@ -29,7 +29,7 @@ public class Hypixel15Step extends SubMode<Step> {
         stepping = false;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         final long time = System.currentTimeMillis();
         if (mc.thePlayer.onGround && mc.thePlayer.isCollidedHorizontally && MoveUtil.isMoving() && time - lastStep >= delay.getInput()) {
@@ -38,7 +38,7 @@ public class Hypixel15Step extends SubMode<Step> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (mc.thePlayer.onGround) {
             offGroundTicks = 0;
@@ -56,7 +56,7 @@ public class Hypixel15Step extends SubMode<Step> {
                 case 0:
                     MoveUtil.stop();
                     MoveUtil.strafe();
-                    mc.thePlayer.jump();
+                    MoveUtil.jump();
                     break;
                 case 1:
                 case 2:
@@ -78,7 +78,7 @@ public class Hypixel15Step extends SubMode<Step> {
                     MoveUtil.stop();
                     break;
                 case 16:
-                    mc.thePlayer.jump();
+                    mc.thePlayer.motionY = .42;
                     stepping = false;
                     break;
             }

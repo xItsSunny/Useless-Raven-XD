@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.movement.noweb;
 
-import keystrokesmod.event.BlockWebEvent;
-import keystrokesmod.event.ReceivePacketEvent;
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.world.BlockWebEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.impl.movement.NoWeb;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.PacketUtils;
@@ -12,7 +12,7 @@ import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
 import net.minecraft.network.play.server.S22PacketMultiBlockChange;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -29,14 +29,14 @@ public class PingNoWeb extends SubMode<NoWeb> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onBlockWeb(@NotNull BlockWebEvent event) {
         if (ignoredBlock.contains(event.getBlockPos())) {
-            event.setCanceled(true);
+            event.cancel();
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (!Utils.nullCheck() || mc.thePlayer.ticksExisted < 20) {
             onDisable();
@@ -60,11 +60,11 @@ public class PingNoWeb extends SubMode<NoWeb> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(@NotNull SendPacketEvent event) {
         if (event.getPacket() instanceof C0FPacketConfirmTransaction) {
             if (delay) {
-                event.setCanceled(true);
+                event.cancel();
                 delayedPackets.add(((C0FPacketConfirmTransaction) event.getPacket()));
             }
         }

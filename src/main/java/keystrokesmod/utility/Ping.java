@@ -1,18 +1,18 @@
 package keystrokesmod.utility;
 
-import keystrokesmod.event.WorldChangeEvent;
-import net.minecraftforge.client.event.ClientChatReceivedEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.world.WorldChangeEvent;
+import keystrokesmod.event.network.ClientChatReceivedEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 public class Ping {
     private static boolean e = false;
     private static long s = 0L;
 
-    @SubscribeEvent
+    @EventListener
     public void onChatMessageRecieved(ClientChatReceivedEvent event) {
         if (e && Utils.nullCheck()) {
-            if (Utils.stripColor(event.message.getUnformattedText()).startsWith("Unknown")) {
-                event.setCanceled(true);
+            if (Utils.stripColor(event.getMessage().getUnformattedText()).startsWith("Unknown")) {
+                event.cancel();
                 e = false;
                 this.getPing();
             }
@@ -45,7 +45,7 @@ public class Ping {
         s = 0L;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onWorldChange(WorldChangeEvent event) {
         e = false;
     }

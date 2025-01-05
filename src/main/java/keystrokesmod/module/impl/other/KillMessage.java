@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.other;
 
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.utility.PacketUtils;
@@ -8,8 +8,8 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.play.server.S13PacketDestroyEntities;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.network.AttackEntityEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class KillMessage extends Module {
@@ -59,10 +59,10 @@ public class KillMessage extends Module {
         this.registerSetting(mode = new ModeSetting("Mode", new String[]{"yby02", "Custom", "Heist"}, 0));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onAttack(@NotNull AttackEntityEvent event) {
-        if (event.target instanceof EntityPlayer) {
-            lastAttack = (EntityPlayer) event.target;
+        if (event.getTarget() instanceof EntityPlayer) {
+            lastAttack = (EntityPlayer) event.getTarget();
             lastAttackTime = System.currentTimeMillis();
         }
     }
@@ -78,7 +78,7 @@ public class KillMessage extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (lastAttack != null && event.getPacket() instanceof S13PacketDestroyEntities) {
             S13PacketDestroyEntities packet = (S13PacketDestroyEntities) event.getPacket();

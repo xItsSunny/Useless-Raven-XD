@@ -10,8 +10,8 @@ import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -39,8 +39,8 @@ public class TejasAssist extends SubMode<AimAssist> {
         this.registerSetting(distance = new SliderSetting("Distance", 5, 1, 8, 0.1));
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onRender(Render2DEvent event) {
         if (noAction()) {
             return;
         }
@@ -66,7 +66,7 @@ public class TejasAssist extends SubMode<AimAssist> {
     private boolean noAction() {
         if (mc.currentScreen != null || !mc.inGameHasFocus) return true;
         if (weaponOnly.isToggled() && !Utils.holdingWeapon()) return true;
-        if (clickAim.isToggled() && !Utils.isLeftClicking()) return true;
+        if (clickAim.isToggled() && Utils.isNotLeftClicking()) return true;
         return breakBlocks.isToggled() && ((PlayerControllerMPAccessor) mc.playerController).isHittingBlock();
     }
 

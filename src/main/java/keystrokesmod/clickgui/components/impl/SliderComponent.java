@@ -1,8 +1,7 @@
 package keystrokesmod.clickgui.components.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.clickgui.components.Component;
-import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -11,7 +10,6 @@ import keystrokesmod.utility.profile.ProfileModule;
 import keystrokesmod.utility.render.RenderUtils;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -71,38 +69,28 @@ public class SliderComponent extends Component {
     public void onDrawScreen(int x, int y) {
         this.y = this.parent.categoryComponent.getY() + this.o;
         this.x = this.parent.categoryComponent.getX();
-        double d = Math.min(this.parent.categoryComponent.gw() - 8, Math.max(0, x - this.x));
+        double d = Math.min(this.parent.categoryComponent.gw() - 8, (0 >= x - this.x) ? 0 : x - this.x);
         this.w = (double) (this.parent.categoryComponent.gw() - 8) * (this.sliderSetting.getInput() - this.sliderSetting.getMin()) / (this.sliderSetting.getMax() - this.sliderSetting.getMin());
         if (this.d) {
             if (d == 0.0D) {
                 this.sliderSetting.setValue(this.sliderSetting.getMin());
-                if (this.sliderSetting.getInput() != this.sliderSetting.getMin() && ModuleManager.hud != null && ModuleManager.hud.isEnabled() && !ModuleManager.organizedModules.isEmpty()) {
-                    ModuleManager.sort();
-                }
                 parent.categoryComponent.render();
             } else {
-                double n = roundToInterval(d / (double) (this.parent.categoryComponent.gw() - 8) * (this.sliderSetting.getMax() - this.sliderSetting.getMin()) + this.sliderSetting.getMin(), 2);
+                double n = roundToInterval(d / (double) (this.parent.categoryComponent.gw() - 8) * (this.sliderSetting.getMax() - this.sliderSetting.getMin()) + this.sliderSetting.getMin());
                 this.sliderSetting.setValue(n);
-                if (this.sliderSetting.getInput() != n && ModuleManager.hud != null && ModuleManager.hud.isEnabled() && !ModuleManager.organizedModules.isEmpty()) {
-                    ModuleManager.sort();
-                }
                 parent.categoryComponent.render();
             }
-            if (Raven.currentProfile != null) {
-                ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+            if (Client.currentProfile != null) {
+                ((ProfileModule) Client.currentProfile.getModule()).saved = false;
             }
         }
 
     }
 
-    private static double roundToInterval(double v, int p) {
-        if (p < 0) {
-            return 0.0D;
-        } else {
-            BigDecimal bd = new BigDecimal(v);
-            bd = bd.setScale(p, RoundingMode.HALF_UP);
-            return bd.doubleValue();
-        }
+    private static double roundToInterval(double v) {
+        BigDecimal bd = new BigDecimal(v);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
     public void onClick(int x, int y, int b) {

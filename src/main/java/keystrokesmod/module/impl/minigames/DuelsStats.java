@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.minigames;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
@@ -8,9 +8,10 @@ import keystrokesmod.utility.ProfileUtils;
 import keystrokesmod.utility.URLUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.client.event.ClientChatReceivedEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.network.ClientChatReceivedEvent;
+import keystrokesmod.event.world.EntityJoinWorldEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -134,10 +135,10 @@ public class DuelsStats extends Module {
 
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMessageReceived(ClientChatReceivedEvent c) {
         if (Utils.nullCheck() && this.id()) {
-            String s = Utils.stripColor(c.message.getUnformattedText());
+            String s = Utils.stripColor(c.getMessage().getUnformattedText());
             if (s.contains(" ")) {
                 String[] sp = s.split(" ");
                 String n;
@@ -160,9 +161,9 @@ public class DuelsStats extends Module {
         }
     }
 
-    @SubscribeEvent
-    public void onEntityJoin(EntityJoinWorldEvent j) {
-        if (j.entity == mc.thePlayer) {
+    @EventListener
+    public void onEntityJoin(@NotNull EntityJoinWorldEvent j) {
+        if (j.getEntity() == mc.thePlayer) {
             this.en = "";
             this.q.clear();
         }
@@ -179,7 +180,7 @@ public class DuelsStats extends Module {
             Utils.sendMessage("&cAPI Key is empty!");
         } else {
             ProfileUtils.DM dm = ProfileUtils.DM.values()[(int) (mode.getInput() - 1.0D)];
-            Raven.getExecutor().execute(() -> {
+            Client.getExecutor().execute(() -> {
                 int[] s = ProfileUtils.getHypixelStats(n, dm);
                 if (s != null) {
                     if (s[0] == -1) {

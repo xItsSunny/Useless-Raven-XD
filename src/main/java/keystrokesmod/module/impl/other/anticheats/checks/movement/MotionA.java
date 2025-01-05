@@ -1,6 +1,5 @@
 package keystrokesmod.module.impl.other.anticheats.checks.movement;
 
-import keystrokesmod.module.impl.other.Anticheat;
 import keystrokesmod.module.impl.other.anticheats.Check;
 import keystrokesmod.module.impl.other.anticheats.TRPlayer;
 import keystrokesmod.module.impl.other.anticheats.config.AdvancedConfig;
@@ -147,6 +146,6 @@ public class MotionA extends Check {
 
     @Override
     public boolean isDisabled() {
-        return !Anticheat.getMovementCheck().isToggled() || !Anticheat.getMovementCheckMotionA().isToggled() || !Anticheat.getExperimentalMode().isToggled();
+        return true;
     }
 }

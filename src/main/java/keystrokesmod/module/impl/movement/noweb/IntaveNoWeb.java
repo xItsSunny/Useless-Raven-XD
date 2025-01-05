@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.movement.noweb;
 
-import keystrokesmod.event.BlockWebEvent;
-import keystrokesmod.event.MoveInputEvent;
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.world.BlockWebEvent;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.NoWeb;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
@@ -12,8 +12,7 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class IntaveNoWeb extends SubMode<NoWeb> {
@@ -31,12 +30,12 @@ public class IntaveNoWeb extends SubMode<NoWeb> {
         this.registerSetting(upAndDown = new ButtonSetting("UpAndDown", false, noDown::isToggled));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onWeb(@NotNull BlockWebEvent event) {
         lastWeb = event.getBlockPos();
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onPreUpdate(PreUpdateEvent event) {
         if (lastWeb == null || !Utils.nullCheck() || BlockUtils.getBlock(lastWeb) != Blocks.web) {
             if (webbing)
@@ -78,7 +77,7 @@ public class IntaveNoWeb extends SubMode<NoWeb> {
         lastWeb = null;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMove(MoveInputEvent event) {
         if (webbing)
             event.setJump(false);

@@ -10,10 +10,9 @@ import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.backtrack.TimedPacket;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.network.Packet;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.event.network.AttackEntityEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Queue;
@@ -62,8 +61,8 @@ public class DynamicFakeLag extends SubMode<FakeLag> {
         Utils.correctValue(startRange, maxTargetRange);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onRenderTick(TickEvent.RenderTickEvent ev) {
+    @EventListener(priority = 2)
+    public void onRenderTick(Render2DEvent ev) {
         if (!Utils.nullCheck()) {
             sendPacket(false);
             lastDisableTime = System.currentTimeMillis();
@@ -110,11 +109,11 @@ public class DynamicFakeLag extends SubMode<FakeLag> {
         lastHurt = mc.thePlayer.hurtTime > 0;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onAttack(@NotNull AttackEntityEvent e) {
-        if (e.target instanceof AbstractClientPlayer) {
-            if (ignoreTeammates.isToggled() && Utils.isTeamMate(e.target)) return;
-            target = (AbstractClientPlayer) e.target;
+        if (e.getTarget() instanceof AbstractClientPlayer) {
+            if (ignoreTeammates.isToggled() && Utils.isTeamMate(e.getTarget())) return;
+            target = (AbstractClientPlayer) e.getTarget();
         }
     }
 

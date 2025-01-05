@@ -12,9 +12,8 @@ import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.client.MouseEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -87,32 +86,31 @@ public class Reach extends Module {
             }
             Vec3 zz5 = zz3.addVector(zz4.xCoord * reach, zz4.yCoord * reach, zz4.zCoord * reach);
             Vec3 hitVec = null;
-            List zz8 = mc.theWorld.getEntitiesWithinAABBExcludingEntity(zz2, zz2.getEntityBoundingBox().addCoord(zz4.xCoord * reach, zz4.yCoord * reach, zz4.zCoord * reach).expand(1.0D, 1.0D, 1.0D));
+            List<Entity> zz8 = mc.theWorld.getEntitiesWithinAABBExcludingEntity(zz2, zz2.getEntityBoundingBox().addCoord(zz4.xCoord * reach, zz4.yCoord * reach, zz4.zCoord * reach).expand(1.0D, 1.0D, 1.0D));
             double zz9 = reach;
 
-            for (int zz10 = 0; zz10 < zz8.size(); ++zz10) {
-                Entity zz11 = (Entity) zz8.get(zz10);
-                if (zz11.canBeCollidedWith()) {
-                    float ex = (float) ((double) zz11.getCollisionBorderSize() * HitBox.getExpand(zz11));
-                    AxisAlignedBB zz13 = zz11.getEntityBoundingBox().expand(ex, ex, ex);
+            for (Entity object : zz8) {
+                if (object.canBeCollidedWith()) {
+                    float ex = (float) ((double) object.getCollisionBorderSize() * HitBox.getExpand(object));
+                    AxisAlignedBB zz13 = object.getEntityBoundingBox().expand(ex, ex, ex);
                     zz13 = zz13.expand(expand, expand, expand);
                     MovingObjectPosition zz14 = zz13.calculateIntercept(zz3, zz5);
                     if (zz13.isVecInside(zz3)) {
                         if (0.0D < zz9 || zz9 == 0.0D) {
-                            entity = zz11;
+                            entity = object;
                             hitVec = zz14 == null ? zz3 : zz14.hitVec;
                             zz9 = 0.0D;
                         }
                     } else if (zz14 != null) {
                         double zz15 = zz3.distanceTo(zz14.hitVec);
                         if (zz15 < zz9 || zz9 == 0.0D) {
-                            if (zz11 == zz2.ridingEntity) {
+                            if (object == zz2.ridingEntity) {
                                 if (zz9 == 0.0D) {
-                                    entity = zz11;
+                                    entity = object;
                                     hitVec = zz14.hitVec;
                                 }
                             } else {
-                                entity = zz11;
+                                entity = object;
                                 hitVec = zz14.hitVec;
                                 zz9 = zz15;
                             }
@@ -138,9 +136,9 @@ public class Reach extends Module {
         Utils.correctValue(min, max);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @EventListener(priority = 2)
     public void e(@NotNull MouseEvent ev) {
-        if (ev.button >= 0 && ev.buttonstate && Utils.nullCheck()) {
+        if (ev.getButton() >= 0 && ev.isButtonstate() && Utils.nullCheck()) {
             call();
         }
     }

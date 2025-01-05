@@ -1,11 +1,12 @@
 package keystrokesmod.module.impl.world.tower;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.world.Tower;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
+import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class VanillaTower extends SubMode<Tower> {
@@ -29,12 +30,12 @@ public class VanillaTower extends SubMode<Tower> {
         wasTowering = false;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent e) throws IllegalAccessException {
         if (parent.canTower()) {
             wasTowering = true;
             Utils.setSpeed(Math.max((diagonal() ? diagonalSpeed.getInput() : speed.getInput()) * 0.1 - 0.25, 0));
-            mc.thePlayer.jump();
+            MoveUtil.jump();
         } else {
             if (wasTowering && slowedTicks.getInput() > 0) {
                 if (slowTicks++ < slowedTicks.getInput()) {

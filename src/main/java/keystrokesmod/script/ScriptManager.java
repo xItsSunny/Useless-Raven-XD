@@ -1,11 +1,10 @@
 package keystrokesmod.script;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.module.Module;
 import keystrokesmod.script.classes.Entity;
-import net.minecraftforge.common.MinecraftForge;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -31,13 +30,13 @@ public class ScriptManager {
     public String b = ((String[])ScriptManager.class.getProtectionDomain().getCodeSource().getLocation().getPath().split("\\.jar!"))[0].substring(5) + ".jar";
 
     public ScriptManager() {
-        directory = new File(Raven.mc.mcDataDir + File.separator + "keystrokes", "scripts");
+        directory = new File(Client.mc.mcDataDir + File.separator + "keystrokes", "scripts");
     }
 
     public void onEnable(Script dv) {
         if (dv.event == null) {
             dv.event = new ScriptEvents(getModule(dv));
-            MinecraftForge.EVENT_BUS.register(dv.event);
+            Client.EVENT_BUS.register(dv.event);
         }
         dv.invokeMethod("onEnable");
     }
@@ -124,13 +123,13 @@ public class ScriptManager {
         script.createScript(string);
         script.run();
         Module module = new Module(script);
-        Raven.scriptManager.scripts.put(script, module);
-        Raven.scriptManager.invoke("onLoad", module);
+        Client.scriptManager.scripts.put(script, module);
+        Client.scriptManager.invoke("onLoad", module);
     }
 
     public void onDisable(Script script) {
         if (script.event != null) {
-            MinecraftForge.EVENT_BUS.unregister(script.event);
+            Client.EVENT_BUS.unregister(script.event);
             script.event = null;
         }
         script.invokeMethod("onDisable");

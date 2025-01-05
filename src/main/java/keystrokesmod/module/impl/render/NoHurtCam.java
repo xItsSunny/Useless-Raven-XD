@@ -1,12 +1,12 @@
 package keystrokesmod.module.impl.render;
 
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import net.minecraft.network.play.server.S0BPacketAnimation;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 public class NoHurtCam extends Module {
     private final ButtonSetting noHurtAnime;
@@ -19,13 +19,13 @@ public class NoHurtCam extends Module {
         this.registerSetting(noHurtAnime = new ButtonSetting("No hurt anime", false));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(ReceivePacketEvent event) {
         if (noHurtAnime.isToggled() && event.getPacket() instanceof S0BPacketAnimation) {
             S0BPacketAnimation packet = (S0BPacketAnimation) event.getPacket();
 
             if (packet.getEntityID() == mc.thePlayer.getEntityId() && packet.getAnimationType() == 1)
-                event.setCanceled(true);
+                event.cancel();
         }
     }
 }

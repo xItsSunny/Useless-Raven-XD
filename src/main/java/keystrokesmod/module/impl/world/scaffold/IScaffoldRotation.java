@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.world.scaffold;
 
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.player.RotationEvent;
 import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.aim.RotationData;

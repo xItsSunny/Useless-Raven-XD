@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.other.anticheats.utils.world;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.EntityLivingBase;
@@ -12,7 +12,7 @@ import java.util.Objects;
 
 public class LevelUtils {
     public static WorldClient getClientLevel() {
-        return Objects.requireNonNull(Raven.mc.theWorld);
+        return Objects.requireNonNull(Client.mc.theWorld);
     }
 
     public static @NotNull List<EntityLivingBase> getEntities(@NotNull WorldClient level) {

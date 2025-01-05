@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.other;
 
-import keystrokesmod.Raven;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
@@ -9,7 +9,7 @@ import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.server.S02PacketChat;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
@@ -30,7 +30,7 @@ public class AutoPlay extends Module {
         this.registerSetting(delay = new SliderSetting("Delay", 1.5, 0.5, 5, 0.5, "s"));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceive(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S02PacketChat) {
             S02PacketChat packet = (S02PacketChat) event.getPacket();
@@ -41,7 +41,7 @@ public class AutoPlay extends Module {
                     || message.contains(BedwarsLoseMessage) && message.length() < BedwarsLoseMessage.length() + 3) {
                 Utils.sendModuleMessage(this, "Sending you to a new game.");
 
-                Raven.getExecutor().schedule(() -> {
+                Client.getExecutor().schedule(() -> {
                     if (!ModuleManager.autoPlay.isEnabled()) return;
 
                     String command = "";

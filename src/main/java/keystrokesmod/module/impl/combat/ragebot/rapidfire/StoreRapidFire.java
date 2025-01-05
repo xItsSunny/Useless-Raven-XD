@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.combat.ragebot.rapidfire;
 
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.PreTickEvent;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.client.PreTickEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.impl.combat.RageBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -16,9 +16,8 @@ import keystrokesmod.utility.render.progress.Progress;
 import keystrokesmod.utility.render.progress.ProgressManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.*;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -57,8 +56,8 @@ public class StoreRapidFire extends LegitRapidFire {
         fire = true;
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onRender(Render2DEvent event) {
         if (!Utils.nullCheck() || !fire || storing) return;
 
         synchronized (packetQueue) {
@@ -71,10 +70,10 @@ public class StoreRapidFire extends LegitRapidFire {
         fire = false;
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onPreMotion(PreMotionEvent event) {
         if (canStore()) {
-            event.setCanceled(true);
+            event.cancel();
             storing = true;
             storeTicks = (int) Math.min(storeTicks + 1, ticks.getInput());
             progress.setText("Rapid fire " + storeTicks);
@@ -92,10 +91,10 @@ public class StoreRapidFire extends LegitRapidFire {
         }
     }
 
-    @SubscribeEvent
-    public void onReceivePacket(@NotNull ReceivePacketEvent e) {
+    @EventListener
+    public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (!Utils.nullCheck()) return;
-        Packet<?> p = e.getPacket();
+        Packet<?> p = event.getPacket();
         if (skipPackets.contains(p)) {
             skipPackets.remove(p);
             return;
@@ -107,7 +106,7 @@ public class StoreRapidFire extends LegitRapidFire {
                 return;
             }
 
-            if (e.isCanceled())
+            if (event.isCancelled())
                 return;
 
             if (p instanceof S08PacketPlayerPosLook || p instanceof S40PacketDisconnect) {
@@ -119,13 +118,13 @@ public class StoreRapidFire extends LegitRapidFire {
                 return;
 
             packetQueue.add(new TimedPacket(p));
-            e.setCanceled(true);
+            event.cancel();
         } catch (NullPointerException ignored) {
 
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreTick(PreTickEvent e) {
         synchronized (packetQueue) {
             while (!packetQueue.isEmpty()) {

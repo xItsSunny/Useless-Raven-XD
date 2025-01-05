@@ -5,8 +5,8 @@ import keystrokesmod.module.impl.movement.fly.*;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.utility.render.RenderUtils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 
 public class Fly extends Module {
     public final ModeValue mode;
@@ -24,8 +24,6 @@ public class Fly extends Module {
                 .add(new MatrixFly("Matrix", this))
                 .add(new MatrixBowFly("MatrixBow", this))
                 .add(new MatrixTNTFly("MatrixTNT", this))
-                .add(new FakeFly("Fake", this))
-                .add(new HypixelTestFly("Test", this))
                 .add(new CustomFly("Custom", this))
                 .add(new GrimACFly("GrimAC", this))
         );
@@ -52,8 +50,8 @@ public class Fly extends Module {
         }
     }
 
-    @SubscribeEvent
-    public void onRenderTick(TickEvent.RenderTickEvent e) {
-        RenderUtils.renderBPS(showBPS.isToggled(), e);
+    @EventListener
+    public void onRenderTick(Render2DEvent e) {
+        RenderUtils.renderBPS(showBPS.isToggled());
     }
 }

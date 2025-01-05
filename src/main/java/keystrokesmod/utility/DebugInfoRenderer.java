@@ -1,8 +1,9 @@
 package keystrokesmod.utility;
 
-import keystrokesmod.Raven;
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.network.SendPacketEvent;
+import keystrokesmod.event.render.Render2DEvent;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerMove;
 import keystrokesmod.script.classes.Vec3;
 import keystrokesmod.utility.font.CenterMode;
@@ -10,8 +11,7 @@ import keystrokesmod.utility.font.FontManager;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -26,9 +26,9 @@ public class DebugInfoRenderer extends net.minecraft.client.gui.Gui {
     private static Vec3 lastServerPos = Vec3.ZERO;
     private static Vec3 curServerPos = Vec3.ZERO;
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
-        if (!Raven.debugger || !Utils.nullCheck()) {
+        if (!Client.debugger || !Utils.nullCheck()) {
             speedFromJump.clear();
             avgSpeedFromJump = -1;
             return;
@@ -50,16 +50,16 @@ public class DebugInfoRenderer extends net.minecraft.client.gui.Gui {
         );
     }
 
-    @SubscribeEvent
-    public void onRenderTick(RenderTickEvent ev) {
-        if (!Raven.debugger || !Utils.nullCheck()) {
+    @EventListener
+    public void onRenderTick(Render2DEvent ev) {
+        if (!Client.debugger || !Utils.nullCheck()) {
             return;
         }
 
         if (mc.currentScreen == null) {
             RenderUtils.renderBPS(String.format("Server speed: %.2fbps  Client speed: ", PlayerMove.getXzSecSpeed(lastServerPos, curServerPos)), true, true);
             if (avgSpeedFromJump != -1) {
-                ScaledResolution scaledResolution = new ScaledResolution(Raven.mc);
+                ScaledResolution scaledResolution = new ScaledResolution(Client.mc);
 
                 FontManager.getMinecraft().drawString(
                         String.format("Speed from jump: %.2f", avgSpeedFromJump),
@@ -73,7 +73,7 @@ public class DebugInfoRenderer extends net.minecraft.client.gui.Gui {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(@NotNull SendPacketEvent event) {
         if (event.getPacket() instanceof C03PacketPlayer.C04PacketPlayerPosition) {
             C03PacketPlayer.C04PacketPlayerPosition packet = (C03PacketPlayer.C04PacketPlayerPosition) event.getPacket();

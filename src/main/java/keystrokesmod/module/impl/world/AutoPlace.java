@@ -1,7 +1,8 @@
 package keystrokesmod.module.impl.world;
 
-import keystrokesmod.event.PostUpdateEvent;
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.PostUpdateEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.render.DrawBlockHighlightEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -19,9 +20,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
-import net.minecraftforge.client.event.DrawBlockHighlightEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.lwjgl.input.Mouse;
 
 public class AutoPlace extends Module {
@@ -67,13 +66,13 @@ public class AutoPlace extends Module {
         this.resetVariables();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (!postPlace.isToggled())
             action();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPostUpdate(PostUpdateEvent event) {
         if (postPlace.isToggled())
             action();
@@ -96,7 +95,7 @@ public class AutoPlace extends Module {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @EventListener(priority = 2)
     public void bh(DrawBlockHighlightEvent ev) {
         if (Utils.nullCheck()) {
             if (mc.currentScreen == null && !mc.thePlayer.capabilities.isFlying) {

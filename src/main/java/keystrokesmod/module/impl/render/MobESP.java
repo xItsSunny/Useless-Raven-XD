@@ -1,5 +1,7 @@
 package keystrokesmod.module.impl.render;
 
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.utility.Utils;
@@ -7,8 +9,6 @@ import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.*;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.awt.*;
 
@@ -87,8 +87,8 @@ public class MobESP extends Module {
         }
     }
 
-    @SubscribeEvent
-    public void onRenderWorldLast(RenderWorldLastEvent e) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (!Utils.nullCheck()) {
             return;
         }

@@ -1,12 +1,12 @@
 package keystrokesmod.module.impl.player.nofall;
 
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.impl.player.NoFall;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.Reflection;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class VulcanNoFall extends SubMode<NoFall> {
         this.registerSetting(minFallDistance = new SliderSetting("Minimum fall distance", 3.0, 0.0, 8.0, 0.1));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPacketSend(@NotNull SendPacketEvent event) {
         if (event.getPacket() instanceof C03PacketPlayer && mc.thePlayer.fallDistance > minFallDistance.getInput()) {
             if (currentModCount > maxModCount.get(hasModCount % maxModCount.size())) {

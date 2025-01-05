@@ -1,8 +1,9 @@
 package keystrokesmod.module.impl.movement.fly;
 
-import keystrokesmod.event.BlockAABBEvent;
-import keystrokesmod.event.MoveInputEvent;
-import keystrokesmod.event.ReceivePacketEvent;
+import keystrokesmod.event.world.BlockAABBEvent;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.network.ReceivePacketEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.setting.impl.SubMode;
@@ -11,7 +12,6 @@ import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class MatrixFly extends SubMode<Fly> {
@@ -27,13 +27,13 @@ public class MatrixFly extends SubMode<Fly> {
         Utils.sendMessage("Break the block under your feet to disable anti-cheat.");
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMoveInput(MoveInputEvent event) {
         if (MoveUtil.isMoving())
             event.setJump(true);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onBlockAABB(@NotNull BlockAABBEvent event) {
         if (BlockUtils.replaceable(event.getBlockPos())) {
             final double x = event.getBlockPos().getX(), y = event.getBlockPos().getY(), z = event.getBlockPos().getZ();
@@ -44,7 +44,7 @@ public class MatrixFly extends SubMode<Fly> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
             Notifications.sendNotification(Notifications.NotificationTypes.INFO, "Anti-cheat flagged.");

@@ -34,7 +34,8 @@ public class KeyStrokeKeyRenderer {
             this.g = Math.min(255, (int) (2L * (System.currentTimeMillis() - this.f)));
             this.h = Math.max(0.0D, 1.0D - (double) (System.currentTimeMillis() - this.f) / 20.0D);
         } else {
-            this.g = Math.max(0, 255 - (int) (2L * (System.currentTimeMillis() - this.f)));
+            int b = 255 - (int) (2L * (System.currentTimeMillis() - this.f));
+            this.g = (0 >= b) ? 0 : b;
             this.h = Math.min(1.0D, (double) (System.currentTimeMillis() - this.f) / 20.0D);
         }
 

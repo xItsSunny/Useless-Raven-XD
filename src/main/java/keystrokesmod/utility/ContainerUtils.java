@@ -1,5 +1,6 @@
 package keystrokesmod.utility;
 
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import net.minecraft.block.*;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
 public class ContainerUtils {
     public static final Set<String> IGNORE_ITEMS = new HashSet<>(Arrays.asList("stick", "flesh", "string", "cake", "mushroom", "flint", "compass", "dyePowder", "feather", "shears", "anvil", "torch", "seeds", "leather", "skull", "record"));
@@ -412,11 +413,7 @@ public class ContainerUtils {
     }
 
     public static int getProtection(final @NotNull ItemStack itemStack) {
-        return ((ItemArmor)itemStack.getItem()).damageReduceAmount + EnchantmentHelper.getEnchantmentModifierDamage(new ItemStack[] { itemStack }, DamageSource.generic);
-    }
-
-    public static void click(int slot) {
-        mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, slot, 0, 1, mc.thePlayer);
+        return ((ItemArmor) itemStack.getItem()).damageReduceAmount + EnchantmentHelper.getEnchantmentModifierDamage(new ItemStack[]{itemStack}, DamageSource.generic);
     }
 
     public static boolean sort(int bestSlot, int desiredSlot) {
@@ -515,5 +512,66 @@ public class ContainerUtils {
 
     public static boolean isProjectiles(ItemStack itemStackInSlot) {
         return itemStackInSlot != null && (itemStackInSlot.getItem() instanceof ItemEgg || itemStackInSlot.getItem() instanceof ItemSnowball);
+    }
+
+    private static final Map<Integer, Integer> GOOD_POTIONS = new Int2IntOpenHashMap() {{
+        put(6, 1); // Instant Health
+        put(10, 2); // Regeneration
+        put(11, 3); // Resistance
+        put(21, 4); // Health Boost
+        put(22, 5); // Absorption
+        put(23, 6); // Saturation
+        put(5, 7); // Strength
+        put(1, 8); // Speed
+        put(12, 9); // Fire Resistance
+        put(14, 10); // Invisibility
+        put(3, 11); // Haste
+        put(13, 12); // Water Breathing
+    }};
+
+    /**
+     * Checks if a potion is good
+     *
+     * @return good potion
+     */
+    public static boolean goodPotion(final int id) {
+        return GOOD_POTIONS.containsKey(id);
+    }
+
+    /**
+     * Gets a potions ranking
+     *
+     * @return potion ranking
+     */
+    public static int potionRanking(final int id) {
+        return GOOD_POTIONS.getOrDefault(id, -1);
+    }
+
+    private static final List<Item> WHITELISTED_ITEMS = Arrays.asList(Items.fishing_rod, Items.water_bucket, Items.bucket, Items.arrow, Items.bow, Items.snowball, Items.egg, Items.ender_pearl);
+
+    public static boolean useful(final @NotNull ItemStack stack) {
+        final Item item = stack.getItem();
+
+        if (item instanceof ItemPotion) {
+            final ItemPotion potion = (ItemPotion) item;
+            return ItemPotion.isSplash(stack.getMetadata()) && goodPotion(potion.getEffects(stack).get(0).getPotionID());
+        }
+
+        if (item instanceof ItemBlock) {
+            final Block block = ((ItemBlock) item).getBlock();
+            if (block instanceof BlockGlass || block instanceof BlockStainedGlass || (block.isFullBlock() && !(block instanceof ITileEntityProvider || block instanceof BlockContainer || block instanceof BlockTNT || block instanceof BlockSlime || block instanceof BlockFalling))) {
+                return true;
+            }
+        }
+
+        return item instanceof ItemSword ||
+                item instanceof ItemTool ||
+                item instanceof ItemArmor ||
+                item instanceof ItemFood ||
+                WHITELISTED_ITEMS.contains(item);
+    }
+
+    public static int hashItem(@NotNull ItemStack item) {
+        return System.identityHashCode(item);
     }
 }

@@ -1,18 +1,17 @@
 package keystrokesmod.mixins.impl.entity;
 
 import com.mojang.authlib.GameProfile;
-import keystrokesmod.event.*;
+import keystrokesmod.event.player.*;
+import keystrokesmod.event.world.PushOutOfBlockEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.NoSlow;
-import keystrokesmod.module.impl.movement.Sprint;
-import keystrokesmod.module.impl.movement.fly.FakeFly;
+import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.movement.Direction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
@@ -21,7 +20,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
+import keystrokesmod.Client;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -32,6 +31,7 @@ import java.util.Objects;
 
 import static keystrokesmod.utility.movement.Direction.*;
 
+@SuppressWarnings("UnresolvedMixinReference")
 @Mixin(value = EntityPlayerSP.class, priority = 999)
 public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
     @Shadow
@@ -118,15 +118,15 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         RotationUtils.prevRenderYaw = RotationUtils.renderYaw;
 
         PreUpdateEvent event = new PreUpdateEvent();
-        MinecraftForge.EVENT_BUS.post(event);
-        if (event.isCanceled())
+        Client.EVENT_BUS.post(event);
+        if (event.isCancelled())
             ci.cancel();
     }
 
     @Inject(method = "onUpdate", at = @At("RETURN"))
     public void onPostUpdate(CallbackInfo ci) {
         if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0, this.posZ))) {  // ensure compat
-            MinecraftForge.EVENT_BUS.post(new PostUpdateEvent());
+            Client.EVENT_BUS.post(new PostUpdateEvent());
         }
     }
 
@@ -149,10 +149,10 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
                 this.isSneaking()
         );
 
-        MinecraftForge.EVENT_BUS.post(pre);
-        if (pre.isCanceled()) {
+        Client.EVENT_BUS.post(pre);
+        if (pre.isCancelled()) {
             //Todo: EventUpdate Post
-            MinecraftForge.EVENT_BUS.post(new PostMotionEvent());
+            Client.EVENT_BUS.post(new PostMotionEvent());
             return;
         }
 
@@ -186,7 +186,9 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
                 pre.setRenderYaw(false);
             }
 
-            if (FakeFly.hideRotation()) {
+
+
+            if (RotationHandler.hideRotation()) {
                 RotationUtils.renderPitch = rotationPitch;
                 RotationUtils.renderYaw = rotationYaw;
             } else {
@@ -197,8 +199,8 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             double d0 = pre.getPosX() - this.lastReportedPosX;
             double d1 = pre.getPosY() - this.lastReportedPosY;
             double d2 = pre.getPosZ() - this.lastReportedPosZ;
-            double d3 = (double) (pre.getYaw() - this.lastReportedYaw);
-            double d4 = (double) (pre.getPitch() - this.lastReportedPitch);
+            double d3 = pre.getYaw() - this.lastReportedYaw;
+            double d4 = pre.getPitch() - this.lastReportedPitch;
             boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D || this.positionUpdateTicks >= 20;
             boolean flag3 = d3 != 0.0D || d4 != 0.0D;
 
@@ -233,7 +235,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         }
 
         //Todo: EventUpdate Post
-        MinecraftForge.EVENT_BUS.post(new PostMotionEvent());
+        Client.EVENT_BUS.post(new PostMotionEvent());
     }
 
     /**
@@ -258,7 +260,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
 
         if (this.inPortal) {
             if (this.mc.currentScreen != null && !this.mc.currentScreen.doesGuiPauseGame()) {
-                this.mc.displayGuiScreen((GuiScreen) null);
+                this.mc.displayGuiScreen(null);
             }
 
             if (this.timeInPortal == 0.0F) {
@@ -292,11 +294,11 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             --this.timeUntilPortal;
         }
 
-        boolean flag = this.movementInput.jump;
-        boolean flag1 = this.movementInput.sneak;
-        float f = 0.8F;
-        boolean flag2 = this.movementInput.moveForward >= f;
         this.movementInput.updatePlayerMoveState();
+        boolean jumpDown = this.movementInput.jump;
+        boolean sneakDown = this.movementInput.sneak;
+        float minValueToSprint = 0.8F;
+        boolean playerCanSprint = this.movementInput.moveForward >= minValueToSprint;
 
         // no slow
         @SuppressWarnings("EqualsBetweenInconvertibleTypes")
@@ -306,15 +308,22 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
                 && Objects.equals(this, Minecraft.getMinecraft().thePlayer)
                 && ModuleManager.killAura.autoBlockMode.getInput() != 0;
         final boolean usingItemModified = this.isUsingItem() || autoBlocking;
-        boolean stopSprint = Sprint.stopSprint() || this.isUsingItem()
-                && (ModuleManager.noSlow != null && ModuleManager.noSlow.isEnabled() && NoSlow.getForwardSlowed() <= 0.8)
-                || (autoBlocking && ModuleManager.killAura.slowdown.getInput() <= 0.8);
+
+        SprintEvent event = new SprintEvent(true);
+        Client.EVENT_BUS.post(event);
+
+        boolean stopSprint = !event.isSprint();
+        if (mc.thePlayer.isUsingItem()) {
+            stopSprint = !(ModuleManager.noSlow != null && ModuleManager.noSlow.isEnabled()
+                    && NoSlow.getForwardSlowed() > 0.8);
+        }
+        if (!stopSprint && autoBlocking) {
+            stopSprint = ModuleManager.killAura.slowdown.getInput() <= 0.8;
+        }
 
         if (usingItemModified && !this.isRiding()) {
-            MovementInput var10000 = this.movementInput;
-            var10000.moveStrafe *= autoBlocking ? (float) ModuleManager.killAura.slowdown.getInput() : NoSlow.getStrafeSlowed();
-            var10000 = this.movementInput;
-            var10000.moveForward *= autoBlocking ? (float) ModuleManager.killAura.slowdown.getInput() : NoSlow.getForwardSlowed();
+            this.movementInput.moveStrafe *= autoBlocking ? (float) ModuleManager.killAura.slowdown.getInput() : NoSlow.getStrafeSlowed();
+            this.movementInput.moveForward *= autoBlocking ? (float) ModuleManager.killAura.slowdown.getInput() : NoSlow.getForwardSlowed();
             if (stopSprint) {
                 this.sprintToggleTimer = 0;
             }
@@ -324,9 +333,9 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         this.pushOutOfBlocks(this.posX - (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ - (double) this.width * 0.35D);
         this.pushOutOfBlocks(this.posX + (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ - (double) this.width * 0.35D);
         this.pushOutOfBlocks(this.posX + (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ + (double) this.width * 0.35D);
-        boolean flag3 = (float) this.getFoodStats().getFoodLevel() > 6.0F || this.capabilities.allowFlying;
+        boolean entityCanSprint = ((float) this.getFoodStats().getFoodLevel() > 6.0F || this.capabilities.allowFlying) && !stopSprint;
 
-        if (this.onGround && !flag1 && !flag2 && this.movementInput.moveForward >= f && !this.isSprinting() && flag3 && !this.isUsingItem() && !this.isPotionActive(Potion.blindness)) {
+        if (this.onGround && !sneakDown && !playerCanSprint && this.movementInput.moveForward >= minValueToSprint && !this.isSprinting() && entityCanSprint && !this.isUsingItem() && !this.isPotionActive(Potion.blindness)) {
             if (this.sprintToggleTimer <= 0 && !this.mc.gameSettings.keyBindSprint.isKeyDown()) {
                 this.sprintToggleTimer = 7;
             } else {
@@ -334,11 +343,11 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             }
         }
 
-        if (!this.isSprinting() && this.movementInput.moveForward >= f && flag3 && !this.isUsingItem() && !this.isPotionActive(Potion.blindness) && this.mc.gameSettings.keyBindSprint.isKeyDown()) {
+        if (!this.isSprinting() && (this.movementInput.moveForward >= minValueToSprint) && entityCanSprint && !this.isUsingItem() && !this.isPotionActive(Potion.blindness) && this.mc.gameSettings.keyBindSprint.isKeyDown()) {
             this.setSprinting(true);
         }
 
-        if (this.isSprinting() && (this.movementInput.moveForward < f || this.isCollidedHorizontally || !flag3)) {
+        if (this.isSprinting() && (this.movementInput.moveForward < minValueToSprint || this.isCollidedHorizontally || !entityCanSprint)) {
             this.setSprinting(false);
         }
 
@@ -348,7 +357,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
                     this.capabilities.isFlying = true;
                     this.sendPlayerAbilities();
                 }
-            } else if (!flag && this.movementInput.jump) {
+            } else if (!jumpDown && this.movementInput.jump) {
                 if (this.flyToggleTimer == 0) {
                     this.flyToggleTimer = 7;
                 } else {
@@ -361,11 +370,11 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
 
         if (this.capabilities.isFlying && this.isCurrentViewEntity()) {
             if (this.movementInput.sneak) {
-                this.motionY -= (double) (this.capabilities.getFlySpeed() * 3.0F);
+                this.motionY -= this.capabilities.getFlySpeed() * 3.0F;
             }
 
             if (this.movementInput.jump) {
-                this.motionY += (double) (this.capabilities.getFlySpeed() * 3.0F);
+                this.motionY += this.capabilities.getFlySpeed() * 3.0F;
             }
         }
 
@@ -378,13 +387,13 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
                 }
             }
 
-            if (flag && !this.movementInput.jump) {
+            if (jumpDown && !this.movementInput.jump) {
                 this.horseJumpPowerCounter = -10;
                 this.sendHorseJump();
-            } else if (!flag && this.movementInput.jump) {
+            } else if (!jumpDown && this.movementInput.jump) {
                 this.horseJumpPowerCounter = 0;
                 this.horseJumpPower = 0.0F;
-            } else if (flag) {
+            } else if (jumpDown) {
                 ++this.horseJumpPowerCounter;
 
                 if (this.horseJumpPowerCounter < 10) {
@@ -415,7 +424,8 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
             BlockPos blockpos = new BlockPos(p_pushOutOfBlocks_1_, p_pushOutOfBlocks_3_, p_pushOutOfBlocks_5_);
             double d0 = p_pushOutOfBlocks_1_ - (double) blockpos.getX();
             double d1 = p_pushOutOfBlocks_5_ - (double) blockpos.getZ();
-            int entHeight = Math.max((int) Math.ceil(this.height), 1);
+            int a = (int) Math.ceil(this.height);
+            int entHeight = (a >= 1) ? a : 1;
             if (!this.raven_bS$isHeadspaceFree(blockpos, entHeight)) {
                 Direction direction = null;
                 double d2 = 9999.0;
@@ -440,8 +450,8 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
 
                 if (direction != null) {
                     PushOutOfBlockEvent event = new PushOutOfBlockEvent(direction, 0.1F);
-                    MinecraftForge.EVENT_BUS.post(event);
-                    if (event.isCanceled())
+                    Client.EVENT_BUS.post(event);
+                    if (event.isCancelled())
                         cir.setReturnValue(false);
                     direction = event.getDirection();
                     final float pushMotion = event.getPushMotion();

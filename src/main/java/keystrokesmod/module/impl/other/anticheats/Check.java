@@ -3,7 +3,7 @@ package keystrokesmod.module.impl.other.anticheats;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import keystrokesmod.module.impl.other.Anticheat;
 import keystrokesmod.module.impl.other.anticheats.utils.alert.LogUtils;
-import net.minecraftforge.common.MinecraftForge;
+import keystrokesmod.Client;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class Check {
@@ -14,7 +14,7 @@ public abstract class Check {
     public Check(String checkName, @NotNull TRPlayer player) {
         this.checkName = checkName;
         this.player = player;
-        MinecraftForge.EVENT_BUS.register(this);
+        Client.EVENT_BUS.register(this);
     }
 
     protected static void customMsg(String msg) {
@@ -23,7 +23,7 @@ public abstract class Check {
 
     @Override
     protected void finalize() {
-        MinecraftForge.EVENT_BUS.unregister(this);
+        Client.EVENT_BUS.unregister(this);
     }
 
     public abstract int getAlertBuffer();

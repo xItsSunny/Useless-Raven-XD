@@ -1,8 +1,9 @@
 package keystrokesmod.module.impl.movement.wallclimb;
 
-import keystrokesmod.event.BlockAABBEvent;
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.PushOutOfBlockEvent;
+import keystrokesmod.event.world.BlockAABBEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.world.PushOutOfBlockEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.mixins.impl.client.KeyBindingAccessor;
 import keystrokesmod.module.impl.movement.WallClimb;
 import keystrokesmod.module.setting.impl.SubMode;
@@ -10,7 +11,6 @@ import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.MoveUtil;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class TestWallClimb extends SubMode<WallClimb> {
@@ -18,7 +18,7 @@ public class TestWallClimb extends SubMode<WallClimb> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (mc.thePlayer.isCollidedHorizontally && !BlockUtils.insideBlock()) {
             double yaw = MoveUtil.direction();
@@ -32,13 +32,13 @@ public class TestWallClimb extends SubMode<WallClimb> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPushOutOfBlock(@NotNull PushOutOfBlockEvent event) {
         if (BlockUtils.insideBlock())
-            event.setCanceled(true);
+            event.cancel();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onAABB(BlockAABBEvent event) {
         if (BlockUtils.insideBlock()) {
             BlockPos playerPos = new BlockPos(mc.thePlayer);

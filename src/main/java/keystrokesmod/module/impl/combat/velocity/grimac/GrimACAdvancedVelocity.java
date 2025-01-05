@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.combat.velocity.grimac;
 
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.PreVelocityEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.PreVelocityEvent;
 import keystrokesmod.mixins.impl.entity.EntityPlayerSPAccessor;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.combat.KillAura;
@@ -14,9 +14,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemFood;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import javax.vecmath.Vector2d;
@@ -24,7 +22,6 @@ import javax.vecmath.Vector2d;
 public class GrimACAdvancedVelocity extends SubMode<GrimACVelocity> {
     private final ButtonSetting notWhileEating;
     private final ButtonSetting debug;
-    private final ButtonSetting test;
 
     public boolean velocityInput;
     public float velocityYaw;
@@ -36,7 +33,6 @@ public class GrimACAdvancedVelocity extends SubMode<GrimACVelocity> {
         super(name, parent);
         this.registerSetting(notWhileEating = new ButtonSetting("Not while eating", false));
         this.registerSetting(debug = new ButtonSetting("Debug", false));
-        this.registerSetting(test = new ButtonSetting("Test", false));
     }
 
     @Override
@@ -44,29 +40,7 @@ public class GrimACAdvancedVelocity extends SubMode<GrimACVelocity> {
         skipTicks = 0;
     }
 
-    @SubscribeEvent
-    public void onLivingUpdate(LivingEvent.@NotNull LivingUpdateEvent event) {
-        if (event.entityLiving != mc.thePlayer) return;
-        if (ViaVersionFixHelper.is122() || test.isToggled()) {
-            if (velocityInput) {
-                if (attacked) {
-                    mc.thePlayer.motionX *= reduceXZ;
-                    mc.thePlayer.motionZ *= reduceXZ;
-                    attacked = false;
-                }
-                if (mc.thePlayer.hurtTime == 0) {
-                    velocityInput = false;
-                }
-            }
-        } else {
-            if (mc.thePlayer.hurtTime > 0 && mc.thePlayer.onGround) {
-                mc.thePlayer.addVelocity(-1.3E-10, -1.3E-10, -1.3E-10);
-                mc.thePlayer.setSprinting(false);
-            }
-        }
-    }
-
-    @SubscribeEvent
+    @EventListener
     public void onPreVelocity(PreVelocityEvent event) {
         if (notWhileEating.isToggled() && mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemFood && mc.thePlayer.isUsingItem())
             return;
@@ -111,11 +85,29 @@ public class GrimACAdvancedVelocity extends SubMode<GrimACVelocity> {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onPreUpdate(PreUpdateEvent event) {
+        if (ViaVersionFixHelper.is122()) {
+            if (velocityInput) {
+                if (attacked) {
+                    mc.thePlayer.motionX *= reduceXZ;
+                    mc.thePlayer.motionZ *= reduceXZ;
+                    attacked = false;
+                }
+                if (mc.thePlayer.hurtTime == 0) {
+                    velocityInput = false;
+                }
+            }
+        } else {
+            if (mc.thePlayer.hurtTime > 0 && mc.thePlayer.onGround) {
+                mc.thePlayer.addVelocity(-1.3E-10, -1.3E-10, -1.3E-10);
+                mc.thePlayer.setSprinting(false);
+            }
+        }
+
         if (skipTicks > 0) {
             skipTicks--;
-            event.setCanceled(true);
+            event.cancel();
         }
     }
 }

@@ -10,8 +10,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
-import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.client.MouseEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.lwjgl.input.Mouse;
 
 import java.util.Arrays;
@@ -74,9 +74,9 @@ public class SumoFences extends Module {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMouse(MouseEvent e) {
-        if (e.buttonstate && (e.button == 0 || e.button == 1) && Utils.nullCheck() && this.isSumo()) {
+        if (e.isButtonstate() && (e.getButton() == 0 || e.getButton() == 1) && Utils.nullCheck() && this.isSumo()) {
             MovingObjectPosition mop = mc.objectMouseOver;
             if (mop != null && mop.typeOfHit == MovingObjectType.BLOCK) {
                 int x = mop.getBlockPos().getX();
@@ -84,8 +84,8 @@ public class SumoFences extends Module {
 
                 for (BlockPos pos : f_p) {
                     if (pos.getX() == x && pos.getZ() == z) {
-                        e.setCanceled(true);
-                        if (e.button == 0) {
+                        e.cancel();
+                        if (e.getButton() == 0) {
                             Utils.playerSwing();
                         }
                         Mouse.poll();

@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.other.anticheats.utils.world;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.script.classes.Vec3;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.util.BlockPos;
@@ -20,7 +20,7 @@ public class PlayerRotation {
     }
 
     public static float getYaw(@NotNull Vec3 pos) {
-        return getYaw(Raven.mc.thePlayer, pos);
+        return getYaw(Client.mc.thePlayer, pos);
     }
 
     public static float getPitch(@NotNull BlockPos pos) {
@@ -38,6 +38,6 @@ public class PlayerRotation {
     }
 
     public static float getPitch(@NotNull Vec3 pos) {
-        return getPitch(Raven.mc.thePlayer, pos);
+        return getPitch(Client.mc.thePlayer, pos);
     }
 }

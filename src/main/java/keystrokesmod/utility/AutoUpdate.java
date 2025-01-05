@@ -3,7 +3,7 @@ package keystrokesmod.utility;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.realmsclient.gui.ChatFormatting;
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.impl.render.Watermark;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,7 +24,7 @@ import java.io.InputStream;
 public class AutoUpdate {
 
     public static void init() {
-        Raven.getExecutor().execute(() -> {
+        Client.getExecutor().execute(() -> {
             @NotNull Result result = checkVersion();
             switch (result.getType()) {
                 case FAIL:
@@ -32,7 +32,7 @@ public class AutoUpdate {
                     break;
                 case OLD:
                     Utils.sendMessageAnyWay(ChatFormatting.RED + "You are not at latest version." +
-                            ChatFormatting.RESET + " current: " + Watermark.VERSION + "  latest: " + result.getLatestVersion());
+                            ChatFormatting.RESET + " current: " + Client.VERSION + "  latest: " + result.getLatestVersion());
                     Utils.sendMessageAnyWay("Run command 'update' to download latest version.");
                     break;
             }
@@ -62,7 +62,7 @@ public class AutoUpdate {
             CloseableHttpResponse response = httpClient.execute(httpGet);
 
             InputStream input = response.getEntity().getContent();
-            File file = new File(Raven.mc.mcDataDir + File.separator + "mods", "Raven-XD.jar");
+            File file = new File(Client.mc.mcDataDir + File.separator + "mods", "Raven-XD.jar");
             file.createNewFile();
             FileOutputStream output = new FileOutputStream(file);
 
@@ -101,7 +101,7 @@ public class AutoUpdate {
             String ver = jsonObject.get("tag_name").getAsString().substring(1);
             String url = jsonObject.getAsJsonArray("assets").get(0).getAsJsonObject().get("browser_download_url").getAsString();
 
-            if (ver.equals(Watermark.VERSION)) {
+            if (ver.equals(Client.VERSION)) {
                 return new Result(Result.Type.LATEST, url, ver);
             } else {
                 return new Result(Result.Type.OLD, url, ver);

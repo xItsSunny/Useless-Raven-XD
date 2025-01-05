@@ -1,11 +1,11 @@
 package keystrokesmod.mixins.impl.gui;
 
-import keystrokesmod.event.PreConnectEvent;
+import keystrokesmod.event.network.PreConnectEvent;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.GuiConnecting;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.network.NetworkManager;
-import net.minecraftforge.common.MinecraftForge;
+import keystrokesmod.Client;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+@SuppressWarnings("UnresolvedMixinReference")
 @Mixin(GuiConnecting.class)
 public abstract class MixinGuiConnecting extends GuiScreen {
     @Unique
@@ -24,8 +25,8 @@ public abstract class MixinGuiConnecting extends GuiScreen {
     @Inject(method = "connect", at = @At("HEAD"), cancellable = true)
     public void onConnect(String p_connect_1_, int p_connect_2_, CallbackInfo ci) {
         raven_bS$preConnectEvent = new PreConnectEvent((GuiConnecting) (Object) this, p_connect_1_, p_connect_2_);
-        MinecraftForge.EVENT_BUS.post(raven_bS$preConnectEvent);
-        if (raven_bS$preConnectEvent.isCanceled()) {
+        Client.EVENT_BUS.post(raven_bS$preConnectEvent);
+        if (raven_bS$preConnectEvent.isCancelled()) {
             ci.cancel();
         }
     }

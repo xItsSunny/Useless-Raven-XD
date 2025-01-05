@@ -1,9 +1,9 @@
 package keystrokesmod.module.impl.movement;
 
 import keystrokesmod.clickgui.ClickGui;
-import keystrokesmod.event.MoveInputEvent;
-import keystrokesmod.event.PreUpdateEvent;
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
@@ -17,7 +17,8 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.network.play.client.C0EPacketClickWindow;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import net.minecraft.network.play.client.C16PacketClientStatus;
 import org.lwjgl.input.Keyboard;
 
 import static keystrokesmod.module.ModuleManager.*;
@@ -52,13 +53,13 @@ public class InvMove extends Module {
         this.registerSetting(targetNearbyCheck = new ButtonSetting("Target nearby check", true));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMoveInput(MoveInputEvent event) {
         if (mode.getInput() == 3 && canInvMove() && !(mc.currentScreen instanceof ClickGui))
             event.setJump(false);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(PreUpdateEvent event) {
         if (canInvMove()) {
             if (mc.currentScreen instanceof ClickGui && clickGui.isToggled()) {
@@ -113,26 +114,27 @@ public class InvMove extends Module {
         return false;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(SendPacketEvent event) {
-        if (noOpenPacket.isToggled() && event.getPacket() instanceof C0BPacketEntityAction) {
-            if (((C0BPacketEntityAction) event.getPacket()).getAction() == C0BPacketEntityAction.Action.OPEN_INVENTORY) {
-                event.setCanceled(true);
+        if (noOpenPacket.isToggled()) {
+            if (event.getPacket() instanceof C16PacketClientStatus
+                    && ((C16PacketClientStatus) event.getPacket()).getStatus() == C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT) {
+                event.cancel();
             }
         }
 
         if ((int) mode.getInput() != 2) return;
 
-        if (event.getPacket() instanceof C0BPacketEntityAction) {
-            C0BPacketEntityAction packet = (C0BPacketEntityAction) event.getPacket();
+        if (event.getPacket() instanceof C16PacketClientStatus) {
+            C16PacketClientStatus packet = (C16PacketClientStatus) event.getPacket();
 
-            if (packet.getAction() == C0BPacketEntityAction.Action.OPEN_INVENTORY) {
+            if (packet.getStatus() == C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT) {
                 clicked = false;
-                event.setCanceled(true);
+                event.cancel();
             }
         } else if (event.getPacket() instanceof C0EPacketClickWindow) {
             if (!clicked && !noOpenPacket.isToggled()) {
-                PacketUtils.sendPacketNoEvent(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.OPEN_INVENTORY));
+                PacketUtils.sendPacketNoEvent(new C16PacketClientStatus(C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT));
             }
             clicked = true;
         }

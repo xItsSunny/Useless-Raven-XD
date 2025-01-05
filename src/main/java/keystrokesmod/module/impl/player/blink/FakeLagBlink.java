@@ -1,6 +1,9 @@
 package keystrokesmod.module.impl.player.blink;
 
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.event.network.SendPacketEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.impl.player.Blink;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -20,11 +23,7 @@ import net.minecraft.network.login.client.C00PacketLoginStart;
 import net.minecraft.network.login.client.C01PacketEncryptionResponse;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.status.client.C00PacketServerQuery;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Queue;
@@ -72,7 +71,8 @@ public class FakeLagBlink extends SubMode<Blink> {
     @Override
     public void onDisable() throws Throwable {
         if (!needToDisable) {
-            MinecraftForge.EVENT_BUS.register(this);
+            Client.EVENT_BUS.register(this);
+            Client.EVENT_BUS.register(this);
             stopTime = System.currentTimeMillis();
             needToDisable = true;
         }
@@ -83,8 +83,8 @@ public class FakeLagBlink extends SubMode<Blink> {
         return String.valueOf(packetQueue.size());
     }
 
-    @SubscribeEvent
-    public void onRender(RenderWorldLastEvent event) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         animationX.run(vec3.x());
         animationY.run(vec3.y());
         animationZ.run(vec3.z());
@@ -93,8 +93,8 @@ public class FakeLagBlink extends SubMode<Blink> {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onRenderTick(TickEvent.RenderTickEvent ev) {
+    @EventListener(priority = 2)
+    public void onRenderTick(Render2DEvent ev) {
         if (needToDisable) {
             progress.setProgress((blinkedTime / maxBlinkTime.getInput()) - Math.min((System.currentTimeMillis() - stopTime) / (maxBlinkTime.getInput() / releaseSpeed.getInput()), 1));
         } else {
@@ -109,7 +109,8 @@ public class FakeLagBlink extends SubMode<Blink> {
             synchronized (packetQueue) {
                 sendPacket(false);
                 if (packetQueue.isEmpty()) {
-                    MinecraftForge.EVENT_BUS.unregister(this);
+                    Client.EVENT_BUS.unregister(this);
+                    Client.EVENT_BUS.unregister(this);
                     needToDisable = false;
                     ProgressManager.remove(progress);
                     return;
@@ -119,7 +120,7 @@ public class FakeLagBlink extends SubMode<Blink> {
         sendPacket(true);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @EventListener(priority = 2)
     public void onSendPacket(@NotNull SendPacketEvent e) {
         if (!Utils.nullCheck()) return;
         final Packet<?> packet = e.getPacket();
@@ -130,11 +131,11 @@ public class FakeLagBlink extends SubMode<Blink> {
                 || packet instanceof C01PacketChatMessage) {
             return;
         }
-        if (e.isCanceled()) {
+        if (e.isCancelled()) {
             return;
         }
         packetQueue.add(new TimedPacket(packet, System.currentTimeMillis()));
-        e.setCanceled(true);
+        e.cancel();
     }
 
     public void sendPacket(boolean delay) {

@@ -1,6 +1,6 @@
 package keystrokesmod.module;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.client.Settings;
@@ -13,7 +13,6 @@ import keystrokesmod.utility.i18n.I18nModule;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
@@ -63,7 +62,7 @@ public class Module {
         this.settings = new ArrayList<>();
         this.settingsWeak = new WeakHashSet<>();
         if (!(this instanceof SubMode))
-            Raven.moduleCounter++;
+            Client.moduleCounter++;
     }
 
     public Module(String name, Module.category moduleCategory) {
@@ -89,8 +88,7 @@ public class Module {
                     this.isToggled = false;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                Utils.sendMessage("&cFailed to check keybinding. Setting to none");
+                Utils.handleException(e, String.format("checking keyBind for module '%s'", this.getName()));
                 this.keycode = 0;
             }
         }
@@ -109,17 +107,15 @@ public class Module {
         }
         this.setEnabled(true);
         ModuleManager.organizedModules.add(this);
-        if (ModuleManager.hud.isEnabled()) {
-            ModuleManager.sort();
-        }
 
         if (this.script != null) {
-            Raven.scriptManager.onEnable(script);
+            Client.scriptManager.onEnable(script);
         } else {
             try {
-                MinecraftForge.EVENT_BUS.register(this);
+                Client.EVENT_BUS.register(this);
                 this.onEnable();
-            } catch (Throwable ignored) {
+            } catch (Throwable e) {
+                Utils.handleException(e, String.format("enable module '%s'", this.getName()));
             }
         }
     }
@@ -131,12 +127,13 @@ public class Module {
         this.setEnabled(false);
         ModuleManager.organizedModules.remove(this);
         if (this.script != null) {
-            Raven.scriptManager.onDisable(script);
+            Client.scriptManager.onDisable(script);
         } else {
             try {
-                MinecraftForge.EVENT_BUS.unregister(this);
+                Client.EVENT_BUS.unregister(this);
                 this.onDisable();
-            } catch (Throwable ignored) {
+            } catch (Throwable e) {
+                Utils.handleException(e, String.format("disable module '%s'", this.getName()));
             }
         }
     }
@@ -153,7 +150,6 @@ public class Module {
 
     public final void setPrettyInfo(String name) {
         this.prettyInfo = name;
-        ModuleManager.sort();
     }
 
     public String getName() {
@@ -168,7 +164,6 @@ public class Module {
 
     public final void setPrettyName(String name) {
         this.prettyName = name;
-        ModuleManager.sort();
     }
 
     public @Nullable String getToolTip() {
@@ -210,6 +205,7 @@ public class Module {
         }
     }
 
+    @SuppressWarnings("unused")
     public void unregisterSetting(@NotNull Setting setting) {
         synchronized (settings) {
             this.settings.remove(setting);
@@ -248,7 +244,7 @@ public class Module {
     public void guiUpdate() throws Throwable {
     }
 
-    public void guiButtonToggled(ButtonSetting b) throws Exception {
+    public void guiButtonToggled(ButtonSetting b) {
     }
 
     public void setBind(int keybind) {

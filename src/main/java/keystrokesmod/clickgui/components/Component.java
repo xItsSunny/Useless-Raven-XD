@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui.components;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.clickgui.components.impl.*;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Gui;
@@ -47,7 +47,7 @@ public abstract class Component implements IComponent {
         onDrawScreen(x, y);
 
         if (getSetting() != null && hover && getSetting().isVisible() && getParent().po && Gui.toolTip.isToggled() && getSetting().getPrettyToolTip() != null) {
-            Raven.clickGui.run(() -> RenderUtils.drawToolTip(getSetting().getPrettyToolTip(), x, y));
+            Client.clickGui.run(() -> RenderUtils.drawToolTip(getSetting().getPrettyToolTip(), x, y));
         }
     }
 

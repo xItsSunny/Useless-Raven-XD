@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.world;
 
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
@@ -8,8 +9,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.Reflection;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Mouse;
 
@@ -34,9 +34,9 @@ public class FastMine extends Module { // from b4 src
         return ((int) multiplier.getInput() == multiplier.getInput() ? (int) multiplier.getInput() + "" : multiplier.getInput()) + " " + multiplier.getPrettyInfo();
     }
 
-    @SubscribeEvent
-    public void a(TickEvent.@NotNull PlayerTickEvent e) {
-        if (e.phase != TickEvent.Phase.END || !mc.inGameHasFocus || !Utils.nullCheck()) {
+    @EventListener
+    public void a(PreUpdateEvent e) {
+        if (!mc.inGameHasFocus || !Utils.nullCheck()) {
             return;
         }
         if (creativeDisable.isToggled() && mc.thePlayer.capabilities.isCreativeMode) {

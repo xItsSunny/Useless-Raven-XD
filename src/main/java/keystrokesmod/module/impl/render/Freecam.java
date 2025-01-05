@@ -1,6 +1,8 @@
 package keystrokesmod.module.impl.render;
 
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.event.network.SendPacketEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -11,9 +13,7 @@ import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.client.MouseEvent;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
@@ -142,8 +142,8 @@ public class Freecam extends Module {
         }
     }
 
-    @SubscribeEvent
-    public void re(RenderWorldLastEvent e) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (Utils.nullCheck()) {
             if (!showArm.isToggled()) {
                 mc.thePlayer.renderArmPitch = mc.thePlayer.prevRenderArmPitch = 700.0F;
@@ -154,39 +154,39 @@ public class Freecam extends Module {
 
     }
 
-    @SubscribeEvent
+    @EventListener
     public void m(MouseEvent e) {
         if (!Utils.nullCheck()) {
             return;
         }
-        if ((e.button == 0 && !allowDigging.isToggled() || e.button == 1 && !allowPlacing.isToggled()) && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-            e.setCanceled(true);
+        if ((e.getButton() == 0 && !allowDigging.isToggled() || e.getButton() == 1 && !allowPlacing.isToggled()) && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+            e.cancel();
         }
         if (!allowInteracting.isToggled()) {
-            if ((e.button == 1 || e.button == 0) && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
-                e.setCanceled(true);
+            if ((e.getButton() == 1 || e.getButton() == 0) && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+                e.cancel();
             }
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(SendPacketEvent e) {
         if (!Utils.nullCheck()) {
             return;
         }
         if (!allowDigging.isToggled()) {
             if (e.getPacket() instanceof C07PacketPlayerDigging) {
-                e.setCanceled(true);
+                e.cancel();
             }
         }
         if (!allowPlacing.isToggled()) {
             if (e.getPacket() instanceof C08PacketPlayerBlockPlacement) {
-                e.setCanceled(true);
+                e.cancel();
             }
         }
         if (!allowInteracting.isToggled()) {
             if (e.getPacket() instanceof C02PacketUseEntity) {
-                e.setCanceled(true);
+                e.cancel();
             }
         }
     }

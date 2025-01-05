@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.render;
 
-import keystrokesmod.event.EyeHeightEvent;
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.render.EyeHeightEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -9,8 +9,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.render.Animation;
 import keystrokesmod.utility.render.Easing;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class MotionCamera extends Module {
@@ -34,7 +33,7 @@ public class MotionCamera extends Module {
         this.registerSetting(notWhileTower = new ButtonSetting("Not while tower", true, scaffold::isToggled));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (mc.thePlayer.onGround) {
             if (Double.isNaN(y)) {
@@ -51,7 +50,7 @@ public class MotionCamera extends Module {
         y = Double.NaN;
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @EventListener(priority = -1)
     public void onEyeHeightEvent(@NotNull EyeHeightEvent event) {
         if (Double.isNaN(y)) return;
         if (!canMotion()) {

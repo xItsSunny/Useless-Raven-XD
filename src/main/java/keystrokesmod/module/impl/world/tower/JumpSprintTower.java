@@ -1,11 +1,11 @@
 package keystrokesmod.module.impl.world.tower;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.world.Tower;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import static keystrokesmod.module.ModuleManager.tower;
@@ -22,7 +22,7 @@ public class JumpSprintTower extends SubMode<Tower> {
         this.registerSetting(noStrafe = new ButtonSetting("No strafe", false));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) throws IllegalAccessException {
         if (tower.canTower()) {
             event.setSprinting(false);

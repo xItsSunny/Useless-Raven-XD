@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.other;
 
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Notifications;
 import keystrokesmod.module.impl.minigames.BedWars;
@@ -8,9 +9,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,17 +30,12 @@ public class BedProximityAlert extends Module {
         playerAlertStatus = new HashMap<>();
     }
 
-    @SubscribeEvent
-    public void onPlayerTick(PlayerTickEvent event) {
-        if (event.phase == TickEvent.Phase.START) {
-            return;
-        }
-
-        EntityPlayer player = event.player;
+    @EventListener
+    public void onPlayerTick(PreUpdateEvent event) {
         BlockPos spawnPos = BedWars.getSpawnPos();
         if (BedWars.whitelistOwnBed.isToggled() && spawnPos != null) {
-            for (EntityPlayer otherPlayer : player.worldObj.playerEntities) {
-                if (otherPlayer == player) {
+            for (EntityPlayer otherPlayer : mc.thePlayer.worldObj.playerEntities) {
+                if (otherPlayer == mc.thePlayer) {
                     continue;
                 }
                 if (ignoreTeammates.isToggled()) {

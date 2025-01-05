@@ -1,13 +1,13 @@
 package keystrokesmod.module.impl.world.tower;
 
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.impl.world.Tower;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import static keystrokesmod.module.ModuleManager.tower;
@@ -20,7 +20,7 @@ public class BlocksMCTower extends SubMode<Tower> {
         this.registerSetting(speed = new SliderSetting("Speed", 0.95, 0.5, 1, 0.01));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (tower.canTower()) {
             if (mc.thePlayer.onGround)
@@ -30,7 +30,7 @@ public class BlocksMCTower extends SubMode<Tower> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(SendPacketEvent event) {
         if (tower.canTower()) {
             if (mc.thePlayer.motionY > -0.0784000015258789 && event.getPacket() instanceof C08PacketPlayerBlockPlacement) {

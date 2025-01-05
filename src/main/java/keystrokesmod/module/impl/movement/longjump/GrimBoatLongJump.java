@@ -8,8 +8,8 @@ import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class GrimBoatLongJump extends SubMode<LongJump> {
@@ -55,8 +55,8 @@ public class GrimBoatLongJump extends SubMode<LongJump> {
         }
     }
 
-    @SubscribeEvent
-    public void onRenderTick(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onRenderTick(Render2DEvent event) {
         if (!Utils.nullCheck() || !timer.isToggled()) return;
 
         if (active) {

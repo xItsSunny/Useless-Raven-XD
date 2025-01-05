@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui.components.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.clickgui.components.IComponent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
@@ -10,7 +10,7 @@ import keystrokesmod.utility.Timer;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.render.*;
 import keystrokesmod.utility.Utils;
-import keystrokesmod.utility.profile.Manager;
+import keystrokesmod.utility.profile.ProfileManagerModule;
 import keystrokesmod.utility.profile.Profile;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
@@ -75,7 +75,7 @@ public class CategoryComponent {
         this.scale = new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
         this.openCloseAnimation = new Animation(Easing.EASE_OUT_QUART, 600); // EASE_OUT_QUART
 
-        for (Module mod : Raven.getModuleManager().inCategory(this.categoryName)) {
+        for (Module mod : Client.getModuleManager().inCategory(this.categoryName)) {
             if (mod instanceof SubMode) {
                 continue;
             }
@@ -92,15 +92,15 @@ public class CategoryComponent {
         int tY = this.buttonHeight + 3;
 
         if ((this.categoryName == Module.category.profiles && isProfile) || (this.categoryName == Module.category.scripts && !isProfile)) {
-            ModuleComponent manager = new ModuleComponent(isProfile ? new Manager() : new keystrokesmod.script.Manager(), this, tY);
+            ModuleComponent manager = new ModuleComponent(isProfile ? new ProfileManagerModule() : new keystrokesmod.script.Manager(), this, tY);
             this.modules.add(manager);
 
-            if ((Raven.profileManager == null && isProfile) || (Raven.scriptManager == null && !isProfile)) {
+            if ((Client.profileManager == null && isProfile) || (Client.scriptManager == null && !isProfile)) {
                 return;
             }
 
             if (isProfile) {
-                for (Profile profile : Raven.profileManager.profiles) {
+                for (Profile profile : Client.profileManager.profiles) {
                     if (Objects.equals(profile.getName(), "latest")) continue;
                     tY += 16;
                     ModuleComponent b = new ModuleComponent(profile.getModule(), this, tY);
@@ -108,7 +108,7 @@ public class CategoryComponent {
                 }
             }
             else {
-                for (Module module : Raven.scriptManager.scripts.values()) {
+                for (Module module : Client.scriptManager.scripts.values()) {
                     if (module instanceof SubMode)
                         continue;
 

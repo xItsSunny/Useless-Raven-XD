@@ -1,10 +1,9 @@
 package keystrokesmod.module.impl.movement.fly;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.movement.Fly;
 import keystrokesmod.module.setting.impl.SubMode;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class GrimACFly extends SubMode<Fly> {
@@ -14,7 +13,7 @@ public class GrimACFly extends SubMode<Fly> {
         super(name, parent);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @EventListener(priority = -1)
     public void onPreMotion(@NotNull PreMotionEvent event) {
         lastY += 0.001;
         mc.thePlayer.setPosition(event.getPosX(), lastY, event.getPosZ());

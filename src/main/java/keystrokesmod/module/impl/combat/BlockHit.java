@@ -11,8 +11,8 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -66,8 +66,8 @@ public class BlockHit extends Module {
         Utils.correctValue(postDelayMin, postDelayMax);
     }
 
-    @SubscribeEvent
-    public void onTick(TickEvent.RenderTickEvent e) {
+    @EventListener
+    public void onTick(Render2DEvent e) {
         if (!Utils.nullCheck())
             return;
 

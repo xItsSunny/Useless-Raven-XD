@@ -1,13 +1,14 @@
 package keystrokesmod.module.impl.client;
 
-import keystrokesmod.event.PreTickEvent;
+import keystrokesmod.Client;
+import keystrokesmod.event.client.PreTickEvent;
 import keystrokesmod.mixins.impl.client.MinecraftAccessor;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
 import keystrokesmod.module.setting.impl.ModeSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class Settings extends Module {
@@ -15,7 +16,6 @@ public class Settings extends Module {
     public static ButtonSetting weaponAxe;
     public static ButtonSetting weaponRod;
     public static ButtonSetting weaponStick;
-    private final ButtonSetting oldHitReg;
     public static SliderSetting offset;
     public static SliderSetting timeMultiplier;
     public static ModeSetting toggleSound;
@@ -28,7 +28,6 @@ public class Settings extends Module {
         this.registerSetting(weaponAxe = new ButtonSetting("Set axe as weapon", false));
         this.registerSetting(weaponRod = new ButtonSetting("Set rod as weapon", false));
         this.registerSetting(weaponStick = new ButtonSetting("Set stick as weapon", false));
-        this.registerSetting(oldHitReg = new ButtonSetting("1.7 hit reg", true));
         this.registerSetting(new DescriptionSetting("Profiles"));
         this.registerSetting(sendMessage = new ButtonSetting("Send message on enable", true));
         this.registerSetting(new DescriptionSetting("Theme colors"));
@@ -36,12 +35,12 @@ public class Settings extends Module {
         this.registerSetting(timeMultiplier = new SliderSetting("Time multiplier", 0.5, 0.1, 4.0, 0.1));
         this.registerSetting(toggleSound = new ModeSetting("Toggle sound", new String[]{"None", "Rise", "Sigma", "QuickMacro"}, 1));
         this.canBeEnabled = false;
+        Client.EVENT_BUS.register(this);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreTick(PreTickEvent event) {
-        if (oldHitReg.isToggled())
-            ((MinecraftAccessor) mc).setLeftClickCounter(-1);
+        ((MinecraftAccessor) mc).setLeftClickCounter(-1);
     }
 
     public static @NotNull String getToggleSound(boolean enable) {

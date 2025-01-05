@@ -1,12 +1,12 @@
 package keystrokesmod.module.impl.world.tower;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.world.Tower;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class ConstantMotionTower extends SubMode<Tower> {
@@ -19,7 +19,7 @@ public class ConstantMotionTower extends SubMode<Tower> {
         this.registerSetting(strafe = new ButtonSetting("Strafe", false));
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (parent.canTower()) {
             mc.thePlayer.motionY = motion.getInput();

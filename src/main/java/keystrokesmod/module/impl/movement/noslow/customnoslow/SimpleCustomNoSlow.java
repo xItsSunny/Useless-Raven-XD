@@ -1,6 +1,10 @@
 package keystrokesmod.module.impl.movement.noslow.customnoslow;
 
-import keystrokesmod.event.*;
+import keystrokesmod.event.network.SendPacketEvent;
+import keystrokesmod.event.player.PostMotionEvent;
+import keystrokesmod.event.player.PostUpdateEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.movement.noslow.CustomNoSlow;
 import keystrokesmod.module.impl.other.SlotHandler;
@@ -143,10 +147,10 @@ public class SimpleCustomNoSlow extends SubMode<CustomNoSlow> {
     }
 
     public void onSendPacket(@NotNull SendPacketEvent event) {
-        if (event.getPacket() instanceof C08PacketPlayerBlockPlacement && !event.isCanceled() && bug.isToggled()) {
+        if (event.getPacket() instanceof C08PacketPlayerBlockPlacement && !event.isCancelled() && bug.isToggled()) {
             C08PacketPlayerBlockPlacement packet = (C08PacketPlayerBlockPlacement) event.getPacket();
             if (!mc.thePlayer.isUsingItem()) {
-                event.setCanceled(true);
+                event.cancel();
                 PacketUtils.sendPacketNoEvent(packet);
                 PacketUtils.sendPacketNoEvent(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
             }

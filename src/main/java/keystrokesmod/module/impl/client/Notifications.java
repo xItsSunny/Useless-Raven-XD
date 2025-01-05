@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.client;
 
+import keystrokesmod.Client;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.notification.DefaultNotification;
@@ -10,8 +11,8 @@ import keystrokesmod.utility.CoolDown;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.render.AnimationUtils;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
+import keystrokesmod.event.render.Render2DEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,19 +56,8 @@ public class Notifications extends Module {
         }
     }
 
-    @Override
-    public void onEnable() {
-        mode.enable();
-        notifs.clear();
-    }
-
-    @Override
-    public void onDisable() {
-        mode.disable();
-    }
-
-    @SubscribeEvent
-    public void onTick(TickEvent.RenderTickEvent event) {
+    @EventListener
+    public void onTick(Render2DEvent event) {
         ScaledResolution sr = new ScaledResolution(mc);
         for (int index = 0; index < notifs.size(); index++) {
             Notification noti = notifs.get(index);

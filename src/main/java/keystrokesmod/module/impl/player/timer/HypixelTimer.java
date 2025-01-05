@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.player.timer;
 
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.combat.KillAura;
 import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.impl.player.Timer;
@@ -9,8 +9,7 @@ import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class HypixelTimer extends SubMode<Timer> {
@@ -45,10 +44,10 @@ public class HypixelTimer extends SubMode<Timer> {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @EventListener(priority = -2)
     public void onPreMotion(PreMotionEvent event) {
         if (active) {
-            event.setCanceled(true);
+            event.cancel();
             balanceTicks = Math.min(balanceTicks + 1, maxBalance.getInput() / 50);
         }
     }

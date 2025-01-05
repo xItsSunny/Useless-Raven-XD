@@ -1,9 +1,14 @@
 package keystrokesmod.utility;
 
+import keystrokesmod.Client;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.mixins.impl.entity.EntityAccessor;
 import keystrokesmod.module.impl.movement.TargetStrafe;
 import keystrokesmod.module.impl.other.anticheats.utils.world.PlayerMove;
 import keystrokesmod.script.classes.Vec3;
+import keystrokesmod.utility.movement.Move;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
@@ -12,7 +17,7 @@ import net.minecraft.util.MathHelper;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
 public class MoveUtil {
     public static final double WALK_SPEED = 0.221;
@@ -68,6 +73,10 @@ public class MoveUtil {
     public static void stop() {
         mc.thePlayer.motionX = 0;
         mc.thePlayer.motionZ = 0;
+    }
+
+    public static float getYawFromMovement() {
+        return mc.thePlayer.rotationYaw + Move.fromMovement(mc.thePlayer.moveForward, mc.thePlayer.moveStrafing).getDeltaYaw();
     }
 
     /**
@@ -328,6 +337,53 @@ public class MoveUtil {
                     entity.onGround || !BlockUtils.replaceable(new BlockPos(result.toVec3())) ? 0 : MoveUtil.predictedMotion(motion.y(), i),
                     MoveUtil.predictedMotionXZ(motion.z(), i, MoveUtil.isMoving(entity))
             );
+        }
+        return result;
+    }
+
+    static {
+        Client.EVENT_BUS.register(MoveUtil.class);
+    }
+
+    private static boolean noJump = false;
+    private static final Object[] lock = new Object[0];
+
+    public static void jump() {
+        synchronized (lock) {
+            if (!noJump)
+                mc.thePlayer.jump();
+            noJump = true;
+        }
+    }
+
+    @EventListener(priority = 3)
+    public static void onMoveInput(MoveInputEvent event) {
+        synchronized (lock) {
+            if (noJump) {
+                event.setJump(false);
+            }
+            noJump = false;
+        }
+    }
+
+    public static double getMoveForward() {
+        double result = 0;
+        if (mc.gameSettings.keyBindForward.isKeyDown()) {
+            result++;
+        }
+        if (mc.gameSettings.keyBindBack.isKeyDown()) {
+            result--;
+        }
+        return result;
+    }
+
+    public static double getMoveStrafe() {
+        double result = 0;
+        if (mc.gameSettings.keyBindLeft.isKeyDown()) {
+            result++;
+        }
+        if (mc.gameSettings.keyBindRight.isKeyDown()) {
+            result--;
         }
         return result;
     }

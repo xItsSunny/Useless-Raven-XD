@@ -1,15 +1,15 @@
 package keystrokesmod.module.impl.movement.jesus;
 
-import keystrokesmod.event.BlockAABBEvent;
-import keystrokesmod.event.MoveInputEvent;
-import keystrokesmod.event.PreMotionEvent;
+import keystrokesmod.event.world.BlockAABBEvent;
+import keystrokesmod.event.player.MoveInputEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.impl.movement.Jesus;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.BlockUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class KarhuJesus extends SubMode<Jesus> {
@@ -17,13 +17,13 @@ public class KarhuJesus extends SubMode<Jesus> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onMoveInput(@NotNull MoveInputEvent event) {
         if (BlockUtils.blockRelativeToPlayer(0, -1, 0) instanceof BlockLiquid)
             event.setJump(false);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onBlockAABB(@NotNull BlockAABBEvent event) {
         if (event.getBlock() instanceof BlockLiquid && !mc.gameSettings.keyBindSneak.isKeyDown()) {
             final int x = event.getBlockPos().getX();
@@ -34,7 +34,7 @@ public class KarhuJesus extends SubMode<Jesus> {
         }
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreMotion(PreMotionEvent event) {
         if (Utils.inLiquid()) {
             event.setPosY(event.getPosY() - (mc.thePlayer.ticksExisted % 2 == 0 ? 0.015625 : 0));

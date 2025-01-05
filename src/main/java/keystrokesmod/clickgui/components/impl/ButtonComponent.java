@@ -1,16 +1,14 @@
 package keystrokesmod.clickgui.components.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
+import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.profile.ProfileModule;
-import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
-
-import java.awt.*;
 
 public class ButtonComponent extends Component {
     private final Module mod;
@@ -103,10 +101,11 @@ public class ButtonComponent extends Component {
             this.buttonSetting.toggle();
             try {
                 this.mod.guiButtonToggled(this.buttonSetting);
-            } catch (Exception ignored) {
+            } catch (Throwable e) {
+                Utils.handleException(e);
             }
-            if (Raven.currentProfile != null) {
-                ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+            if (Client.currentProfile != null) {
+                ((ProfileModule) Client.currentProfile.getModule()).saved = false;
             }
             parent.categoryComponent.render();
         }

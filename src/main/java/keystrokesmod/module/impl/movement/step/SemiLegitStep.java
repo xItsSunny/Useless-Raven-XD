@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.movement.step;
 
 import it.unimi.dsi.fastutil.doubles.DoubleList;
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.StepEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.StepEvent;
 import keystrokesmod.module.impl.movement.Step;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.module.setting.impl.SubMode;
@@ -10,8 +10,7 @@ import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.PacketUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class SemiLegitStep extends SubMode<Step> {
@@ -36,7 +35,7 @@ public class SemiLegitStep extends SubMode<Step> {
         state = State.NONE;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onStep(@NotNull StepEvent event) {
         if (event.getHeight() == 1) {
             state = State.BALANCE;
@@ -50,14 +49,14 @@ public class SemiLegitStep extends SubMode<Step> {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @EventListener(priority = -1)
     public void onPreMotion(PreMotionEvent event) {
         if (System.currentTimeMillis() - lastStep > delay.getInput())
             mc.thePlayer.stepHeight = 1;
 
         switch (state) {
             case BALANCE:
-                event.setCanceled(true);
+                event.cancel();
                 MoveUtil.stop();
                 state = State.STEP;
                 break;

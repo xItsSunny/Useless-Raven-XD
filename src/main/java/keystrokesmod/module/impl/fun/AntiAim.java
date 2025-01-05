@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.fun;
 
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.RotationEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.player.RotationEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.fun.antiaim.BackwardAntiAim;
 import keystrokesmod.module.impl.fun.antiaim.SnapAntiAim;
@@ -10,8 +10,7 @@ import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class AntiAim extends Module {
@@ -44,7 +43,7 @@ public class AntiAim extends Module {
         mode.disable();
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onRotation(@NotNull RotationEvent event) {
         if (canAntiAim()) {
             event.setMoveFix(moveFix.isToggled() ? RotationHandler.MoveFix.Silent : RotationHandler.MoveFix.None);
@@ -60,7 +59,7 @@ public class AntiAim extends Module {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onPreMotion(PreMotionEvent event) {
         if (canAntiAim() && cancelSprint.isToggled()) {
             event.setSprinting(false);

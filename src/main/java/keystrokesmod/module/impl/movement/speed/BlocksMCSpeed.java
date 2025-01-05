@@ -1,11 +1,11 @@
 package keystrokesmod.module.impl.movement.speed;
 
-import keystrokesmod.event.PreUpdateEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.Speed;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class BlocksMCSpeed extends SubMode<Speed> {
@@ -13,14 +13,13 @@ public class BlocksMCSpeed extends SubMode<Speed> {
         super(name, parent);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onPreUpdate(@NotNull PreUpdateEvent event) {
         if (parent.noAction() || !MoveUtil.isMoving()) return;
 
         if (mc.thePlayer.onGround) {
             MoveUtil.strafe(MoveUtil.getAllowedHorizontalDistance());
-            if (!Utils.jumpDown())
-                mc.thePlayer.jump();
+            MoveUtil.jump();
         } else {
             MoveUtil.strafe();
         }

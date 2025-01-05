@@ -1,6 +1,8 @@
 package keystrokesmod.module.impl.player.fakelag;
 
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.event.network.SendPacketEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.impl.player.Blink;
 import keystrokesmod.module.impl.player.FakeLag;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -16,10 +18,7 @@ import net.minecraft.network.login.client.C00PacketLoginStart;
 import net.minecraft.network.login.client.C01PacketEncryptionResponse;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.status.client.C00PacketServerQuery;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Queue;
@@ -43,8 +42,8 @@ public class LatencyFakeLag extends SubMode<FakeLag> {
         vec3 = null;
     }
 
-    @SubscribeEvent
-    public void onRender(RenderWorldLastEvent event) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (drawRealPosition.isToggled() && vec3 != null) {
             if (mc.gameSettings.thirdPersonView == 0) return;
 
@@ -52,8 +51,8 @@ public class LatencyFakeLag extends SubMode<FakeLag> {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onRenderTick(TickEvent.RenderTickEvent ev) {
+    @EventListener(priority = 2)
+    public void onRenderTick(Render2DEvent ev) {
         if (!Utils.nullCheck()) {
             sendPacket(false);
             return;
@@ -61,7 +60,7 @@ public class LatencyFakeLag extends SubMode<FakeLag> {
         sendPacket(true);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @EventListener(priority = 2)
     public void onSendPacket(@NotNull SendPacketEvent e) {
         if (!Utils.nullCheck()) return;
         final Packet<?> packet = e.getPacket();
@@ -77,11 +76,11 @@ public class LatencyFakeLag extends SubMode<FakeLag> {
             sendPacket(false);
             return;
         }
-        if (e.isCanceled()) {
+        if (e.isCancelled()) {
             return;
         }
         packetQueue.add(new TimedPacket(packet, receiveTime));
-        e.setCanceled(true);
+        e.cancel();
     }
 
     public void sendPacket(boolean delay) {

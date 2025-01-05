@@ -1,6 +1,8 @@
 package keystrokesmod.module.impl.player.blink;
 
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.event.network.SendPacketEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.player.Blink;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -16,9 +18,7 @@ import net.minecraft.network.login.client.C01PacketEncryptionResponse;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.status.client.C00PacketServerQuery;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.event.render.Render2DEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -71,16 +71,16 @@ public class NormalBlink extends SubMode<Module> {
         return String.valueOf(blinkedPackets.size());
     }
 
-    @SubscribeEvent
-    public void onRender(TickEvent.RenderTickEvent event) {
-        if (!overlay.isToggled() || event.phase != TickEvent.Phase.END || !Utils.nullCheck()) {
+    @EventListener
+    public void onRender(Render2DEvent event) {
+        if (!overlay.isToggled() || !Utils.nullCheck()) {
             return;
         }
 
         RenderUtils.drawText("blinking: " + blinkedPackets.size());
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onSendPacket(SendPacketEvent e) {
         if (!Utils.nullCheck() || mc.thePlayer.isDead) {
             this.disable();
@@ -98,7 +98,7 @@ public class NormalBlink extends SubMode<Module> {
             return;
         }
         blinkedPackets.add(packet);
-        e.setCanceled(true);
+        e.cancel();
 
         if (pulse.isToggled()) {
             if (System.currentTimeMillis() - startTime >= pulseDelay.getInput()) {
@@ -108,8 +108,8 @@ public class NormalBlink extends SubMode<Module> {
         }
     }
 
-    @SubscribeEvent
-    public void onRenderWorld(RenderWorldLastEvent e) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (!Utils.nullCheck() || pos == null || !initialPosition.isToggled()) {
             return;
         }

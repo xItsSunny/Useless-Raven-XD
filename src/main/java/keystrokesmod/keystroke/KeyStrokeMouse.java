@@ -9,7 +9,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 
 public class KeyStrokeMouse {
     private static String[] a = new String[]{"LMB", "RMB"};
@@ -56,7 +56,8 @@ public class KeyStrokeMouse {
             this.i = Math.min(255, (int) (2L * (System.currentTimeMillis() - this.h)));
             this.j = Math.max(0.0D, 1.0D - (double) (System.currentTimeMillis() - this.h) / 20.0D);
         } else {
-            this.i = Math.max(0, 255 - (int) (2L * (System.currentTimeMillis() - this.h)));
+            int b1 = 255 - (int) (2L * (System.currentTimeMillis() - this.h));
+            this.i = (0 >= b1) ? 0 : b1;
             this.j = Math.min(1.0D, (double) (System.currentTimeMillis() - this.h) / 20.0D);
         }
 

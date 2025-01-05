@@ -1,5 +1,6 @@
 package keystrokesmod.utility.render.blur;
 
+import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.render.ColorUtils;
 import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.client.renderer.GlStateManager;
@@ -9,7 +10,7 @@ import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 
-import static keystrokesmod.Raven.mc;
+import static keystrokesmod.Client.mc;
 import static keystrokesmod.utility.render.blur.StencilUtil.checkSetupFBO;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glUniform1;
@@ -19,8 +20,8 @@ import static org.lwjgl.opengl.GL20.glUniform1;
  * @since 05/13/2022
  */
 public class GaussianBlur {
-
-    private static final ShaderUtil gaussianBlur = new ShaderUtil("keystrokesmod:shaders/gaussian.frag");
+    private static boolean unsupported = false;
+    private static ShaderUtil gaussianBlur = null;
 
     private static Framebuffer framebuffer = new Framebuffer(1, 1, false);
 
@@ -39,7 +40,18 @@ public class GaussianBlur {
         glUniform1(gaussianBlur.getUniform("weights"), weightBuffer);
     }
 
-    public static void startBlur(){
+    public static boolean startBlur() {
+        if (unsupported) return false;
+        if (gaussianBlur == null) {
+            try {
+                gaussianBlur = new ShaderUtil("keystrokesmod:shaders/gaussian.frag");
+            } catch (IllegalStateException e) {
+                unsupported = true;
+                Utils.handleException(e, "Initializing Blur, but device doesn't support!");
+                return false;
+            }
+        }
+
         mc.mcProfiler.startSection("Pre-blur");
         mc.getFramebuffer().bindFramebuffer(false);
         checkSetupFBO(mc.getFramebuffer());
@@ -50,9 +62,11 @@ public class GaussianBlur {
         glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
         glColorMask(false, false, false, false);
         mc.mcProfiler.endSection();
+        return true;
     }
 
     public static void endBlur(@Range(from = 0, to = 64) int radius, float compression) {
+        if (unsupported) return;
         mc.mcProfiler.startSection("Post-blur");
         StencilUtil.readStencilBuffer(1);
 

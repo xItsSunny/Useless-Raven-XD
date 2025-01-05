@@ -1,8 +1,8 @@
 package keystrokesmod.module.impl.fun;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
+import keystrokesmod.anticrack.AntiCrack;
 import keystrokesmod.module.Module;
-import net.minecraft.crash.CrashReport;
 
 
 public class Yeet extends Module {
@@ -15,8 +15,7 @@ public class Yeet extends Module {
     @Override
     public void onEnable() {
         enableTicks = 0;
-        Raven.mc.thePlayer.playSound("keystrokesmod:yeet", 1, 1);
-        mc.ingameGUI.displayTitle("还是PVP大佬", "", 10, 10, 10);
+        Client.mc.thePlayer.playSound("keystrokesmod:yeet", 1, 1);
     }
 
     @Override
@@ -25,15 +24,7 @@ public class Yeet extends Module {
 
         if (enableTicks == 20) {
             this.disable();
-            for (int i = 0; i < 10; i++) {
-                mc.crashed(new CrashReport("Yeet!", new YeetException()));
-            }
-        }
-    }
-
-    public static class YeetException extends RuntimeException {
-        public YeetException() {
-            super("Yeet!");
+            AntiCrack.UNREACHABLE("Yeet!");
         }
     }
 }

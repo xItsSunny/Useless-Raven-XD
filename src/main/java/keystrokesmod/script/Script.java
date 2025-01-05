@@ -1,6 +1,6 @@
 package keystrokesmod.script;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.utility.Utils;
 import net.minecraft.launchwrapper.Launch;
 
@@ -58,29 +58,29 @@ public class Script {
             if (this.scriptName == null || this.codeStr == null) {
                 return false;
             }
-            final File file = new File(Raven.scriptManager.tempDir);
+            final File file = new File(Client.scriptManager.tempDir);
             if (!file.exists() || !file.isDirectory()) {
                 file.mkdir();
             }
-            if (Raven.scriptManager.compiler == null) {
+            if (Client.scriptManager.compiler == null) {
                 return false;
             }
             final Diagnostic bp = new Diagnostic();
-            final StandardJavaFileManager standardFileManager = Raven.scriptManager.compiler.getStandardFileManager(bp, null, null);
+            final StandardJavaFileManager standardFileManager = Client.scriptManager.compiler.getStandardFileManager(bp, null, null);
             final ArrayList<String> list = new ArrayList<>();
             list.add("-d");
-            list.add(Raven.scriptManager.tempDir);
+            list.add(Client.scriptManager.tempDir);
             list.add("-XDuseUnsharedTable");
             if (!(boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment")) {
                 list.add("-classpath");
-                String s = Raven.scriptManager.b;
+                String s = Client.scriptManager.b;
                 try {
                     s = URLDecoder.decode(s, "UTF-8");
                 }
                 catch (UnsupportedOperationException ignored) {}
                 list.add(s);
             }
-            boolean success = Raven.scriptManager.compiler.getTask(null, standardFileManager, bp, list, null, Collections.singletonList(new ClassObject(this.scriptName, this.codeStr, this.extraLines))).call();
+            boolean success = Client.scriptManager.compiler.getTask(null, standardFileManager, bp, list, null, Collections.singletonList(new ClassObject(this.scriptName, this.codeStr, this.extraLines))).call();
             if (!success) {
                 this.error = true;
                 return false;
@@ -126,7 +126,7 @@ public class Script {
     public void delete() {
         this.d = null;
         this.b = null;
-        final File file = new File(Raven.scriptManager.tempDir + File.separator + this.scriptName + ".class");
+        final File file = new File(Client.scriptManager.tempDir + File.separator + this.scriptName + ".class");
         if (file.exists()) {
             file.delete();
         }
@@ -135,7 +135,7 @@ public class Script {
     public void createScript(final String s) {
         extraLines = 0;
         final StringBuilder sb = new StringBuilder();
-        final Iterator<String> iterator = Raven.scriptManager.imports.iterator();
+        final Iterator<String> iterator = Client.scriptManager.imports.iterator();
         while (iterator.hasNext()) {
             extraLines++;
             sb.append("import ").append(iterator.next()).append(";\n");

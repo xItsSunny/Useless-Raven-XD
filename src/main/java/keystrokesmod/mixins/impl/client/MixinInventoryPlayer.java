@@ -1,7 +1,7 @@
 package keystrokesmod.mixins.impl.client;
 
 
-import keystrokesmod.Raven;
+import keystrokesmod.Client;
 import keystrokesmod.module.impl.other.SlotHandler;
 import keystrokesmod.utility.Utils;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,7 +21,7 @@ public abstract class MixinInventoryPlayer {
 
     @Inject(method = "getCurrentItem", at = @At("HEAD"), cancellable = true)
     public void getCurrentItem(@NotNull CallbackInfoReturnable<ItemStack> cir) {
-        if (Utils.nullCheck() && this.player == Raven.mc.thePlayer) {
+        if (Utils.nullCheck() && this.player == Client.mc.thePlayer) {
             cir.setReturnValue(SlotHandler.getHeldItem());
         }
     }

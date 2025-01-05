@@ -1,14 +1,13 @@
 package keystrokesmod.module.impl.world.scaffold.sprint;
 
-import keystrokesmod.event.PreMotionEvent;
-import keystrokesmod.event.SendPacketEvent;
+import keystrokesmod.event.player.PreMotionEvent;
+import keystrokesmod.event.network.SendPacketEvent;
 import keystrokesmod.module.impl.player.blink.NormalBlink;
 import keystrokesmod.module.impl.world.Scaffold;
 import keystrokesmod.module.impl.world.scaffold.IScaffoldSprint;
 import keystrokesmod.utility.MoveUtil;
 import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 public class HypixelSprint extends IScaffoldSprint {
@@ -32,7 +31,7 @@ public class HypixelSprint extends IScaffoldSprint {
         mc.thePlayer.motionZ *= .8;
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @EventListener(priority = 1)
     public void onPreUpdate(PreMotionEvent event) {
         if (mc.thePlayer.onGround) {
             mc.thePlayer.motionX *= 1.114 - MoveUtil.getSpeedEffect() * .01 - Math.random() * 1E-4;

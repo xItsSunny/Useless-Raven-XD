@@ -1,14 +1,14 @@
 package keystrokesmod.module.impl.other.anticheats.checks.simulation;
 
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import keystrokesmod.event.client.PreTickEvent;
 import keystrokesmod.module.impl.other.Anticheat;
 import keystrokesmod.module.impl.other.anticheats.Check;
 import keystrokesmod.module.impl.other.anticheats.TRPlayer;
 import keystrokesmod.module.impl.other.anticheats.utils.phys.PredictEngine;
 import keystrokesmod.script.classes.Vec3;
 import net.minecraft.util.MovementInput;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -51,8 +51,8 @@ public class Simulation extends Check {
         this.engine = new PredictEngine(player);
     }
 
-    @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event) {
+    @EventListener
+    public void onClientTick(PreTickEvent event) {
         try {
             if (!nextPosition.isEmpty()) {
                 Vec3 nearestVec = nextPosition.poll();

@@ -1,6 +1,7 @@
 package keystrokesmod.module.impl.world;
 
-import keystrokesmod.event.SafeWalkEvent;
+import keystrokesmod.event.player.PreUpdateEvent;
+import keystrokesmod.event.player.SafeWalkEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -9,9 +10,7 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
@@ -36,6 +35,8 @@ public class SafeWalk extends Module {
 
     public static boolean canSafeWalk() {
         if (ModuleManager.safeWalk != null && ModuleManager.safeWalk.isEnabled()) {
+            if (mc.currentScreen != null)
+                return false;
             if (disableOnForward.isToggled() && Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode())) {
                 return false;
             }
@@ -63,11 +64,8 @@ public class SafeWalk extends Module {
         }
     }
 
-    @SubscribeEvent
-    public void onTick(TickEvent.@NotNull PlayerTickEvent e) {
-        if (e.phase != TickEvent.Phase.END) {
-            return;
-        }
+    @EventListener
+    public void onTick(PreUpdateEvent e) {
         if (!shift.isToggled() || Keyboard.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()) || !Utils.nullCheck()) {
             return;
         }
@@ -96,14 +94,7 @@ public class SafeWalk extends Module {
         }
     }
 
-    @SubscribeEvent
-    public void onGuiOpen(final GuiOpenEvent guiOpenEvent) {
-        if (shift.isToggled() && guiOpenEvent.gui == null) {
-            this.isSneaking = mc.thePlayer.isSneaking();
-        }
-    }
-
-    @SubscribeEvent
+    @EventListener
     public void onSafeWalk(@NotNull SafeWalkEvent event) {
         if (canSafeWalk())
             event.setSafeWalk(true);

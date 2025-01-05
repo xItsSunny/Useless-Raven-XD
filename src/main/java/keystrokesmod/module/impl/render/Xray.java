@@ -1,5 +1,7 @@
 package keystrokesmod.module.impl.render;
 
+import keystrokesmod.event.render.Render3DEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -9,9 +11,7 @@ import keystrokesmod.utility.render.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import keystrokesmod.event.world.EntityJoinWorldEvent;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -95,22 +95,22 @@ public class Xray extends Module {
         return false;
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onEntityJoin(EntityJoinWorldEvent e) {
-        if (e.entity == mc.thePlayer) {
+        if (e.getEntity() == mc.thePlayer) {
             this.blocks.clear();
         }
     }
 
-    @SubscribeEvent
-    public void onRenderWorld(RenderWorldLastEvent ev) {
+    @EventListener
+    public void onRender3D(Render3DEvent event) {
         if (!Utils.nullCheck()) {
             return;
         }
         if (!this.blocks.isEmpty()) {
-            Iterator iterator = blocks.iterator();
+            Iterator<BlockPos> iterator = blocks.iterator();
             while (iterator.hasNext()) {
-                BlockPos blockPos = (BlockPos) iterator.next();
+                BlockPos blockPos = iterator.next();
                 Block block = BlockUtils.getBlock(blockPos);
                 if (block == null || !canBreak(block)) {
                     iterator.remove();

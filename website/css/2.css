@@ -278,6 +278,10 @@
 	margin: 30px auto;
 	width: 100px;
 }
+.anim2{
+	margin: 30px auto;
+	width: 100px;
+}
 .anim:hover{
 	animation-name: D;
 	animation-duration: 1s;
@@ -286,7 +290,22 @@
 	box-shadow: 0px 0px 100px 5px;
 	width: 200px;
 }
+.anim2:hover{
+	animation-name: D;
+	animation-duration: 1s;
+  	animation-direction: alternate;
+	line-height: 40px;
+	box-shadow: 0px 0px 100px 5px;
+	width: 200px;
+}
 .anim{
+	animation-name: Doff;
+	animation-duration: 1s;
+  	animation-direction: alternate;
+	line-height: 40px;
+	box-shadow: 0px 0px 100px 5px;
+	width: 100px;
+.anim2{
 	animation-name: Doff;
 	animation-duration: 1s;
   	animation-direction: alternate;

@@ -32,7 +32,7 @@ public class LogUtils {
 
             }
             if (Anticheat.getAutoReport().getInput() != 0) {
-                Client.mc.thePlayer.sendChatMessage(
+               Client.mc.thePlayer.sendChatMessage(
                         Anticheat.getAutoReport().getOptions()[(int) Anticheat.getAutoReport().getInput()]
                                 + " "
                                 + Utils.stripColor(player)

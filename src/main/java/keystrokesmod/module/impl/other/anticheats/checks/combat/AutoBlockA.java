@@ -9,7 +9,7 @@ import keystrokesmod.utility.RotationUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.network.play.server.S0BPacketAnimation;
 import net.minecraft.network.play.server.S14PacketEntity;
-import keystrokesmod.eventbus.annotations.EventListener;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import static keystrokesmod.Client.mc;
@@ -21,7 +21,7 @@ public class AutoBlockA extends Check {
         super("AutoBlockA", player);
     }
 
-    @EventListener
+    @SubscribeEvent
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S0BPacketAnimation) {
             if (((S0BPacketAnimation) event.getPacket()).getEntityID() == player.fabricPlayer.getEntityId()) {
@@ -49,6 +49,6 @@ public class AutoBlockA extends Check {
 
     @Override
     public boolean isDisabled() {
-        return !Anticheat.getCombatCheck().isToggled();
+        return !Anticheat.getCombatCheck().isToggled() || !Anticheat.getCombatCheckAutoBlockA().isToggled();
     }
 }

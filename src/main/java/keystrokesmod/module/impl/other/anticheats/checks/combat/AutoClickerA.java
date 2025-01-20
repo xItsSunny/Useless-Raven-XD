@@ -2,6 +2,7 @@ package keystrokesmod.module.impl.other.anticheats.checks.combat;
 
 import it.unimi.dsi.fastutil.longs.LongArrayFIFOQueue;
 import keystrokesmod.event.network.ReceivePacketEvent;
+import keystrokesmod.eventbus.annotations.EventListener;
 import keystrokesmod.module.impl.other.Anticheat;
 import keystrokesmod.module.impl.other.anticheats.Check;
 import keystrokesmod.module.impl.other.anticheats.TRPlayer;
@@ -16,7 +17,7 @@ public class AutoClickerA extends Check {
         super("AutoClickerA", player);
     }
 
-    @SubscribeEvent
+    @EventListener
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S0BPacketAnimation) {
             if (((S0BPacketAnimation) event.getPacket()).getEntityID() == player.fabricPlayer.getEntityId()) {

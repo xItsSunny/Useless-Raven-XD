@@ -167,8 +167,7 @@ public class PredictEngine extends EntityPlayer implements Cloneable {
             BlockPos blockpos = new BlockPos(p_pushOutOfBlocks_1_, p_pushOutOfBlocks_3_, p_pushOutOfBlocks_5_);
             double d0 = p_pushOutOfBlocks_1_ - (double) blockpos.getX();
             double d1 = p_pushOutOfBlocks_5_ - (double) blockpos.getZ();
-            int a = (int) Math.ceil(this.height);
-            int entHeight = (a >= 1) ? a : 1;
+            int entHeight = Math.max((int) Math.ceil(this.height), 1);
             boolean inTranslucentBlock = !this.isHeadspaceFree(blockpos, entHeight);
             if (inTranslucentBlock) {
                 int i = -1;

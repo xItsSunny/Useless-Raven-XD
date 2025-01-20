@@ -6,7 +6,7 @@ import keystrokesmod.module.impl.other.Anticheat;
 import keystrokesmod.module.impl.other.anticheats.Check;
 import keystrokesmod.module.impl.other.anticheats.TRPlayer;
 import net.minecraft.network.play.server.S0BPacketAnimation;
-import keystrokesmod.eventbus.annotations.EventListener;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class AutoClickerA extends Check {
@@ -16,7 +16,7 @@ public class AutoClickerA extends Check {
         super("AutoClickerA", player);
     }
 
-    @EventListener
+    @SubscribeEvent
     public void onReceivePacket(@NotNull ReceivePacketEvent event) {
         if (event.getPacket() instanceof S0BPacketAnimation) {
             if (((S0BPacketAnimation) event.getPacket()).getEntityID() == player.fabricPlayer.getEntityId()) {
@@ -46,6 +46,6 @@ public class AutoClickerA extends Check {
 
     @Override
     public boolean isDisabled() {
-        return !Anticheat.getCombatCheck().isToggled();
+        return !Anticheat.getCombatCheck().isToggled() || !Anticheat.getCombatCheckAutoClickerA().isToggled();
     }
 }

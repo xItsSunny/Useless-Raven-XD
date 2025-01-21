@@ -10,6 +10,7 @@ import keystrokesmod.module.impl.other.*;
 import keystrokesmod.module.impl.player.*;
 import keystrokesmod.module.impl.render.*;
 import keystrokesmod.module.impl.world.*;
+import keystrokesmod.utility.PacketUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -126,6 +127,7 @@ public class ModuleManager {
     public static MotionCamera motionCamera;
     public static Optimize optimize;
     public static SelfDamage selfDamage;
+    public static AutoGG autoGG;
 
     static List<Module> modules = new ArrayList<>();
 
@@ -206,6 +208,7 @@ public class ModuleManager {
         // other
         this.addModule(new Anticheat());
         this.addModule(autoPlay = new AutoPlay());
+        this.addModule(autoGG = new AutoGG());
         this.addModule(autoRespawn = new AutoRespawn());
         this.addModule(clickRecorder = new ClickRecorder());
         this.addModule(new FakeChat());

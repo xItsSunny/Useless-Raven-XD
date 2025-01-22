@@ -277,17 +277,17 @@ public class Commands {
                     return;
                 }
 
-                Spammer.customSpam = c.substring(13);
-                print("&aSet spammessage to " + Spammer.customSpam, 1);
-            } else if (firstArg.equals("customname")) {
+                Spammer.spammer = c.substring(13);
+                print("&aSet spammessage to " + Spammer.spammer, 1);
+            } else if (firstArg.equals("autoGG")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
                 }
 
-                AutoGG.customGG = c.substring(14);
-                print("&aSet customgg to " + AutoGG.customGG, 1);
-            }else if (firstArg.equals("customSpam")) {
+                AutoGG.autoGG = c.substring(14);
+                print("&aSet customgg to " + AutoGG.autoGG, 1);
+            }else if (firstArg.equals("spammer")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
                     return;
@@ -555,7 +555,9 @@ public class Commands {
                 print("4 killmessage [message]", 0);
                 print("4 clientspoofer [brand]", 0);
                 print(String.format("5 clientname [name (current is '%s')]", Watermark.customName), 0);
-                print("6 chat <args>", 0);
+                print("6 spammer [message]", 0);
+                print("7 autogg [message]", 0);
+                print("8 chat <args>", 0);
             }
 
         }

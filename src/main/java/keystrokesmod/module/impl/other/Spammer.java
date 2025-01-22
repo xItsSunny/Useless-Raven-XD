@@ -13,7 +13,7 @@ import keystrokesmod.utility.Utils;
 import java.util.concurrent.TimeUnit;
 
 public class Spammer extends Module {
-    public static String customSpam = null;
+    public static String spammer = null;
 
     private final ModeValue mode;
     private final SliderSetting minDelay;
@@ -82,7 +82,7 @@ public class Spammer extends Module {
             default: // "Waste"
                 return "Stop wasting your time and get Useless Raven XD!";
             case "Custom":
-                return customSpam;
+                return spammer;
         }
     }
 

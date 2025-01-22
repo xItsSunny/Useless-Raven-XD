@@ -26,6 +26,7 @@ public enum Theme {
     HiddenBind(new Color(245, 33, 33), new Color(229, 21, 98)), // 12
     Astolfo(new Color(255,74,255), new Color(74,255,255), new Color(255,255,255)),// 13 (credit @biPas)
     DarkRed(new Color(250,0,0), new Color(240, 0, 0), new Color(230, 0, 0), new Color(220, 0, 0), new Color(210, 0, 0), new Color(200,0,0), new Color(190, 0, 0), new Color(180, 0, 0), new Color(170, 0, 0), new Color(160, 0, 0), new Color(150, 0, 0), new Color(140, 0, 0), new Color(130, 0, 0), new Color(120, 0, 0), new Color(120, 0, 0), new Color(110, 0, 0), new Color(100, 0, 0), new Color(90, 0, 0), new Color(80, 0, 0), new Color(70, 0, 0), new Color(60, 0, 0), new Color(50, 0, 0)),// 14 by xItsSunny
+    Black_and_White(new Color(255, 255, 255), new Color(0, 0, 0)), // 15
     Custom();
     private static final Map<Theme, BufferedImage> imageCache = new HashMap<>(values().length);
 

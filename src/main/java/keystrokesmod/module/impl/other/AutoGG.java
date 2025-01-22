@@ -13,7 +13,7 @@ import keystrokesmod.eventbus.annotations.EventListener;
 import java.util.concurrent.TimeUnit;
 
 public class AutoGG extends Module {
-    public static String autoGG = null;
+    public static String autoGG = "This is a custom autoGG";
     private final ModeValue mode;
     private static SliderSetting minDelay;
     private static SliderSetting maxDelay;

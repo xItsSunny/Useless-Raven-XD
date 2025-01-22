@@ -13,7 +13,7 @@ import keystrokesmod.utility.Utils;
 import java.util.concurrent.TimeUnit;
 
 public class Spammer extends Module {
-    public static String spammer = null;
+    public static String spammer = "This is a custom Spammer";
 
     private final ModeValue mode;
     private final SliderSetting minDelay;

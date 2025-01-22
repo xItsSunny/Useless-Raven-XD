@@ -278,7 +278,7 @@ public class Commands {
                 }
 
                 Spammer.spammer = c.substring(13);
-                print("&aSet spammessage to " + Spammer.spammer, 1);
+                print("&aSet spammer to " + Spammer.spammer, 1);
             } else if (firstArg.equals("autoGG")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
@@ -286,7 +286,7 @@ public class Commands {
                 }
 
                 AutoGG.autoGG = c.substring(14);
-                print("&aSet customgg to " + AutoGG.autoGG, 1);
+                print("&aSet autoGG to " + AutoGG.autoGG, 1);
             }else if (firstArg.equals("spammer")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
@@ -556,7 +556,7 @@ public class Commands {
                 print("4 clientspoofer [brand]", 0);
                 print(String.format("5 clientname [name (current is '%s')]", Watermark.customName), 0);
                 print("6 spammer [message]", 0);
-                print("7 autogg [message]", 0);
+                print("7 autoGG [message]", 0);
                 print("8 chat <args>", 0);
             }
 

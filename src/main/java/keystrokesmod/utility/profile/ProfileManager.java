@@ -224,7 +224,7 @@ public class ProfileManager {
                     Spammer.spammer = profileJson.get ("spammer").getAsString();
                 }
                 if(profileJson.has ("autoGG")) {
-                    AutoGG.autoGG = profileJson.get ("autogg").getAsString();
+                    AutoGG.autoGG = profileJson.get ("autGG").getAsString();
                 }
 
                 for (JsonElement moduleJson : modules) {

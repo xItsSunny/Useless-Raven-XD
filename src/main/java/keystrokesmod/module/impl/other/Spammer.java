@@ -13,6 +13,7 @@ import keystrokesmod.utility.Utils;
 import java.util.concurrent.TimeUnit;
 
 public class Spammer extends Module {
+    public static String customSpam = null;
 
     private final ModeValue mode;
     private final SliderSetting minDelay;
@@ -25,8 +26,8 @@ public class Spammer extends Module {
 
         this.registerSetting(mode = new ModeValue("Mode", this)
                 .add(new LiteralSubMode("Waste", this))
-                .add(new LiteralSubMode("RIPRavenXD", this))
                 .add(new LiteralSubMode("StartCheating", this))
+                .add(new LiteralSubMode( "Custom", this))
         );
 
         this.registerSetting(minDelay = new SliderSetting("Min Delay", 0, 0, 30000, 100, "ms"));
@@ -78,10 +79,10 @@ public class Spammer extends Module {
         switch (mode.getSelected().getPrettyName()) {
             case "StartCheating":
                 return "Start cheating today with Useless Raven XD!";
-            case "RIPRavenXD":
-                return "Raven-XD might be discontinued but Useless Raven XD is still up!";
             default: // "Waste"
                 return "Stop wasting your time and get Useless Raven XD!";
+            case "Custom":
+                return customSpam;
         }
     }
 

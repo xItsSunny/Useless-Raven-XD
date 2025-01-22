@@ -13,6 +13,7 @@ import keystrokesmod.eventbus.annotations.EventListener;
 import java.util.concurrent.TimeUnit;
 
 public class AutoGG extends Module {
+    public static String customGG = null;
     private final ModeValue mode;
     private static SliderSetting minDelay;
     private static SliderSetting maxDelay;
@@ -25,6 +26,7 @@ public class AutoGG extends Module {
                 .add(new LiteralSubMode("Normal", this))
                 .add(new LiteralSubMode("RavenXD", this))
                 .add(new LiteralSubMode("Myau", this))
+                .add(new LiteralSubMode("Custom", this))
         );
 
         this.registerSetting(minDelay = new SliderSetting("Min Delay", 0, 0, 5000, 100, "ms"));
@@ -81,6 +83,8 @@ public class AutoGG extends Module {
                 return "GGs xD";
             case "Myau":
                 return "gg gf ^_^";
+            case "Custom":
+                return customGG;
             default: // "Normal"
                 return "GG";
         }

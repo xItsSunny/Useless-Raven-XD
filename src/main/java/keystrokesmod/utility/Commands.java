@@ -10,9 +10,7 @@ import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Settings;
 import keystrokesmod.module.impl.exploit.ClientSpoofer;
 import keystrokesmod.module.impl.minigames.DuelsStats;
-import keystrokesmod.module.impl.other.FakeChat;
-import keystrokesmod.module.impl.other.KillMessage;
-import keystrokesmod.module.impl.other.NameHider;
+import keystrokesmod.module.impl.other.*;
 import keystrokesmod.module.impl.render.Watermark;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.profile.Profile;
@@ -279,7 +277,23 @@ public class Commands {
                     return;
                 }
 
-                ClientSpoofer.customBrand = c.substring(14);
+                Spammer.customSpam = c.substring(13);
+                print("&aSet spammessage to " + Spammer.customSpam, 1);
+            } else if (firstArg.equals("customname")) {
+                if (!hasArgs) {
+                    print(invSyn, 1);
+                    return;
+                }
+
+                AutoGG.customGG = c.substring(14);
+                print("&aSet customgg to " + AutoGG.customGG, 1);
+            }else if (firstArg.equals("customSpam")) {
+                if (!hasArgs) {
+                    print(invSyn, 1);
+                    return;
+                }
+
+                ClientSpoofer.customBrand = c.substring(15);
                 print("&aSet clientspoofer custom brand to " + ClientSpoofer.customBrand, 1);
             } else if (firstArg.equals("binds")) {
                 for (Module module : Client.getModuleManager().getModules()) {

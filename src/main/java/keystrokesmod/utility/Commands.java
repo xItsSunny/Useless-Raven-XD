@@ -47,11 +47,11 @@ public class Commands {
     public static void rCMD(@NotNull String c) {
         if (!c.isEmpty()) {
             String cm = c.toLowerCase();
-            List<String> args = Arrays.asList(c.split(" "));  // maybe bug
+            List<String> args = Arrays.asList(c.split(" "));
             boolean hasArgs = args.size() > 1;
             String n;
             String firstArg = args.get(0).toLowerCase();
-            
+
             if (firstArg.equals("setkey")) {
                 if (!hasArgs) {
                     print(invSyn, 1);

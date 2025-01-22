@@ -59,7 +59,7 @@ public class AutoGG extends Module {
                 active = false;
 
                 long delay = Utils.randomizeInt(minDelay.getInput(), maxDelay.getInput());
-                
+
                 Client.getExecutor().schedule(() -> {
                     mc.thePlayer.sendChatMessage(getMessageForMode());
                 }, delay, TimeUnit.MILLISECONDS);

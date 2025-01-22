@@ -128,6 +128,7 @@ public class ModuleManager {
     public static Optimize optimize;
     public static SelfDamage selfDamage;
     public static AutoGG autoGG;
+    public static Spammer spammer;
 
     static List<Module> modules = new ArrayList<>();
 
@@ -219,6 +220,7 @@ public class ModuleManager {
         this.addModule(rotationHandler = new RotationHandler());
         this.addModule(new ScreenshotHelper());
         this.addModule(slotHandler = new SlotHandler());
+        this.addModule(spammer = new Spammer());
         this.addModule(staffDetector = new StaffDetector());
         this.addModule(new BedProximityAlert());
         this.addModule(autoRegister = new AutoRegister());

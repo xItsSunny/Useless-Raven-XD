@@ -83,7 +83,7 @@ jobs:
         echo "::set-output name=jarname::$output"
         
     - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.findjar.outputs.jarname }}
         path: build/libs/${{ steps.findjar.outputs.jarname }}

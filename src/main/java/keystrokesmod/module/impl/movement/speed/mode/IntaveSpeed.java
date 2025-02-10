@@ -3,7 +3,6 @@ package keystrokesmod.module.impl.movement.speed.mode;
 import keystrokesmod.event.player.MoveInputEvent;
 import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.Speed;
-import keystrokesmod.module.impl.other.RotationHandler;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
@@ -25,29 +24,28 @@ public class IntaveSpeed extends SubMode<Speed> {
         if (parent.noAction()) return;
 
         EntityPlayerSP player = mc.thePlayer;
-        if (player == null || !MoveUtil.isMoving()) return; 
+        if (player == null || !MoveUtil.isMoving()) return;
 
-        if (!player.onGround) {
-            float rotationOffset = player.moveStrafing > 0 ? 45f : (player.moveStrafing < 0 ? -45f : 0);
-            RotationHandler.setRotationYaw(player.rotationYaw + rotationOffset);
-            RotationHandler.setMoveFix(RotationHandler.MoveFix.Silent);
-        }
-
-        if (player.onGround && lowHop.isToggled()) {
-            player.motionY = 0.4;
+        if (player.onGround) {
+            if (lowHop.isToggled()) {
+                player.motionY = 0.3; 
+                MoveUtil.setSpeed(MoveUtil.getBaseSpeed() * 1.05);
+            }
+        } else {
+            player.motionY -= 0.0008;
+            MoveUtil.setSpeed(MoveUtil.getBaseSpeed() * 1.02);
         }
     }
 
     @EventListener
     public void onMove(MoveInputEvent event) {
-        if (MoveUtil.isMoving()) {
-            event.setJump(true);
+        if (MoveUtil.isMoving() && lowHop.isToggled()) {
+            event.setJump(true); 
         }
     }
 
     @Override
     public void onDisable() {
-        Utils.resetTimer(); 
-        RotationHandler.setMoveFix(RotationHandler.MoveFix.None); 
+        Utils.resetTimer();
     }
 }

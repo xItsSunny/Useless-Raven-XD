@@ -1,13 +1,13 @@
-package keystrokesmod.module.impl.movement.speed;
+package keystrokesmod.module.impl.movement.speed.mode;
 
 import keystrokesmod.event.player.PostPlayerInputEvent;
 import keystrokesmod.event.player.PrePlayerInputEvent;
 import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.Speed;
 import keystrokesmod.module.impl.movement.TargetStrafe;
-import keystrokesmod.module.impl.movement.speed.hypixel.GroundStrafeSpeed;
-import keystrokesmod.module.impl.movement.speed.hypixel.HypixelGroundSpeed;
-import keystrokesmod.module.impl.movement.speed.hypixel.HypixelLowHopSpeed;
+import keystrokesmod.module.impl.movement.speed.setting.GroundStrafeSpeed;
+import keystrokesmod.module.impl.movement.speed.setting.HypixelGroundSpeed;
+import keystrokesmod.module.impl.movement.speed.setting.HypixelLowHopSpeed;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.module.setting.impl.SliderSetting;

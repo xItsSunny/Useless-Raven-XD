@@ -9,6 +9,9 @@ import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.eventbus.annotations.EventListener;
 import net.minecraft.client.entity.EntityPlayerSP;
+
+import static keystrokesmod.Client.mc;
+
 import org.jetbrains.annotations.NotNull;
 
 public class IntaveSpeed extends SubMode<Speed> {
@@ -28,19 +31,19 @@ public class IntaveSpeed extends SubMode<Speed> {
 
         if (player.onGround) {
             if (lowHop.isToggled()) {
-                player.motionY = 0.3; 
-                MoveUtil.setSpeed(MoveUtil.getBaseSpeed() * 1.05);
+                player.motionY = 0.33;
+                MoveUtil.strafe(MoveUtil.getBaseMoveSpeed() * 1.015); 
             }
         } else {
-            player.motionY -= 0.0008;
-            MoveUtil.setSpeed(MoveUtil.getBaseSpeed() * 1.02);
+            player.motionY -= 0.002; 
+            MoveUtil.strafe(MoveUtil.getBaseMoveSpeed() * 1.01); 
         }
     }
 
     @EventListener
     public void onMove(MoveInputEvent event) {
         if (MoveUtil.isMoving() && lowHop.isToggled()) {
-            event.setJump(true); 
+            event.setJump(true);
         }
     }
 

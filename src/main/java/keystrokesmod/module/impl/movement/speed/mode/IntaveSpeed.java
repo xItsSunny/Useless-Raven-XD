@@ -1,6 +1,5 @@
 package keystrokesmod.module.impl.movement.speed.mode;
 
-import keystrokesmod.event.player.MoveInputEvent;
 import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.Speed;
 import keystrokesmod.module.setting.impl.SubMode;
@@ -26,24 +25,23 @@ public class IntaveSpeed extends SubMode<Speed> {
         EntityPlayerSP player = mc.thePlayer;
         if (player == null || !MoveUtil.isMoving()) return;
 
-        if (player.onGround) {
-            player.motionY = 0.31;
-            MoveUtil.strafe(MoveUtil.getBaseSpeed() * 1.01); 
-        } else {
-            player.motionY -= 0.001;
-            MoveUtil.strafe(MoveUtil.getBaseSpeed() * 1.00); 
+        if (player.onGround && !player.isCollidedHorizontally) {
+            player.jump();
         }
-    }
 
-    @EventListener
-    public void onMove(MoveInputEvent event) {
-        if (MoveUtil.isMoving()) {
-            event.setJump(true);
+        float fallDist = player.fallDistance;
+        if (fallDist >= 1.3) {
+            Utils.getTimer().timerSpeed = 1.0f;
+        } else if (fallDist > 0.1 && fallDist < 1.3) {
+            Utils.getTimer().timerSpeed = 0.7f;
+        } else if (!player.onGround && fallDist <= 0.1) {
+            Utils.getTimer().timerSpeed = 1.4f;
         }
     }
 
     @Override
     public void onDisable() {
+        Utils.getTimer().timerSpeed = 1.0f;
         Utils.resetTimer();
     }
 }

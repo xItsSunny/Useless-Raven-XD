@@ -2,8 +2,8 @@ package keystrokesmod.utility.profile;
 
 import com.google.gson.*;
 import keystrokesmod.Client;
-import keystrokesmod.clickgui.ClickGui;
-import keystrokesmod.clickgui.components.impl.CategoryComponent;
+import keystrokesmod.clickgui.ravenxd.components.impl.CategoryComponent;
+import keystrokesmod.clickgui.ravenxd.ClickGui;
 import keystrokesmod.event.world.WorldChangeEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;

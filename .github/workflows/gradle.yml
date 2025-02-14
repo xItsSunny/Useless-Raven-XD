@@ -22,30 +22,40 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        java-version: [8, 11]
+      fail-fast: false
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
     - name: Validate Gradle wrapper
-      uses: gradle/actions/wrapper-validation@v4
+      uses: gradle/actions/wrapper-validation@v3
 
-    - name: Set up JDK 8
+    - name: Set up JDK ${{ matrix.java-version }}
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '8'
+        java-version: ${{ matrix.java-version }}
         cache: 'gradle'
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
+      uses: gradle/actions/setup-gradle@v3
 
     - name: Execute Gradle build
       run: ./gradlew build --stacktrace
-      
+
+    - name: Run Tests
+      run: ./gradlew test --stacktrace
+      continue-on-error: true 
+
     - name: Send JAR to Discord Webhook
-      if: github.event_name == 'push' # Only send to Discord on push events
+      if: github.event_name == 'push'
       env:
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         GITHUB_SHA: ${{ github.sha }}
@@ -67,15 +77,15 @@ jobs:
           -F "file=@$JAR_PATH" \
           -F "payload_json={\"content\":\"$GIT_COMMIT_AUTHOR pushed $GIT_COMMIT_COMMENT_COUNT changes to the repository $GITHUB_REPOSITORY on branch $GITHUB_REF. Commit URL: $GIT_COMMIT_URL\"}" \
           $DISCORD_WEBHOOK_URL
-          
+
     - name: Find Correct JAR
       id: findjar
       run: |
         output="$(find build/libs/ ! -name "*-sources.jar" -type f -printf "%f\n")"
         echo "::set-output name=jarname::$output"
-        
+
     - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ steps.findjar.outputs.jarname }}
         path: build/libs/${{ steps.findjar.outputs.jarname }}

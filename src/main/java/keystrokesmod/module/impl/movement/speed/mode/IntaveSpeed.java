@@ -13,6 +13,9 @@ import static keystrokesmod.Client.mc;
 import org.jetbrains.annotations.NotNull;
 
 public class IntaveSpeed extends SubMode<Speed> {
+    private static final float NORMAL_TIMER_SPEED = 1.0f;
+    private static final float FALLING_TIMER_SPEED = 0.8f;
+    private static final float JUMP_TIMER_SPEED = 1.6f;
 
     public IntaveSpeed(String name, @NotNull Speed parent) {
         super(name, parent);
@@ -29,19 +32,24 @@ public class IntaveSpeed extends SubMode<Speed> {
             player.jump();
         }
 
+        adjustTimerSpeedBasedOnFallDistance(player);
+    }
+
+    private void adjustTimerSpeedBasedOnFallDistance(EntityPlayerSP player) {
         float fallDist = player.fallDistance;
+
         if (fallDist >= 1.3) {
-            Utils.getTimer().timerSpeed = 1.0f;
+            Utils.getTimer().timerSpeed = NORMAL_TIMER_SPEED; 
         } else if (fallDist > 0.1 && fallDist < 1.3) {
-            Utils.getTimer().timerSpeed = 0.7f;
+            Utils.getTimer().timerSpeed = FALLING_TIMER_SPEED; 
         } else if (!player.onGround && fallDist <= 0.1) {
-            Utils.getTimer().timerSpeed = 1.4f;
+            Utils.getTimer().timerSpeed = JUMP_TIMER_SPEED; 
         }
     }
 
     @Override
     public void onDisable() {
-        Utils.getTimer().timerSpeed = 1.0f;
+        Utils.getTimer().timerSpeed = NORMAL_TIMER_SPEED;
         Utils.resetTimer();
     }
 }

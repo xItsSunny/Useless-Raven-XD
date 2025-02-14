@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import keystrokesmod.Client;
-import keystrokesmod.clickgui.ClickGui;
+import keystrokesmod.clickgui.ravenxd.ClickGui;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Settings;

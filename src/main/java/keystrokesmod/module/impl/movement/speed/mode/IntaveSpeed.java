@@ -3,7 +3,6 @@ package keystrokesmod.module.impl.movement.speed.mode;
 import keystrokesmod.event.player.MoveInputEvent;
 import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.Speed;
-import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;
@@ -15,11 +14,9 @@ import static keystrokesmod.Client.mc;
 import org.jetbrains.annotations.NotNull;
 
 public class IntaveSpeed extends SubMode<Speed> {
-    private final ButtonSetting lowHop;
 
     public IntaveSpeed(String name, @NotNull Speed parent) {
         super(name, parent);
-        this.registerSetting(lowHop = new ButtonSetting("LowHop", false));
     }
 
     @EventListener
@@ -30,19 +27,17 @@ public class IntaveSpeed extends SubMode<Speed> {
         if (player == null || !MoveUtil.isMoving()) return;
 
         if (player.onGround) {
-            if (lowHop.isToggled()) {
-                player.motionY = 0.33;
-                MoveUtil.strafe(MoveUtil.getBaseMoveSpeed() * 1.015); 
-            }
+            player.motionY = 0.31;
+            MoveUtil.strafe(MoveUtil.getBaseSpeed() * 1.01); 
         } else {
-            player.motionY -= 0.002; 
-            MoveUtil.strafe(MoveUtil.getBaseMoveSpeed() * 1.01); 
+            player.motionY -= 0.001;
+            MoveUtil.strafe(MoveUtil.getBaseSpeed() * 1.00); 
         }
     }
 
     @EventListener
     public void onMove(MoveInputEvent event) {
-        if (MoveUtil.isMoving() && lowHop.isToggled()) {
+        if (MoveUtil.isMoving()) {
             event.setJump(true);
         }
     }

@@ -18,13 +18,15 @@ public enum Theme {
     Flare(new Color(231, 39, 24), new Color(245, 173, 49)), // 3
     Flower(new Color(215, 166, 231), new Color(211, 90, 232)), // 4
     Gold(new Color(255, 215, 0), new Color(240, 159, 0)), // from croat, 5
-    Grayscale(new Color(240, 240, 240), new Color(110, 110, 110)), // 6
-    Royal(new Color(125, 204, 241), new Color(30, 71, 170)), // 7
-    Sky(new Color(160, 230, 225), new Color(15, 190, 220)), // 8
-    Vine(new Color(17, 192, 45), new Color(201, 234, 198)), // 9
-    Descriptor(new Color(95, 235, 255), new Color(68, 102, 250)), // 10
-    HiddenBind(new Color(245, 33, 33), new Color(229, 21, 98)), // 11
-    Astolfo(new Color(255,74,255), new Color(74,255,255), new Color(255,255,255)), // 12 (credit @biPas)
+    Grayscale(new Color(240, 240, 240), new Color(110, 110, 110)), // 7
+    Royal(new Color(125, 204, 241), new Color(30, 71, 170)), // 8
+    Sky(new Color(160, 230, 225), new Color(15, 190, 220)), // 9
+    Vine(new Color(17, 192, 45), new Color(201, 234, 198)), // 10
+    Descriptor(new Color(95, 235, 255), new Color(68, 102, 250)), // 11
+    HiddenBind(new Color(245, 33, 33), new Color(229, 21, 98)), // 12
+    Astolfo(new Color(255,74,255), new Color(74,255,255), new Color(255,255,255)),// 13 (credit @biPas)
+    DarkRed(new Color(250,0,0), new Color(240, 0, 0), new Color(230, 0, 0), new Color(220, 0, 0), new Color(210, 0, 0), new Color(200,0,0), new Color(190, 0, 0), new Color(180, 0, 0), new Color(170, 0, 0), new Color(160, 0, 0), new Color(150, 0, 0), new Color(140, 0, 0), new Color(130, 0, 0), new Color(120, 0, 0), new Color(120, 0, 0), new Color(110, 0, 0), new Color(100, 0, 0), new Color(90, 0, 0), new Color(80, 0, 0), new Color(70, 0, 0), new Color(60, 0, 0), new Color(50, 0, 0)),// 14 by xItsSunny
+    Black_and_White(new Color(255, 255, 255), new Color(0, 0, 0)), // 15
     Custom();
     private static final Map<Theme, BufferedImage> imageCache = new HashMap<>(values().length);
 

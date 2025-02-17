@@ -169,7 +169,7 @@ public class MoveUtil {
                 : enoughMovementForSprinting());
     }
 
-    public static double getBaseMoveSpeed() {
+    public static double getBaseSpeed() {
         double baseSpeed = 0.2873;
         if (mc.thePlayer.isPotionActive(Potion.moveSpeed)) {
             baseSpeed *= 1.0 + 0.2 * (mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1);

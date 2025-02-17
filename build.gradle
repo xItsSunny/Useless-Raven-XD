@@ -78,10 +78,14 @@ dependencies {
     implementation files('libraries/fastutil-core-8.5.14.jar')
     implementation files('libraries/json-20220924.jar')
     implementation files('libraries/discord-rpc.jar')
+    implementation files('libraries/phantomshield-annotations.jar')
+    implementation files('libraries/phantomshield-inline.jar')
 
     embed files('libraries/fastutil-core-8.5.14.jar')
     embed files('libraries/json-20220924.jar')
     embed files('libraries/discord-rpc.jar')
+    embed files('libraries/phantomshield-annotations.jar')
+    embed files('libraries/phantomshield-inline.jar')
 }
 
 processResources {

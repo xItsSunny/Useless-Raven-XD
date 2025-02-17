@@ -2,13 +2,15 @@ package keystrokesmod.utility.profile;
 
 import com.google.gson.*;
 import keystrokesmod.Client;
-import keystrokesmod.clickgui.ClickGui;
-import keystrokesmod.clickgui.components.impl.CategoryComponent;
+import keystrokesmod.clickgui.ravenxd.components.impl.CategoryComponent;
+import keystrokesmod.clickgui.ravenxd.ClickGui;
 import keystrokesmod.event.world.WorldChangeEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;
 import keystrokesmod.module.impl.exploit.ClientSpoofer;
+import keystrokesmod.module.impl.other.AutoGG;
 import keystrokesmod.module.impl.other.KillMessage;
+import keystrokesmod.module.impl.other.Spammer;
 import keystrokesmod.module.impl.render.HUD;
 import keystrokesmod.module.impl.render.TargetHUD;
 import keystrokesmod.module.impl.render.Watermark;
@@ -66,6 +68,8 @@ public class ProfileManager {
         jsonObject.addProperty("clientName", Watermark.customName);
         jsonObject.addProperty("killmessage", KillMessage.killMessage);
         jsonObject.addProperty("clientbrand", ClientSpoofer.customBrand);
+        jsonObject.addProperty("spammer", Spammer.spammer);
+        jsonObject.addProperty("autoGG", AutoGG.autoGG);
         jsonObject.addProperty("keybind", keyBind);
         JsonArray jsonArray = new JsonArray();
         for (Module module : Client.moduleManager.getModules()) {
@@ -215,6 +219,12 @@ public class ProfileManager {
                 }
                 if (profileJson.has("clientbrand")) {
                     ClientSpoofer.customBrand = profileJson.get("clientbrand").getAsString();
+                }
+                if(profileJson.has ("spammer")) {
+                    Spammer.spammer = profileJson.get ("spammer").getAsString();
+                }
+                if(profileJson.has ("autoGG")) {
+                    AutoGG.autoGG = profileJson.get ("autGG").getAsString();
                 }
 
                 for (JsonElement moduleJson : modules) {

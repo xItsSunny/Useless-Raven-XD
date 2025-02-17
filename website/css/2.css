@@ -305,6 +305,7 @@
 	line-height: 40px;
 	box-shadow: 0px 0px 100px 5px;
 	width: 100px;
+}
 .anim2{
 	animation-name: Doff;
 	animation-duration: 1s;

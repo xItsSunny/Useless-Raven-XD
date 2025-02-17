@@ -16,9 +16,6 @@ import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import keystrokesmod.eventbus.annotations.EventListener;
-
-import static keystrokesmod.Client.mc;
-
 import org.jetbrains.annotations.NotNull;
 
 public class HypixelStep extends SubMode<Step> {
@@ -51,7 +48,7 @@ public class HypixelStep extends SubMode<Step> {
             Utils.getTimer().timerSpeed = (float) timer.getInput();
             stepped = true;
             for (double motion : MOTION) {
-                MoveUtil.strafe(MoveUtil.getBaseSpeed());
+                MoveUtil.strafe(MoveUtil.getBaseMoveSpeed());
                 PacketUtils.sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(
                         mc.thePlayer.posX,
                         mc.thePlayer.posY + motion,

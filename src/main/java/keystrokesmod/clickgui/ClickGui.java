@@ -1,11 +1,11 @@
-package keystrokesmod.clickgui.ravenxd;
+package keystrokesmod.clickgui;
 
 import keystrokesmod.Client;
-import keystrokesmod.clickgui.ravenxd.components.Component;
-import keystrokesmod.clickgui.ravenxd.components.IComponent;
-import keystrokesmod.clickgui.ravenxd.components.impl.BindComponent;
-import keystrokesmod.clickgui.ravenxd.components.impl.CategoryComponent;
-import keystrokesmod.clickgui.ravenxd.components.impl.ModuleComponent;
+import keystrokesmod.clickgui.components.Component;
+import keystrokesmod.clickgui.components.IComponent;
+import keystrokesmod.clickgui.components.impl.BindComponent;
+import keystrokesmod.clickgui.components.impl.CategoryComponent;
+import keystrokesmod.clickgui.components.impl.ModuleComponent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.CommandLine;

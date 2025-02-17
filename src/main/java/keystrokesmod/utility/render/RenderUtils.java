@@ -1,7 +1,7 @@
 package keystrokesmod.utility.render;
 
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import keystrokesmod.clickgui.ravenxd.ClickGui;
+import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.mixins.impl.render.RenderManagerAccessor;
 import keystrokesmod.module.impl.render.Freecam;
 import keystrokesmod.module.impl.render.HUD;

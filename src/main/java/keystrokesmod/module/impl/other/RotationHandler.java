@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.other;
 
+import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.event.player.MoveInputEvent;
 import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.event.player.PreUpdateEvent;
@@ -20,7 +21,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import keystrokesmod.Client;
-import keystrokesmod.clickgui.ravenxd.ClickGui;
 import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

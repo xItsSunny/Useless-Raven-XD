@@ -1,4 +1,4 @@
-package keystrokesmod.module.impl.movement.speed.mode;
+package keystrokesmod.module.impl.movement.speed;
 
 import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.module.impl.client.Notifications;

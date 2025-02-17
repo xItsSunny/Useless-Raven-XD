@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.clickgui.ravenxd.ClickGui;
+import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.player.timer.BalanceTimer;
 import keystrokesmod.module.impl.player.timer.HypixelTimer;

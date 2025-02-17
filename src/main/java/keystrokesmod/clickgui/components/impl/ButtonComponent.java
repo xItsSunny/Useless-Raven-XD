@@ -1,7 +1,7 @@
-package keystrokesmod.clickgui.ravenxd.components.impl;
+package keystrokesmod.clickgui.components.impl;
 
 import keystrokesmod.Client;
-import keystrokesmod.clickgui.ravenxd.components.Component;
+import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;

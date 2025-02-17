@@ -2,7 +2,7 @@ package keystrokesmod.script;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import keystrokesmod.Client;
-import keystrokesmod.clickgui.ravenxd.ClickGui;
+import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.module.Module;
 import keystrokesmod.script.classes.Entity;
 

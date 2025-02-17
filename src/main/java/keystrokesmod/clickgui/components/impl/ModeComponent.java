@@ -1,19 +1,18 @@
-package keystrokesmod.clickgui.ravenxd.components.impl;
+package keystrokesmod.clickgui.components.impl;
 
 import keystrokesmod.Client;
-import keystrokesmod.clickgui.ravenxd.components.Component;
+import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.setting.Setting;
-import keystrokesmod.module.setting.impl.ModeValue;
+import keystrokesmod.module.setting.impl.ModeSetting;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-public class ModeValueComponent extends Component {
-    public static final double SCALE_FACTOR = 0.5D;
-    private final ModeValue modeValue;
+public class ModeComponent extends Component {
+    private final ModeSetting ModeSetting;
 
-    public ModeValueComponent(ModeValue modeValue, ModuleComponent moduleComponent, int o) {
+    public ModeComponent(ModeSetting ModeSetting, ModuleComponent moduleComponent, int o) {
         super(moduleComponent);
-        this.modeValue = modeValue;
+        this.ModeSetting = ModeSetting;
         this.x = moduleComponent.categoryComponent.getX() + moduleComponent.categoryComponent.gw();
         this.y = moduleComponent.categoryComponent.getY() + moduleComponent.o;
         this.o = o;
@@ -21,16 +20,16 @@ public class ModeValueComponent extends Component {
 
     @Override
     public Setting getSetting() {
-        return modeValue;
+        return ModeSetting;
     }
 
     public void render() {
         GL11.glPushMatrix();
-        GL11.glScaled(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
+        GL11.glScaled(0.5D, 0.5D, 0.5D);
 
-        String value = this.modeValue.getSubModeValues().get((int) this.modeValue.getInput()).getRawPrettyName();
+        String value = this.ModeSetting.getPrettyOptions()[(int) this.ModeSetting.getInput()];
         getFont().drawString(
-                this.modeValue.getName() + ": " + value,
+                this.ModeSetting.getPrettyName() + ": " + value,
                 (float) ((int) ((float) (this.parent.categoryComponent.getX() + 4) * 2.0F)),
                 (float) ((int) ((float) (this.parent.categoryComponent.getY() + this.o + 3) * 2.0F)),
                 color, true
@@ -74,9 +73,9 @@ public class ModeValueComponent extends Component {
             next = !next;
 
         if (next) {
-            this.modeValue.nextValue();
+            this.ModeSetting.nextValue();
         } else {
-            this.modeValue.prevValue();
+            this.ModeSetting.prevValue();
         }
     }
 }

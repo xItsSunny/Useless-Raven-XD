@@ -1,5 +1,6 @@
 package keystrokesmod.module.impl.render;
 
+import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -9,7 +10,6 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.player.EntityPlayer;
 import keystrokesmod.eventbus.annotations.EventListener;
-import keystrokesmod.clickgui.ravenxd.ClickGui;
 import keystrokesmod.event.render.Render2DEvent;
 import org.lwjgl.opengl.GL11;
 

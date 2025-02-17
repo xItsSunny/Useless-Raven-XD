@@ -1,7 +1,7 @@
 package keystrokesmod.module.impl.movement.speed.hypixel.lowhop;
 
 import keystrokesmod.event.player.PreUpdateEvent;
-import keystrokesmod.module.impl.movement.speed.setting.HypixelLowHopSpeed;
+import keystrokesmod.module.impl.movement.speed.hypixel.HypixelLowHopSpeed;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.eventbus.annotations.EventListener;

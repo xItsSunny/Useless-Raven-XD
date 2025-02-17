@@ -4,7 +4,7 @@ import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.event.network.ReceivePacketEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
-import keystrokesmod.module.impl.movement.speed.mode.*;
+import keystrokesmod.module.impl.movement.speed.*;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.ModeValue;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -33,7 +33,6 @@ public class Speed extends Module {
                 .add(new BlocksMCSpeed("BlocksMC", this))
                 .add(new VulcanSpeed("Vulcan", this))
                 .add(new GrimACSpeed("GrimAC", this))
-                .add(new IntaveSpeed("Intave", this))
                 .add(new StrafeSpeed("Strafe", this))
         );
         this.registerSetting(liquidDisable = new ButtonSetting("Disable in liquid", true));

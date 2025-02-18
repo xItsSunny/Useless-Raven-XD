@@ -1,7 +1,7 @@
-package keystrokesmod.module.impl.movement.speed.hypixel;
+package keystrokesmod.module.impl.movement.speed.setting;
 
 import keystrokesmod.event.player.PrePlayerInputEvent;
-import keystrokesmod.module.impl.movement.speed.HypixelSpeed;
+import keystrokesmod.module.impl.movement.speed.mode.HypixelSpeed;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;
 import keystrokesmod.utility.Utils;

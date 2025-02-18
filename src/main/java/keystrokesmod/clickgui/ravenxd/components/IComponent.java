@@ -1,7 +1,7 @@
-package keystrokesmod.clickgui.components;
+package keystrokesmod.clickgui.ravenxd.components;
 
-import keystrokesmod.clickgui.ClickGui;
-import keystrokesmod.clickgui.components.impl.ModuleComponent;
+import keystrokesmod.clickgui.ravenxd.components.impl.ModuleComponent;
+import keystrokesmod.clickgui.ravenxd.ClickGui;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.utility.font.IFont;
 import org.jetbrains.annotations.NotNull;

@@ -4,15 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import keystrokesmod.Client;
-import keystrokesmod.clickgui.ClickGui;
+import keystrokesmod.clickgui.ravenxd.ClickGui;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.module.impl.client.Settings;
 import keystrokesmod.module.impl.exploit.ClientSpoofer;
 import keystrokesmod.module.impl.minigames.DuelsStats;
-import keystrokesmod.module.impl.other.FakeChat;
-import keystrokesmod.module.impl.other.KillMessage;
-import keystrokesmod.module.impl.other.NameHider;
+import keystrokesmod.module.impl.other.*;
 import keystrokesmod.module.impl.render.Watermark;
 import keystrokesmod.utility.font.IFont;
 import keystrokesmod.utility.profile.Profile;
@@ -47,11 +45,11 @@ public class Commands {
     public static void rCMD(@NotNull String c) {
         if (!c.isEmpty()) {
             String cm = c.toLowerCase();
-            List<String> args = Arrays.asList(c.split(" "));  // maybe bug
+            List<String> args = Arrays.asList(c.split(" "));
             boolean hasArgs = args.size() > 1;
             String n;
             String firstArg = args.get(0).toLowerCase();
-            
+
             if (firstArg.equals("setkey")) {
                 if (!hasArgs) {
                     print(invSyn, 1);
@@ -279,7 +277,23 @@ public class Commands {
                     return;
                 }
 
-                ClientSpoofer.customBrand = c.substring(14);
+                Spammer.spammer = c.substring(13);
+                print("&aSet spammer to " + Spammer.spammer, 1);
+            } else if (firstArg.equals("autoGG")) {
+                if (!hasArgs) {
+                    print(invSyn, 1);
+                    return;
+                }
+
+                AutoGG.autoGG = c.substring(14);
+                print("&aSet autoGG to " + AutoGG.autoGG, 1);
+            }else if (firstArg.equals("spammer")) {
+                if (!hasArgs) {
+                    print(invSyn, 1);
+                    return;
+                }
+
+                ClientSpoofer.customBrand = c.substring(15);
                 print("&aSet clientspoofer custom brand to " + ClientSpoofer.customBrand, 1);
             } else if (firstArg.equals("binds")) {
                 for (Module module : Client.getModuleManager().getModules()) {
@@ -541,7 +555,9 @@ public class Commands {
                 print("4 killmessage [message]", 0);
                 print("4 clientspoofer [brand]", 0);
                 print(String.format("5 clientname [name (current is '%s')]", Watermark.customName), 0);
-                print("6 chat <args>", 0);
+                print("6 spammer [message]", 0);
+                print("7 autoGG [message]", 0);
+                print("8 chat <args>", 0);
             }
 
         }

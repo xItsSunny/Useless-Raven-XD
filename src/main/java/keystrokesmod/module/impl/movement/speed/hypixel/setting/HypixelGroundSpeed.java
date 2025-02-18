@@ -1,8 +1,8 @@
-package keystrokesmod.module.impl.movement.speed.hypixel;
+package keystrokesmod.module.impl.movement.speed.setting;
 
 import keystrokesmod.event.player.PreMotionEvent;
 import keystrokesmod.event.network.SendPacketEvent;
-import keystrokesmod.module.impl.movement.speed.HypixelSpeed;
+import keystrokesmod.module.impl.movement.speed.mode.HypixelSpeed;
 import keystrokesmod.module.impl.player.blink.NormalBlink;
 import keystrokesmod.module.setting.impl.SubMode;
 import keystrokesmod.utility.MoveUtil;

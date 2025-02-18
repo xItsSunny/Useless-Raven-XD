@@ -1,4 +1,4 @@
-package keystrokesmod.module.impl.movement.speed;
+package keystrokesmod.module.impl.movement.speed.mode;
 
 import keystrokesmod.event.player.PreUpdateEvent;
 import keystrokesmod.module.impl.movement.Speed;

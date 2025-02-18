@@ -4,6 +4,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import keystrokesmod.anticrack.AntiCrack;
+import keystrokesmod.clickgui.ravenxd.ClickGui;
 import keystrokesmod.event.client.PreTickEvent;
 import keystrokesmod.event.render.Render2DEvent;
 import keystrokesmod.eventbus.EventBus;
@@ -13,7 +14,6 @@ import keystrokesmod.keystroke.KeySrokeRenderer;
 import keystrokesmod.keystroke.KeyStrokeConfigGui;
 import keystrokesmod.keystroke.keystrokeCommand;
 import keystrokesmod.module.Module;
-import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.script.ScriptManager;
 import keystrokesmod.utility.*;

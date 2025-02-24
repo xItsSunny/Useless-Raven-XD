@@ -13,6 +13,8 @@ import keystrokesmod.event.network.AttackEntityEvent;
 import keystrokesmod.eventbus.annotations.EventListener;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class IntaveVelocity extends SubMode<Velocity> {
     private final SliderSetting xzOnHit;
     private final SliderSetting xzOnSprintHit;
@@ -51,37 +53,34 @@ public class IntaveVelocity extends SubMode<Velocity> {
         if (noAction()) return;
 
         if (jump.isToggled()) {
-            if (Math.random() > jumpChance.getInput() / 100) return;
+            if (ThreadLocalRandom.current().nextDouble() > jumpChance.getInput() / 100) return;
 
             if (mc.thePlayer.onGround && (jumpInInv.isToggled() || mc.currentScreen == null))
                 MoveUtil.jump();
         }
-        reduced = false;
     }
 
     @EventListener
     public void onAttack(@NotNull AttackEntityEvent event) {
-        if (event.getTarget() instanceof EntityLivingBase && mc.thePlayer.hurtTime > 0) {
-            if (noAction()) return;
-            if (Math.random() > chance.getInput() / 100) return;
-            if (reduceUnnecessarySlowdown.isToggled() && reduced) return;
+        if (!(event.getTarget() instanceof EntityLivingBase) || mc.thePlayer.hurtTime <= 0) return;
+        if (noAction() || ThreadLocalRandom.current().nextDouble() > chance.getInput() / 100) return;
+        if (reduceUnnecessarySlowdown.isToggled() && reduced) return;
 
-            if (mc.thePlayer.isSprinting()) {
-                mc.thePlayer.motionX *= xzOnSprintHit.getInput();
-                mc.thePlayer.motionZ *= xzOnSprintHit.getInput();
-            } else {
-                mc.thePlayer.motionX *= xzOnHit.getInput();
-                mc.thePlayer.motionZ *= xzOnHit.getInput();
-            }
-            reduced = true;
-            if (debug.isToggled())
-                Utils.sendMessage(String.format("Reduced %.3f %.3f", mc.thePlayer.motionX, mc.thePlayer.motionZ));
+        double reduction = mc.thePlayer.isSprinting() ? xzOnSprintHit.getInput() : xzOnHit.getInput();
+        
+        mc.thePlayer.motionX *= reduction;
+        mc.thePlayer.motionZ *= reduction;
+        mc.thePlayer.motionY *= 0.98;
+        
+        reduced = true;
+
+        if (debug.isToggled()) {
+            Utils.sendMessage(String.format("Velocity reduced: XZ=%.3f Y=%.3f", mc.thePlayer.motionX, mc.thePlayer.motionY));
         }
     }
 
     private boolean noAction() {
-        return mc.thePlayer.getActivePotionEffects().parallelStream()
-                .anyMatch(effect -> notWhileSpeed.isToggled() && effect.getPotionID() == Potion.moveSpeed.getId()
-                        || notWhileJumpBoost.isToggled() && effect.getPotionID() == Potion.jump.getId());
+        return (notWhileSpeed.isToggled() && mc.thePlayer.isPotionActive(Potion.moveSpeed)) ||
+               (notWhileJumpBoost.isToggled() && mc.thePlayer.isPotionActive(Potion.jump));
     }
 }

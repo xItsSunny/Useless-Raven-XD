@@ -16,6 +16,9 @@ public class IntaveSpeed extends SubMode<Speed> {
     private static final float NORMAL_TIMER_SPEED = 1.0f;
     private static final float FALLING_TIMER_SPEED = 0.8f;
     private static final float JUMP_TIMER_SPEED = 1.6f;
+    private static final float KILLAURA_TIMER_SPEED = 1.2f; 
+
+    private boolean wasOnGroundLastTick = false;
 
     public IntaveSpeed(String name, @NotNull Speed parent) {
         super(name, parent);
@@ -28,23 +31,43 @@ public class IntaveSpeed extends SubMode<Speed> {
         EntityPlayerSP player = mc.thePlayer;
         if (player == null || !MoveUtil.isMoving()) return;
 
+        boolean usingKillAura = isKillAuraActive();
+
         if (player.onGround && !player.isCollidedHorizontally) {
-            player.jump();
+            if (usingKillAura) {
+                player.motionY = 0.2; 
+            } else {
+                player.jump();
+            }
         }
 
-        adjustTimerSpeedBasedOnFallDistance(player);
+        adjustTimerSpeed(player, usingKillAura);
     }
 
-    private void adjustTimerSpeedBasedOnFallDistance(EntityPlayerSP player) {
+    private void adjustTimerSpeed(EntityPlayerSP player, boolean usingKillAura) {
         float fallDist = player.fallDistance;
 
         if (fallDist >= 1.3) {
-            Utils.getTimer().timerSpeed = NORMAL_TIMER_SPEED; 
+            Utils.getTimer().timerSpeed = NORMAL_TIMER_SPEED;
         } else if (fallDist > 0.1 && fallDist < 1.3) {
-            Utils.getTimer().timerSpeed = FALLING_TIMER_SPEED; 
+            Utils.getTimer().timerSpeed = FALLING_TIMER_SPEED;
         } else if (!player.onGround && fallDist <= 0.1) {
-            Utils.getTimer().timerSpeed = JUMP_TIMER_SPEED; 
+            Utils.getTimer().timerSpeed = JUMP_TIMER_SPEED;
         }
+
+        if (usingKillAura) {
+            Utils.getTimer().timerSpeed = KILLAURA_TIMER_SPEED;
+        }
+
+        if (player.onGround && !wasOnGroundLastTick) {
+            MoveUtil.strafe(0.45f); 
+        }
+
+        wasOnGroundLastTick = player.onGround;
+    }
+
+    private boolean isKillAuraActive() {
+        return mc.thePlayer.getCurrentEquippedItem() != null && mc.thePlayer.isSwingInProgress;
     }
 
     @Override
